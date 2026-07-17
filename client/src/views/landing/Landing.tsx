@@ -37,7 +37,7 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
       className="kimorah-circle"
       sx={{
         width: "100%",
-        maxWidth: { xs: 68, sm: 100, md: 112 },
+        maxWidth: { xs: 80, sm: 124, md: 140 },
         aspectRatio: "1 / 1",
         mx: "auto",
         borderRadius: "50%",
@@ -49,8 +49,8 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
         justifyContent: "center",
         boxShadow: "0 6px 16px rgba(40,40,70,0.18)",
         transition: "transform .18s ease, box-shadow .18s ease",
-        "& svg": { fontSize: { xs: 17, sm: 25 } },
-        "& .mi-glyph": { fontSize: { xs: 17, sm: 25 } },
+        "& svg": { fontSize: { xs: 19, sm: 29 } },
+        "& .mi-glyph": { fontSize: { xs: 19, sm: 29 } },
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", lineHeight: 0, mb: 0.1 }}>
@@ -58,7 +58,7 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
       </Box>
       <Typography
         component="span"
-        sx={{ fontFamily: SERIF, fontSize: { xs: 22, sm: 34 }, lineHeight: 1, fontWeight: 600 }}
+        sx={{ fontFamily: SERIF, fontSize: { xs: 24, sm: 40 }, lineHeight: 1, fontWeight: 600 }}
       >
         {pillar.letter}
       </Typography>
@@ -66,9 +66,10 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
     <Typography
       component="span"
       sx={{
-        fontSize: { xs: 9.5, sm: 12 },
-        fontWeight: 600,
-        color: BODY_GREEN,
+        fontSize: { xs: 10, sm: 13 },
+        fontWeight: 700,
+        color: "#ffffff",
+        textShadow: "0 1px 4px rgba(0,0,0,0.55)",
         letterSpacing: 0.1,
         lineHeight: 1.15,
         textAlign: "center",
@@ -149,7 +150,7 @@ const Landing: React.FC = () => {
           position: "relative",
           zIndex: 1,
           width: "100%",
-          maxWidth: 720,
+          maxWidth: 900,
           px: 3,
           py: { xs: 5, sm: 7 },
           display: "flex",
