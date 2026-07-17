@@ -71,6 +71,6 @@ export const immersiveData: ImmersiveContent = {
   cta: {
     heading: "You don't have to do this alone.",
     subtext: "We're here to walk this path with you.",
-    buttonLabel: "Explore Retreats",
+    buttonLabel: "Explore Workshops",
   },
 };
