@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import LogoBadge from "./LogoBadge";
 import LandingBackground from "./LandingBackground";
 import { PILLARS, Pillar } from "./pillars";
+import { PILLAR_CONTENT } from "../pillars/pillar-content";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 
@@ -104,10 +105,11 @@ const Divider: React.FC = () => (
 const Landing: React.FC = () => {
   const navigate = useNavigate();
 
-  // Pillars don't have destinations yet — route to signup so a visitor can
-  // start. Swap to `navigate(pillar.path)` once those sections exist.
-  const handleSelect = (_pillar: Pillar) => {
-    navigate("/signup");
+  // Open the pillar's detail page if it has content; otherwise fall back to
+  // signup (for pillars whose pages don't exist yet).
+  const handleSelect = (pillar: Pillar) => {
+    const slug = pillar.path.replace("/", "");
+    navigate(PILLAR_CONTENT[slug] ? pillar.path : "/signup");
   };
 
   return (

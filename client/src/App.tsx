@@ -7,6 +7,7 @@ import ResetPassword from "./views/authentication/pages/reset-password";
 import { PrivateRoute } from "./views/shared/private-routes";
 import Dashboard from "./views/dashboard/Dashboard";
 import Landing from "./views/landing/Landing";
+import PillarDetail from "./views/pillars/PillarDetail";
 
 const App: React.FC = () => {
   return (
@@ -22,6 +23,9 @@ const App: React.FC = () => {
 
       {/* Protected routes */}
       <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
+
+      {/* Pillar detail pages (e.g. /mission, /kindness) */}
+      <Route path="/:slug" element={<PillarDetail />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
