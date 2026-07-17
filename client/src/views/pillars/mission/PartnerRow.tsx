@@ -34,10 +34,9 @@ const PartnerRow: React.FC<{ partner: MissionPartner }> = ({ partner }) => (
         fontWeight: 700,
         fontSize: 14,
         color: "#fff",
-        // Logos sit on white (many have transparent backgrounds); initials
+        // Transparent behind logos so they sit cleanly on the card; initials
         // fall back to the partner's accent colour.
-        bgcolor: partner.logoUrl ? partner.logoBg ?? "#fff" : partner.accent,
-        border: partner.logoUrl ? "1px solid rgba(0,0,0,0.08)" : "none",
+        bgcolor: partner.logoUrl ? "transparent" : partner.accent,
         "& img": { objectFit: "contain", p: 0.4 },
       }}
     >
@@ -57,6 +56,7 @@ const PartnerRow: React.FC<{ partner: MissionPartner }> = ({ partner }) => (
       href={partner.url}
       sx={{
         bgcolor: partner.accent,
+        color: "#fff",
         textTransform: "none",
         borderRadius: 999,
         whiteSpace: "nowrap",

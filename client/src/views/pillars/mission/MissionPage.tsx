@@ -144,7 +144,7 @@ const MissionPage: React.FC = () => {
             }}
           >
             <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <EnergySavingsLeafRoundedIcon sx={{ color: "#a9e0b0", fontSize: 34 }} />
+              <Box component="img" src="/pillars/leaf.png" alt="" sx={{ width: 44, height: 44, objectFit: "contain" }} />
               <Box>
                 <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: { xs: 18, sm: 22 } }}>
                   {d.cta.heading}
@@ -172,16 +172,6 @@ const MissionPage: React.FC = () => {
             >
               {d.cta.buttonLabel}
             </Button>
-          </Box>
-
-          {/* Closing leaf flourish */}
-          <Box sx={{ display: "flex", justifyContent: "center", mt: { xs: 4, sm: 5 } }}>
-            <Box
-              component="img"
-              src="/pillars/leaf.png"
-              alt=""
-              sx={{ width: { xs: 64, sm: 90 }, height: "auto", filter: "drop-shadow(0 4px 10px rgba(0,0,0,0.2))" }}
-            />
           </Box>
         </Container>
       </Box>

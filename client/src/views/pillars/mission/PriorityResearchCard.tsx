@@ -30,7 +30,7 @@ const PriorityResearchCard: React.FC<{
         width: { xs: 96, md: 120 },
         height: { xs: 96, md: 120 },
         fontSize: 52,
-        bgcolor: "#3f8f6a",
+        bgcolor: "transparent",
         alignSelf: { xs: "center", md: "flex-start" },
         flexShrink: 0,
       }}
@@ -57,7 +57,7 @@ const PriorityResearchCard: React.FC<{
         <Button
           variant="contained"
           onClick={onTakeSurvey}
-          sx={{ bgcolor: "#5a4a9c", textTransform: "none", borderRadius: 999, boxShadow: "none", "&:hover": { bgcolor: "#4c3f88", boxShadow: "none" } }}
+          sx={{ bgcolor: "#5a4a9c", color: "#fff", textTransform: "none", borderRadius: 999, boxShadow: "none", "&:hover": { bgcolor: "#4c3f88", boxShadow: "none" } }}
         >
           Take Survey ›
         </Button>
