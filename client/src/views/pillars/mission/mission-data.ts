@@ -22,6 +22,8 @@ export interface MissionPartner {
   description: string;
   accent: string;
   logoUrl?: string;
+  /** Background behind the logo (defaults to white). Use dark for white-on-black marks. */
+  logoBg?: string;
   url?: string;
 }
 
@@ -70,7 +72,7 @@ export const missionData: MissionContent = {
   partners: [
     { id: "rainforest", name: "Rainforest Trust",                 description: "Protecting rainforests and wildlife for a healthier planet.", accent: "#3f7d55", logoUrl: "/pillars/partner-rainforest.png" },
     { id: "unicef",     name: "UNICEF",                           description: "Providing education and resources for every child to thrive.", accent: "#2f7fc0", logoUrl: "/pillars/partner-unicef.png" },
-    { id: "nea",        name: "National Endowment for the Arts",  description: "Strengthening communities through the power of the arts.",     accent: "#6b5b9a" },
+    { id: "nea",        name: "National Endowment for the Arts",  description: "Strengthening communities through the power of the arts.",     accent: "#6b5b9a", logoUrl: "/pillars/partner-nea.png", logoBg: "#141414" },
   ],
   cta: {
     heading: "Want to get involved?",
