@@ -14,4 +14,5 @@ export const PILLAR_CONTENT: Record<string, PillarContent> = {
   immersive: { label: "Immersive", bg: "/pillars/immersive-bg.jpg", info: "/pillars/immersive-info.jpg" },
   mission:   { label: "Mission",   bg: "/pillars/mission-bg.jpg",   info: "/pillars/mission-info.jpg" },
   oneness:   { label: "Oneness",   bg: "/pillars/oneness-bg.jpg",   info: "/pillars/oneness-info.jpg" },
+  revitalization: { label: "Revitalization", bg: "/pillars/revitalization-bg.png", info: "/pillars/revitalization-bg.png" },
 };

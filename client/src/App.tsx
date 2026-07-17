@@ -13,6 +13,7 @@ import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
 import KindnessPage from "./views/pillars/kindness/KindnessPage"; // Coquí Research Data dashboard (lives under Mission)
 import SurveyPage from "./views/pillars/kindness/SurveyPage";
 import OnenessPage from "./views/pillars/oneness/OnenessPage";
+import RevitalizationPage from "./views/pillars/revitalization/RevitalizationPage";
 import PillarPlaceholder from "./views/pillars/PillarPlaceholder";
 
 const App: React.FC = () => {
@@ -37,6 +38,7 @@ const App: React.FC = () => {
       <Route path="/mission/coqui/survey" element={<SurveyPage />} />
       <Route path="/immersive" element={<ImmersivePage />} />
       <Route path="/oneness" element={<OnenessPage />} />
+      <Route path="/revitalization" element={<RevitalizationPage />} />
 
       {/* Kindness — placeholder until its page is built */}
       <Route path="/kindness" element={<PillarPlaceholder title="Kindness" bg="/pillars/kindness-bg.jpg" />} />
