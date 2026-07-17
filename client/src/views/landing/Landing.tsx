@@ -8,9 +8,12 @@ import { PILLARS, Pillar } from "./pillars";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 
-const HEADING_GREEN = "#24483a";
-const BODY_GREEN = "#3a4a44";
-const MUTED = "#6b7a72";
+// Glowing white halo for text set over the photo background.
+const HALO =
+  "0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(255,255,255,0.55), 0 1px 3px rgba(0,0,0,0.4)";
+
+// Warm sun-gold from the KIMORAH LIFE logo.
+const SUN = "#e8b53f";
 
 const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> = ({
   pillar,
@@ -141,7 +144,7 @@ const Landing: React.FC = () => {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(180deg, rgba(245,242,250,0.40) 0%, rgba(245,242,250,0.08) 26%, rgba(245,242,250,0) 52%)",
+            "linear-gradient(180deg, rgba(20,12,40,0.32) 0%, rgba(20,12,40,0.14) 32%, rgba(20,12,40,0) 58%)",
         }}
       />
 
@@ -166,8 +169,9 @@ const Landing: React.FC = () => {
           sx={{
             fontFamily: SERIF,
             fontWeight: 600,
-            fontSize: { xs: 40, sm: 46 },
-            color: HEADING_GREEN,
+            fontSize: { xs: 50, sm: 64 },
+            color: "#ffffff",
+            textShadow: HALO,
             mt: 2,
             lineHeight: 1.1,
           }}
@@ -175,10 +179,25 @@ const Landing: React.FC = () => {
           Welcome
         </Typography>
 
-        <Typography sx={{ mt: 1.5, fontWeight: 700, fontSize: 15, color: BODY_GREEN }}>
+        <Typography
+          sx={{
+            mt: 1.5,
+            fontWeight: 700,
+            fontSize: { xs: 18, sm: 21 },
+            color: "#ffffff",
+            textShadow: HALO,
+          }}
+        >
           This is your space.
         </Typography>
-        <Typography sx={{ mt: 0.5, fontSize: 14, color: MUTED }}>
+        <Typography
+          sx={{
+            mt: 0.5,
+            fontSize: { xs: 15, sm: 17 },
+            color: "#ffffff",
+            textShadow: HALO,
+          }}
+        >
           Choose what you want to nurture today.
         </Typography>
 
@@ -190,16 +209,19 @@ const Landing: React.FC = () => {
           sx={{
             fontFamily: SERIF,
             fontStyle: "italic",
-            fontSize: 14.5,
-            color: MUTED,
-            maxWidth: 300,
+            fontSize: { xs: 16, sm: 18.5 },
+            color: "#ffffff",
+            textShadow: HALO,
+            maxWidth: 360,
             lineHeight: 1.5,
           }}
         >
           Every choice is a step toward your well-being.
         </Typography>
 
-        <FavoriteRoundedIcon sx={{ color: "#2f8f8f", fontSize: 18, mt: 1.5, mb: 3 }} />
+        <FavoriteRoundedIcon
+          sx={{ color: SUN, fontSize: { xs: 34, sm: 40 }, mt: 1.5, mb: 3, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.35))" }}
+        />
 
         {/* All seven pillars on one row — the letters read K-I-M-O-R-A-H */}
         <Box
