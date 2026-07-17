@@ -53,8 +53,9 @@ export const kindnessData: KindnessData = {
     { id: "somatic", label: "Somatic Responses", icon: "air" },
     { id: "time", label: "Time & Exposure", icon: "schedule" },
     { id: "location", label: "Location & Displacement", icon: "place" },
-    { id: "data", label: "Coquí Research Data", icon: "bar", active: true },
+    { id: "data", label: "Coquí Research Data", icon: "bar" },
     { id: "methodology", label: "Methodology", icon: "doc" },
+    { id: "survey", label: "Survey", icon: "survey" },
     { id: "about", label: "About the Study", icon: "info" },
   ],
   sidebarQuote:

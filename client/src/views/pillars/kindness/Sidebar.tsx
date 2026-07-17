@@ -11,6 +11,7 @@ import PlaceRoundedIcon from "@mui/icons-material/PlaceRounded";
 import BarChartRoundedIcon from "@mui/icons-material/BarChartRounded";
 import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
+import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import { useNavigate } from "react-router-dom";
 import LogoBadge from "../../landing/LogoBadge";
 import { NavItem } from "./kindness-data";
@@ -26,11 +27,20 @@ const ICONS: Record<string, React.ElementType> = {
   bar: BarChartRoundedIcon,
   doc: DescriptionRoundedIcon,
   info: InfoRoundedIcon,
+  survey: AssignmentRoundedIcon,
 };
 
-const Sidebar: React.FC<{ nav: NavItem[]; quote: string }> = ({ nav, quote }) => {
+const Sidebar: React.FC<{ nav: NavItem[]; quote: string; activeId: string }> = ({ nav, quote, activeId }) => {
   const navigate = useNavigate();
-  const go = (id: string) => document.getElementById(`k-${id}`)?.scrollIntoView({ behavior: "smooth", block: "start" });
+
+  const onNav = (item: NavItem) => {
+    if (item.id === "survey") return navigate("/mission/coqui/survey");
+    if (item.id === "data") return navigate("/mission/coqui");
+    // Dashboard section: scroll to it if we're on the dashboard, else go there.
+    const el = document.getElementById(`k-${item.id}`);
+    if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    else navigate("/mission/coqui");
+  };
 
   return (
     <Box
@@ -65,10 +75,11 @@ const Sidebar: React.FC<{ nav: NavItem[]; quote: string }> = ({ nav, quote }) =>
 
       {nav.map((item) => {
         const Icon = ICONS[item.icon] ?? BarChartRoundedIcon;
+        const active = item.id === activeId;
         return (
           <Box
             key={item.id}
-            onClick={() => go(item.id)}
+            onClick={() => onNav(item)}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -77,13 +88,13 @@ const Sidebar: React.FC<{ nav: NavItem[]; quote: string }> = ({ nav, quote }) =>
               py: 1,
               borderRadius: 2,
               cursor: "pointer",
-              color: item.active ? "#fff" : "#b3addb",
-              bgcolor: item.active ? "rgba(124,107,208,0.38)" : "transparent",
-              "&:hover": { bgcolor: item.active ? "rgba(124,107,208,0.45)" : "rgba(255,255,255,0.06)" },
+              color: active ? "#fff" : "#b3addb",
+              bgcolor: active ? "rgba(124,107,208,0.38)" : "transparent",
+              "&:hover": { bgcolor: active ? "rgba(124,107,208,0.45)" : "rgba(255,255,255,0.06)" },
             }}
           >
             <Icon sx={{ fontSize: 19 }} />
-            <Typography sx={{ fontSize: 13.5, fontWeight: item.active ? 700 : 500 }}>{item.label}</Typography>
+            <Typography sx={{ fontSize: 13.5, fontWeight: active ? 700 : 500 }}>{item.label}</Typography>
           </Box>
         );
       })}

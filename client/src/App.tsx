@@ -11,6 +11,7 @@ import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
 import KindnessPage from "./views/pillars/kindness/KindnessPage"; // Coquí Research Data dashboard (lives under Mission)
+import SurveyPage from "./views/pillars/kindness/SurveyPage";
 import OnenessPage from "./views/pillars/oneness/OnenessPage";
 import PillarPlaceholder from "./views/pillars/PillarPlaceholder";
 
@@ -33,6 +34,7 @@ const App: React.FC = () => {
       <Route path="/mission" element={<MissionPage />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}
       <Route path="/mission/coqui" element={<KindnessPage />} />
+      <Route path="/mission/coqui/survey" element={<SurveyPage />} />
       <Route path="/immersive" element={<ImmersivePage />} />
       <Route path="/oneness" element={<OnenessPage />} />
 
