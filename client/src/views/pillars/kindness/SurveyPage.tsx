@@ -7,6 +7,7 @@ import LockRoundedIcon from "@mui/icons-material/LockRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafRounded";
 import { useNavigate } from "react-router-dom";
+import { api } from "../../../api";
 import CoquiShell from "./CoquiShell";
 import { Lang, L, surveyQuestions, surveyStrings } from "./survey-data";
 import { INK, MUTED, SUB } from "./components";
@@ -104,10 +105,15 @@ const SurveyPage: React.FC = () => {
     return !!val; // consent / single
   })();
 
-  const goNext = () => {
+  const goNext = async () => {
     if (!canProceed) return;
     if (isLast) {
-      // TODO: POST { answers, describes, lang } to /api/research/coqui/survey/response
+      try {
+        await api.post("/api/research/coqui/response", { answers, describes, lang });
+      } catch (e) {
+        // Don't block the thank-you screen if the API is unreachable.
+        console.warn("Survey submit failed:", e);
+      }
       setSubmitted(true);
     } else {
       setIndex((i) => i + 1);

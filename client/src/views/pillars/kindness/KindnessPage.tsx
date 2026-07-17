@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, useEffect, useState } from "react";
 import { Box, Button, Typography } from "@mui/material";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
@@ -9,6 +9,7 @@ import FormatQuoteRoundedIcon from "@mui/icons-material/FormatQuoteRounded";
 import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { kindnessData } from "./kindness-data";
+import { api } from "../../../api";
 import CoquiShell from "./CoquiShell";
 import {
   DonutChart,
@@ -34,6 +35,25 @@ const GLANCE_ICONS: Record<string, ReactNode> = {
 /** Coquí Research Data dashboard (under Mission → Review Data). */
 const KindnessPage: React.FC = () => {
   const d = kindnessData;
+  const [agg, setAgg] = useState<any>(null);
+  useEffect(() => {
+    api.get("/api/research/coqui/aggregates").then((r) => setAgg(r.data)).catch(() => {});
+  }, []);
+
+  // Real aggregates from the uploaded submissions where available; otherwise the
+  // designed sample data. (Imprinting / time-since / time-of-exposure have no
+  // survey source, so they stay as illustrative sample data.)
+  const glance = d.glance.map((g, i) => {
+    if (!agg) return g;
+    if (i === 0) return { ...g, value: String(agg.totalParticipants) };
+    if (i === 1) return { ...g, value: String(agg.countriesRepresented) };
+    return g;
+  });
+  const emotional = agg?.topFeelings?.length ? agg.topFeelings : d.emotionalResponses;
+  const somatic = agg?.topBodyResponses?.length ? agg.topBodyResponses : d.somaticResponses;
+  const originalLoc = agg?.originalLocations?.length ? agg.originalLocations : d.originalLocation;
+  const currentLoc = agg?.currentLocations?.length ? agg.currentLocations : d.currentLocation;
+  const quotes = agg?.quotes?.length ? agg.quotes : d.participantQuotes;
 
   return (
     <CoquiShell activeId="data" heroTitle={d.header.title}>
@@ -42,7 +62,7 @@ const KindnessPage: React.FC = () => {
         <Panel id="k-overview">
           <SectionLabel>AT A GLANCE</SectionLabel>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: { xs: 1.5, sm: 2 } }}>
-            {d.glance.map((g, i) => (
+            {glance.map((g, i) => (
               <StatCard key={i} icon={GLANCE_ICONS[g.icon]} value={g.value} unit={g.unit} label={g.label} />
             ))}
           </Box>
@@ -74,11 +94,11 @@ const KindnessPage: React.FC = () => {
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
           <Panel id="k-emotional">
             <SectionLabel>EMOTIONAL RESPONSES <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top Mentions)</Box></SectionLabel>
-            <HBarChart items={d.emotionalResponses} gradient={["#7fc07a", "#4f9e63"]} max={80} labelWidth={92} />
+            <HBarChart items={emotional} gradient={["#7fc07a", "#4f9e63"]} max={100} labelWidth={92} />
           </Panel>
           <Panel id="k-somatic">
             <SectionLabel>SOMATIC RESPONSES <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top Mentions)</Box></SectionLabel>
-            <HBarChart items={d.somaticResponses} gradient={["#a99ee8", "#7a6cc8"]} max={80} labelWidth={108} />
+            <HBarChart items={somatic} gradient={["#a99ee8", "#7a6cc8"]} max={100} labelWidth={108} />
           </Panel>
           <Panel>
             <SectionLabel>TIME OF EXPOSURE <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Most Impactful)</Box></SectionLabel>
@@ -108,7 +128,7 @@ const KindnessPage: React.FC = () => {
             <Box>
               <Typography sx={{ color: SUB, fontSize: 12, fontWeight: 600, mb: 1 }}>WHAT THE COQUÍ CALL MEANS TO PARTICIPANTS</Typography>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {d.participantQuotes.map((q, i) => (
+                {quotes.map((q: string, i: number) => (
                   <Box key={i} sx={{ display: "flex", gap: 1, alignItems: "flex-start", bgcolor: "rgba(255,255,255,0.05)", borderRadius: 2, p: 1.25 }}>
                     <FormatQuoteRoundedIcon sx={{ color: "#9a8be6", fontSize: 18, flexShrink: 0, transform: "scaleX(-1)" }} />
                     <Typography sx={{ color: SUB, fontSize: 13, fontStyle: "italic" }}>{q}</Typography>
@@ -123,11 +143,11 @@ const KindnessPage: React.FC = () => {
         <Box id="k-location" sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
           <Panel>
             <SectionLabel>ORIGINAL LOCATION <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top 5)</Box></SectionLabel>
-            <HBarChart items={d.originalLocation} gradient={["#7fc07a", "#4f9e63"]} max={50} labelWidth={120} />
+            <HBarChart items={originalLoc} gradient={["#7fc07a", "#4f9e63"]} max={100} labelWidth={120} />
           </Panel>
           <Panel>
             <SectionLabel>CURRENT LOCATION <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top 5)</Box></SectionLabel>
-            <HBarChart items={d.currentLocation} gradient={["#7fa8e0", "#4f7fc4"]} max={50} labelWidth={92} />
+            <HBarChart items={currentLoc} gradient={["#7fa8e0", "#4f7fc4"]} max={100} labelWidth={92} />
           </Panel>
           <Panel id="k-about">
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>
