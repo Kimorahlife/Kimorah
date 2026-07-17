@@ -65,10 +65,11 @@ export const missionData: MissionContent = {
       "Exploring the emotional and somatic impact of the Coquí call on those who once lived with it and no longer do. Search past data, support the study, and help us understand the power of sound, memory, and belonging.",
     surveyUrl: "#",
     dataUrl: "#",
+    imageUrl: "/pillars/mission-frog.png",
   },
   partners: [
-    { id: "rainforest", name: "Rainforest Trust",                 description: "Protecting rainforests and wildlife for a healthier planet.", accent: "#3f7d55" },
-    { id: "unicef",     name: "UNICEF",                           description: "Providing education and resources for every child to thrive.", accent: "#2f7fc0" },
+    { id: "rainforest", name: "Rainforest Trust",                 description: "Protecting rainforests and wildlife for a healthier planet.", accent: "#3f7d55", logoUrl: "/pillars/partner-rainforest.png" },
+    { id: "unicef",     name: "UNICEF",                           description: "Providing education and resources for every child to thrive.", accent: "#2f7fc0", logoUrl: "/pillars/partner-unicef.png" },
     { id: "nea",        name: "National Endowment for the Arts",  description: "Strengthening communities through the power of the arts.",     accent: "#6b5b9a" },
   ],
   cta: {

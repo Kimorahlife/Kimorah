@@ -27,7 +27,19 @@ const PartnerRow: React.FC<{ partner: MissionPartner }> = ({ partner }) => (
   >
     <Avatar
       src={partner.logoUrl}
-      sx={{ width: 52, height: 52, bgcolor: partner.accent, fontWeight: 700, fontSize: 14 }}
+      sx={{
+        width: 52,
+        height: 52,
+        flexShrink: 0,
+        fontWeight: 700,
+        fontSize: 14,
+        color: "#fff",
+        // Logos sit on white (many have transparent backgrounds); initials
+        // fall back to the partner's accent colour.
+        bgcolor: partner.logoUrl ? "#fff" : partner.accent,
+        border: partner.logoUrl ? "1px solid rgba(0,0,0,0.08)" : "none",
+        "& img": { objectFit: "contain", p: 0.6 },
+      }}
     >
       {initials(partner.name)}
     </Avatar>
