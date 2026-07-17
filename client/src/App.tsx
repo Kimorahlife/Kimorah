@@ -10,6 +10,7 @@ import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
+import KindnessPage from "./views/pillars/kindness/KindnessPage";
 
 const App: React.FC = () => {
   return (
@@ -29,6 +30,7 @@ const App: React.FC = () => {
       {/* Full data-driven component pages */}
       <Route path="/mission" element={<MissionPage />} />
       <Route path="/immersive" element={<ImmersivePage />} />
+      <Route path="/kindness" element={<KindnessPage />} />
 
       {/* Other pillar detail pages (image-based for now) */}
       <Route path="/:slug" element={<PillarDetail />} />
