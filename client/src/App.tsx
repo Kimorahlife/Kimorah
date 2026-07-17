@@ -9,6 +9,7 @@ import Dashboard from "./views/dashboard/Dashboard";
 import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
+import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
 
 const App: React.FC = () => {
   return (
@@ -25,8 +26,9 @@ const App: React.FC = () => {
       {/* Protected routes */}
       <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
 
-      {/* Mission — a full data-driven component page */}
+      {/* Full data-driven component pages */}
       <Route path="/mission" element={<MissionPage />} />
+      <Route path="/immersive" element={<ImmersivePage />} />
 
       {/* Other pillar detail pages (image-based for now) */}
       <Route path="/:slug" element={<PillarDetail />} />
