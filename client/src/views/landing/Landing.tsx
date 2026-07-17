@@ -36,8 +36,10 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
     <Box
       className="kimorah-circle"
       sx={{
-        width: { xs: 48, sm: 60, md: 66 },
-        height: { xs: 48, sm: 60, md: 66 },
+        width: "100%",
+        maxWidth: { xs: 68, sm: 100, md: 112 },
+        aspectRatio: "1 / 1",
+        mx: "auto",
         borderRadius: "50%",
         bgcolor: pillar.color,
         color: "#fff",
@@ -47,8 +49,8 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
         justifyContent: "center",
         boxShadow: "0 6px 16px rgba(40,40,70,0.18)",
         transition: "transform .18s ease, box-shadow .18s ease",
-        "& svg": { fontSize: { xs: 15, sm: 18 } },
-        "& .mi-glyph": { fontSize: { xs: 15, sm: 18 } },
+        "& svg": { fontSize: { xs: 17, sm: 25 } },
+        "& .mi-glyph": { fontSize: { xs: 17, sm: 25 } },
       }}
     >
       <Box sx={{ display: "flex", alignItems: "center", lineHeight: 0, mb: 0.1 }}>
@@ -56,7 +58,7 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
       </Box>
       <Typography
         component="span"
-        sx={{ fontFamily: SERIF, fontSize: { xs: 19, sm: 23 }, lineHeight: 1, fontWeight: 600 }}
+        sx={{ fontFamily: SERIF, fontSize: { xs: 22, sm: 34 }, lineHeight: 1, fontWeight: 600 }}
       >
         {pillar.letter}
       </Typography>
@@ -64,7 +66,7 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
     <Typography
       component="span"
       sx={{
-        fontSize: { xs: 8.5, sm: 10 },
+        fontSize: { xs: 9.5, sm: 12 },
         fontWeight: 600,
         color: BODY_GREEN,
         letterSpacing: 0.1,
@@ -147,7 +149,7 @@ const Landing: React.FC = () => {
           position: "relative",
           zIndex: 1,
           width: "100%",
-          maxWidth: 560,
+          maxWidth: 720,
           px: 3,
           py: { xs: 5, sm: 7 },
           display: "flex",
@@ -204,7 +206,7 @@ const Landing: React.FC = () => {
             width: "100%",
             display: "grid",
             gridTemplateColumns: "repeat(7, 1fr)",
-            columnGap: { xs: 0.75, sm: 1.5 },
+            columnGap: { xs: 0.75, sm: 2 },
             mt: 0.5,
             alignItems: "start",
             justifyItems: "center",
