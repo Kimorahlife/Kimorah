@@ -47,7 +47,7 @@ const KindnessPage: React.FC = () => {
       <Box component="main" sx={{ flexGrow: 1, minWidth: 0 }}>
         {/* Mobile back button */}
         <Button
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/mission")}
           startIcon={<ArrowBackRoundedIcon />}
           sx={{
             display: { xs: "inline-flex", md: "none" },

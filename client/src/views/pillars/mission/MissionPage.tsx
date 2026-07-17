@@ -120,7 +120,7 @@ const MissionPage: React.FC = () => {
 
           {/* Priority Research */}
           <SectionHeading title="PRIORITY RESEARCH" />
-          <PriorityResearchCard item={d.priority} />
+          <PriorityResearchCard item={d.priority} onReviewData={() => navigate("/mission/coqui")} />
 
           {/* Featured Partners */}
           <SectionHeading title="FEATURED PARTNERS" />

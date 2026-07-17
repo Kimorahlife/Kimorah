@@ -56,11 +56,11 @@ const Sidebar: React.FC<{ nav: NavItem[]; quote: string }> = ({ nav, quote }) =>
       </Box>
 
       <Button
-        onClick={() => navigate("/")}
+        onClick={() => navigate("/mission")}
         startIcon={<ArrowBackIosNewRoundedIcon sx={{ fontSize: 14 }} />}
         sx={{ justifyContent: "flex-start", color: "#b7b1dd", textTransform: "none", fontWeight: 600, mb: 1, "&:hover": { bgcolor: "rgba(255,255,255,0.06)" } }}
       >
-        Back to Home
+        Back to Mission
       </Button>
 
       {nav.map((item) => {
