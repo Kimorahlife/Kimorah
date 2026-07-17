@@ -8,6 +8,7 @@ import { PrivateRoute } from "./views/shared/private-routes";
 import Dashboard from "./views/dashboard/Dashboard";
 import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
+import MissionPage from "./views/pillars/mission/MissionPage";
 
 const App: React.FC = () => {
   return (
@@ -24,7 +25,10 @@ const App: React.FC = () => {
       {/* Protected routes */}
       <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
 
-      {/* Pillar detail pages (e.g. /mission, /kindness) */}
+      {/* Mission — a full data-driven component page */}
+      <Route path="/mission" element={<MissionPage />} />
+
+      {/* Other pillar detail pages (image-based for now) */}
       <Route path="/:slug" element={<PillarDetail />} />
 
       {/* Fallback */}
