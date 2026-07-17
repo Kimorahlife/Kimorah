@@ -8,9 +8,8 @@ import { PILLARS, Pillar } from "./pillars";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 
-// Glowing white halo for text set over the photo background.
-const HALO =
-  "0 0 10px rgba(255,255,255,0.9), 0 0 22px rgba(255,255,255,0.55), 0 1px 3px rgba(0,0,0,0.4)";
+// Subtle shadow so the plain white text stays legible over the photo (no glow).
+const HALO = "0 1px 3px rgba(0,0,0,0.45)";
 
 // Warm sun-gold from the KIMORAH LIFE logo.
 const SUN = "#e8b53f";
