@@ -98,7 +98,9 @@ const MissionPage: React.FC = () => {
           <Typography sx={{ fontFamily: SERIF, fontWeight: 700, color: INDIGO, fontSize: { xs: 30, sm: 44 }, lineHeight: 1.1 }}>
             {d.tagline}
           </Typography>
-          <Typography sx={{ color: "#4a4670", fontSize: { xs: 15, sm: 18 }, mt: 2, maxWidth: 640 }}>
+          <Typography
+            sx={{ color: "#ffffff", textShadow: "0 1px 4px rgba(0,0,0,0.4)", fontSize: { xs: 15, sm: 18 }, mt: 2, maxWidth: 640 }}
+          >
             {d.description}
           </Typography>
 
