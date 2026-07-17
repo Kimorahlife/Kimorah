@@ -9,6 +9,7 @@ import LogoBadge from "../../landing/LogoBadge";
 import { immersiveData } from "./immersive-data";
 import ServiceCard from "./ServiceCard";
 import RetreatCard from "./RetreatCard";
+import PodcastSection from "./PodcastSection";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 const INDIGO = "#3a2f6e";
@@ -115,6 +116,8 @@ const ImmersivePage: React.FC = () => {
               <RetreatCard key={r.id} retreat={r} />
             ))}
           </Box>
+
+          <PodcastSection heading={d.podcastHeading} subtitle={d.podcastSubtitle} podcasts={d.podcasts} />
 
           {/* CTA banner */}
           <Box

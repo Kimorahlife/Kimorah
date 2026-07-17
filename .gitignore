@@ -34,3 +34,6 @@ dist-ssr
 # keep secrets out of git
 .env*
 !*.example
+
+# Personal reminder
+REMINDER.md
