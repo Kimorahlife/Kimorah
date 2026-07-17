@@ -11,6 +11,7 @@ import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
 import KindnessPage from "./views/pillars/kindness/KindnessPage";
+import OnenessPage from "./views/pillars/oneness/OnenessPage";
 
 const App: React.FC = () => {
   return (
@@ -31,6 +32,7 @@ const App: React.FC = () => {
       <Route path="/mission" element={<MissionPage />} />
       <Route path="/immersive" element={<ImmersivePage />} />
       <Route path="/kindness" element={<KindnessPage />} />
+      <Route path="/oneness" element={<OnenessPage />} />
 
       {/* Other pillar detail pages (image-based for now) */}
       <Route path="/:slug" element={<PillarDetail />} />
