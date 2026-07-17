@@ -115,10 +115,11 @@ const Landing: React.FC = () => {
     <Box
       sx={{
         position: "relative",
-        minHeight: "100dvh",
+        height: "100dvh",
         width: "100%",
         display: "flex",
         justifyContent: "center",
+        alignItems: "center",
         overflow: "hidden",
         backgroundColor: "#cfc8e6",
       }}
@@ -155,7 +156,7 @@ const Landing: React.FC = () => {
           width: "100%",
           maxWidth: 900,
           px: 3,
-          py: { xs: 5, sm: 7 },
+          py: { xs: 2, sm: 3 },
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -172,7 +173,7 @@ const Landing: React.FC = () => {
             fontSize: { xs: 50, sm: 64 },
             color: "#ffffff",
             textShadow: HALO,
-            mt: 2,
+            mt: 1.25,
             lineHeight: 1.1,
           }}
         >
@@ -181,7 +182,7 @@ const Landing: React.FC = () => {
 
         <Typography
           sx={{
-            mt: 1.5,
+            mt: 1,
             fontWeight: 700,
             fontSize: { xs: 18, sm: 21 },
             color: "#ffffff",
@@ -201,7 +202,7 @@ const Landing: React.FC = () => {
           Choose what you want to nurture today.
         </Typography>
 
-        <Box sx={{ mt: 2.5, mb: 2 }}>
+        <Box sx={{ mt: 1.5, mb: 1.25 }}>
           <Divider />
         </Box>
 
@@ -220,7 +221,7 @@ const Landing: React.FC = () => {
         </Typography>
 
         <FavoriteRoundedIcon
-          sx={{ color: SUN, fontSize: { xs: 34, sm: 40 }, mt: 1.5, mb: 3, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.35))" }}
+          sx={{ color: SUN, fontSize: { xs: 34, sm: 40 }, mt: 1, mb: 1.5, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.35))" }}
         />
 
         {/* All seven pillars on one row — the letters read K-I-M-O-R-A-H */}
