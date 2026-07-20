@@ -14,11 +14,18 @@ import KindnessPage from "./views/pillars/kindness/KindnessPage"; // Coquí Rese
 import SurveyPage from "./views/pillars/kindness/SurveyPage";
 import OnenessPage from "./views/pillars/oneness/OnenessPage";
 import RevitalizationPage from "./views/pillars/revitalization/RevitalizationPage";
-import PillarPlaceholder from "./views/pillars/PillarPlaceholder";
+import AcceptancePage from "./views/pillars/AcceptancePage";
+import KindnessPillarPage from "./views/pillars/kindness/KindnessPillarPage";
+import WordsOfKindnessPage from "./views/pillars/kindness/WordsOfKindnessPage";
+import LendAHandPage from "./views/pillars/kindness/LendAHandPage";
+import HarmonyPage from "./views/pillars/harmony/HarmonyPage";
+import LanguageSwitcher from "./views/shared/LanguageSwitcher";
 
 const App: React.FC = () => {
   return (
-    <Routes>
+    <>
+      <LanguageSwitcher />
+      <Routes>
       {/* Public landing — the front door */}
       <Route path="/" element={<Landing />} />
 
@@ -39,16 +46,20 @@ const App: React.FC = () => {
       <Route path="/immersive" element={<ImmersivePage />} />
       <Route path="/oneness" element={<OnenessPage />} />
       <Route path="/revitalization" element={<RevitalizationPage />} />
+      <Route path="/acceptance" element={<AcceptancePage />} />
 
-      {/* Kindness — placeholder until its page is built */}
-      <Route path="/kindness" element={<PillarPlaceholder title="Kindness" bg="/pillars/kindness-bg.jpg" />} />
+      <Route path="/kindness" element={<KindnessPillarPage />} />
+      <Route path="/kindness/words" element={<WordsOfKindnessPage />} />
+      <Route path="/kindness/lend-a-hand" element={<LendAHandPage />} />
+      <Route path="/harmony" element={<HarmonyPage />} />
 
       {/* Other pillar detail pages (image-based for now) */}
       <Route path="/:slug" element={<PillarDetail />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </>
   );
 };
 

@@ -29,6 +29,7 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
       borderRadius: 2,
       p: 0.25,
       width: "100%",
+      minWidth: 0,
       verticalAlign: "top",
       "&:hover .kimorah-circle": {
         transform: "translateY(-4px)",
@@ -39,9 +40,9 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
     <Box
       className="kimorah-circle"
       sx={{
-        width: "100%",
-        maxWidth: { xs: 80, sm: 124, md: 140 },
-        aspectRatio: "1 / 1",
+        width: { xs: 80, sm: 124, md: 140 },
+        height: { xs: 80, sm: 124, md: 140 },
+        flexShrink: 0,
         mx: "auto",
         borderRadius: "50%",
         bgcolor: pillar.color,
@@ -53,18 +54,65 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
         boxShadow: "0 6px 16px rgba(40,40,70,0.18)",
         transition: "transform .18s ease, box-shadow .18s ease",
         "& svg": { fontSize: { xs: 19, sm: 29 } },
-        "& .mi-glyph": { fontSize: { xs: 19, sm: 29 } },
+        "& .mi-glyph": { fontSize: { xs: 26, sm: 42 } },
+        "& .mission-glyph": { position: "relative", display: "inline-flex", flexDirection: "column", alignItems: "center" },
+        "& .mission-glyph::after": { content: '\"\"', position: "absolute", top: "8%", bottom: "-36%", left: "50%", width: 2, bgcolor: "currentColor", transform: "translateX(-50%)" },
+        "& .mission-staff": { position: "absolute", top: "64%", left: "50%", zIndex: 1, fontFamily: SERIF, fontSize: ".72em", lineHeight: 1, transform: "translateX(-50%)" },
+        "& .oneness-glyph": { position: "relative", display: "block", width: { xs: 27, sm: 42 }, height: { xs: 27, sm: 42 } },
+        "& .oneness-glyph i": { position: "absolute", width: "58%", height: "58%", border: "1.5px solid currentColor", borderRadius: "50%" },
+        "& .oneness-glyph i:nth-of-type(1)": { top: 0, left: "21%" },
+        "& .oneness-glyph i:nth-of-type(2)": { top: "21%", right: 0 },
+        "& .oneness-glyph i:nth-of-type(3)": { right: "8%", bottom: 0 },
+        "& .oneness-glyph i:nth-of-type(4)": { left: "8%", bottom: 0 },
+        "& .oneness-glyph i:nth-of-type(5)": { top: "21%", left: 0 },
+        "& .papyrus-glyph": { width: { xs: 27, sm: 42 }, height: { xs: 27, sm: 42 }, overflow: "visible" },
       }}
     >
-      <Box sx={{ display: "flex", alignItems: "center", lineHeight: 0, mb: 0.1 }}>
-        {pillar.icon}
-      </Box>
       <Typography
         component="span"
-        sx={{ fontFamily: SERIF, fontSize: { xs: 24, sm: 40 }, lineHeight: 1, fontWeight: 600 }}
+        sx={{
+          width: "100%",
+          height: { xs: 27, sm: 44 },
+          display: "grid",
+          placeItems: "center",
+          fontFamily: SERIF,
+          fontSize: { xs: 24, sm: 40 },
+          lineHeight: 1,
+          fontWeight: 600,
+        }}
       >
         {pillar.letter}
       </Typography>
+      <Box
+        className="pillar-icon-slot"
+        sx={{
+          position: "relative",
+          width: { xs: 34, sm: 50 },
+          height: { xs: 32, sm: 48 },
+          mt: { xs: 0.15, sm: 0.35 },
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          lineHeight: 0,
+          "& > svg": { width: { xs: 27, sm: 42 }, height: { xs: 27, sm: 42 }, fontSize: { xs: 27, sm: 42 } },
+          ...(pillar.letter === "I" && {
+            pb: { xs: 0.5, sm: 0.8 },
+            "&::after": {
+              content: '\"\"',
+              position: "absolute",
+              left: "18%",
+              right: "18%",
+              bottom: { xs: 2, sm: 3 },
+              height: { xs: 3, sm: 4 },
+              border: "1.5px solid currentColor",
+              borderTop: 0,
+              borderRadius: "0 0 50% 50%",
+            },
+          }),
+        }}
+      >
+        {pillar.icon}
+      </Box>
     </Box>
     <Typography
       component="span"
@@ -105,11 +153,12 @@ const Divider: React.FC = () => (
 const Landing: React.FC = () => {
   const navigate = useNavigate();
 
-  // Open the pillar's detail page if it has content; otherwise fall back to
-  // signup (for pillars whose pages don't exist yet).
+  // Open full component pages or image-based pillar pages. Pillars without
+  // either kind of page continue to the signup flow.
   const handleSelect = (pillar: Pillar) => {
     const slug = pillar.path.replace("/", "");
-    navigate(PILLAR_CONTENT[slug] ? pillar.path : "/signup");
+    const componentPages = new Set(["acceptance", "harmony"]);
+    navigate(componentPages.has(slug) || PILLAR_CONTENT[slug] ? pillar.path : "/signup");
   };
 
   return (
@@ -155,7 +204,7 @@ const Landing: React.FC = () => {
           position: "relative",
           zIndex: 1,
           width: "100%",
-          maxWidth: 900,
+          maxWidth: 1280,
           px: 3,
           py: { xs: 2, sm: 3 },
           display: "flex",
@@ -230,7 +279,7 @@ const Landing: React.FC = () => {
           sx={{
             width: "100%",
             display: "grid",
-            gridTemplateColumns: "repeat(7, 1fr)",
+            gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
             columnGap: { xs: 0.75, sm: 2 },
             mt: 0.5,
             alignItems: "start",
