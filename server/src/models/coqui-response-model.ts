@@ -1,16 +1,17 @@
 import mongoose, { Schema } from "mongoose";
 
 /**
- * Survey responses submitted through the app (distinct from the imported Tally
- * research submissions in `coqui_submissions`). `answers` is keyed by question
- * id; kept flexible so the survey can evolve without a migration.
+ * Survey responses submitted through the app. `answers` is an array of
+ * { questionId, value, describe? } referencing the question bank
+ * (coqui_questions) by id — value holds option ids (single/multi), a number
+ * (scale), or free text.
  */
 const coquiResponseSchema = new Schema(
   {
-    answers: { type: Object, required: true },
-    describes: { type: Object, default: {} },
+    answers: { type: Array, required: true },
     lang: { type: String, default: "en" },
     consent: { type: Boolean, default: false },
+    source: { type: String, default: "app" },
   },
   { timestamps: true, strict: false, collection: "coqui_responses" }
 );

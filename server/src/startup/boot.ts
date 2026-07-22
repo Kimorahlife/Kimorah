@@ -3,6 +3,8 @@ import { Roles } from "../models/roles-model";
 import { refreshCache } from "../services/permission-cache";
 import { KNOWN_PERMISSIONS } from "../config/permissions";
 import { ROLE_CODE_MAP } from "../config/role-codes";
+import { CoquiQuestion } from "../models/coqui-question-model";
+import coquiSurvey from "../config/coqui-survey.json";
 
 const ALL_PERMISSION_KEYS = KNOWN_PERMISSIONS.map((p) => p.key);
 
@@ -65,11 +67,30 @@ export async function seedDefaultRoles(): Promise<void> {
 }
 
 /**
+ * Sync the Coquí survey question bank from config into `coqui_questions`.
+ * Upserts by questionId and prunes any questions removed from config.
+ */
+export async function seedCoquiQuestions(): Promise<void> {
+  const questions = coquiSurvey.questions as Array<Record<string, unknown>>;
+  await CoquiQuestion.bulkWrite(
+    questions.map((q) => {
+      const { id, ...rest } = q as { id: string };
+      return { updateOne: { filter: { questionId: id }, update: { $set: { questionId: id, ...rest } }, upsert: true } };
+    })
+  );
+  const ids = questions.map((q) => (q as { id: string }).id);
+  await CoquiQuestion.deleteMany({ questionId: { $nin: ids } });
+  console.log(`✅ Coquí survey synced (${questions.length} questions)`);
+}
+
+/**
  * Boot sequence. Data is only ever additive here (upsert permissions, insert
- * missing default roles) — deploying never mutates existing role or user data.
+ * missing default roles, sync survey questions) — deploying never mutates
+ * existing role, user, or response data.
  */
 export async function boot(): Promise<void> {
   await syncPermissions();
   await seedDefaultRoles();
+  await seedCoquiQuestions();
   await refreshCache();
 }

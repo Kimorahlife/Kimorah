@@ -4,17 +4,17 @@
  * Usage (from server/):
  *   node scripts/import-coqui-submissions.cjs "<path-to-export.csv>"
  *
- * Normalizes each submission into a clean, queryable shape keyed by short field
- * ids (the same ids the app survey uses) rather than full question sentences:
- *
- *   { submissionId, respondentId, submittedAt, source, answers: {...}, describes: {...} }
- *
- * Multi-selects become arrays; yes/no become "yes"/"no"; scales/ages become
- * numbers. Idempotent (replaceOne by Submission ID). CSV is NOT committed (PII).
+ * Normalizes each submission into the question-bank shape:
+ *   { submissionId, respondentId, submittedAt, source, consent,
+ *     answers: [ { questionId, value, describe? } ] }
+ * where value holds option ids (single/multi), a number (scale/age), or text.
+ * Option ids come from src/config/coqui-survey.json (single source of truth).
+ * Idempotent (replaceOne by Submission ID). CSV is NOT committed (PII).
  */
 require("dotenv").config({ path: ".env.development.local" });
 const fs = require("fs");
 const mongoose = require("mongoose");
+const survey = require("../src/config/coqui-survey.json");
 
 const csvPath = process.argv[2];
 if (!csvPath) { console.error('Usage: node scripts/import-coqui-submissions.cjs "<path-to-export.csv>"'); process.exit(2); }
@@ -35,14 +35,15 @@ function parseCSV(s) {
   return rows;
 }
 
-// Known multi-select option labels (options contain commas, so we match, not split).
-const FEELINGS = ["Calm", "Neutral", "Curious", "Anxious", "Tense", "Sad", "Happy"];
-const BODY_NOW = ["Slow or fast breathing", "Fluttering or tingling sensation in the stomach", "Temperature (warm, cool)", "Jaw tension", "Grounded feet or leg sensations"];
-const BODY_DURING = ["Muscles relaxed (e.g., shoulders, jaw)", "Felt grounded or rooted", "Nostalgic", "Fluttering or tingling sensation in the stomach", "Tears or emotional release", "Heart rate increased or decreased", "Breathing slowed or deepened"];
-const SOUND_FELT = ["Comforting", "Familiar", "Evocative or emotional", "Like part of home", "Spiritually significant", "Like a distant memory"];
+// question id -> [{id, en}] for multi-selects (to map CSV labels -> option ids)
+const OPT = {};
+for (const q of survey.questions) {
+  if (Array.isArray(q.options)) OPT[q.id] = q.options.map((o) => ({ id: o.id, en: o.label.en }));
+}
+const matchIds = (cell, qid) => (OPT[qid] || []).filter((o) => String(cell).includes(o.en)).map((o) => o.id);
 
 const schema = new mongoose.Schema(
-  { submissionId: { type: String, unique: true }, respondentId: String, submittedAt: Date, source: String, answers: Object, describes: Object },
+  { submissionId: { type: String, unique: true }, respondentId: String, submittedAt: Date, source: String, consent: Boolean, answers: Array },
   { timestamps: true, strict: false, collection: "coqui_submissions" }
 );
 const CoquiSubmission = mongoose.model("CoquiSubmission", schema);
@@ -54,8 +55,6 @@ const CoquiSubmission = mongoose.model("CoquiSubmission", schema);
   const rows = parseCSV(fs.readFileSync(csvPath, "utf8"));
   const header = rows[0];
   const data = rows.slice(1).filter((r) => r.length > 2 && r.some((v) => v.trim()));
-
-  // Locate a column by distinctive substrings (robust to punctuation/spacing).
   const col = (...needles) => header.findIndex((h) => needles.every((nd) => h.includes(nd)));
   const idx = {
     submissionId: col("Submission ID"), respondentId: col("Respondent ID"), submittedAt: col("Submitted at"),
@@ -63,7 +62,7 @@ const CoquiSubmission = mongoose.model("CoquiSubmission", schema);
     location_current: col("2. Location"), location_heard: col("3. Where did you used to hear"),
     years_lived: col("4. How long did you live"), time_since: col("5. How long has it been"),
     feel_now: col("6. How do you feel"), activation: col("7. How would you rate"),
-    body_now: col("8. What do you notice"), body_now_other: col("If Other describe") /* first */,
+    body_now: col("8. What do you notice"), body_now_other: col("If Other describe"),
     associate_yes: col("9. Do you associate", "(Yes)"), associate_desc: col("If yes, please describe:"),
     identity_yes: col("10. Do you feel that", "(Yes)"), identity_desc: col("If yes or not sure"),
     shift_yes: col("11. Did anything shift", "(Yes)"), shift_desc: col("If yes, describe what changed"),
@@ -77,11 +76,9 @@ const CoquiSubmission = mongoose.model("CoquiSubmission", schema);
     agree_yes: col("20. Do you agree or disagree", "(Agree)"), agree_desc: col("If you agree, how?"),
     anything_else: col("21. Anything else"),
   };
-
   const g = (r, i) => (i >= 0 ? (r[i] ?? "").trim() : "");
   const bool = (v) => v === "true" || /^yes/i.test(v);
   const num = (v) => { const n = parseFloat(v); return isNaN(n) ? null : n; };
-  const match = (cell, labels) => labels.filter((l) => cell.includes(l));
 
   await mongoose.connect(uri, { serverSelectionTimeoutMS: 15000 });
   console.log(`Connected. Importing ${data.length} submissions…`);
@@ -89,50 +86,50 @@ const CoquiSubmission = mongoose.model("CoquiSubmission", schema);
   let count = 0;
   for (const r of data) {
     const submissionId = g(r, idx.submissionId) || g(r, idx.respondentId);
-    const answers = {
-      consent: bool(g(r, idx.consentYes)) ? "yes" : "no",
-      age: num(g(r, idx.age)),
-      location_current: g(r, idx.location_current),
-      location_heard: g(r, idx.location_heard),
-      years_lived: num(g(r, idx.years_lived)),
-      time_since: g(r, idx.time_since),
-      feel_now: match(g(r, idx.feel_now), FEELINGS),
-      activation: num(g(r, idx.activation)),
-      body_now: match(g(r, idx.body_now), BODY_NOW),
-      associate: bool(g(r, idx.associate_yes)) ? "yes" : "no",
-      identity: bool(g(r, idx.identity_yes)) ? "yes" : "no",
-      shift: bool(g(r, idx.shift_yes)) ? "yes" : "no",
-      body_during: match(g(r, idx.body_during), BODY_DURING),
-      images: bool(g(r, idx.images_yes)) ? "yes" : "no",
-      sound_felt: match(g(r, idx.sound_felt), SOUND_FELT),
-      inside: bool(g(r, idx.inside_yes)) ? "yes" : bool(g(r, idx.inside_no)) ? "no" : bool(g(r, idx.inside_unsure)) ? "unsure" : "",
-      meaning: g(r, idx.meaning),
-      wish_hear: g(r, idx.wish_hear),
-      absence: g(r, idx.absence),
-      belonging: g(r, idx.belonging),
-      agree: bool(g(r, idx.agree_yes)) ? "agree" : "disagree",
-      anything_else: g(r, idx.anything_else),
+    const A = [];
+    const add = (questionId, value, describe) => {
+      const e = { questionId, value };
+      if (describe) e.describe = describe;
+      A.push(e);
     };
-    const describes = {
-      body_now: g(r, idx.body_now_other), associate: g(r, idx.associate_desc), identity: g(r, idx.identity_desc),
-      shift: g(r, idx.shift_desc), body_during: g(r, idx.body_during_other), images: g(r, idx.images_desc),
-      sound_felt: g(r, idx.sound_felt_other), inside: g(r, idx.inside_desc), agree: g(r, idx.agree_desc),
-    };
+    add("consent", bool(g(r, idx.consentYes)) ? "yes" : "no");
+    add("age", num(g(r, idx.age)));
+    add("location_current", g(r, idx.location_current));
+    add("location_heard", g(r, idx.location_heard));
+    add("years_lived", num(g(r, idx.years_lived)));
+    add("time_since", g(r, idx.time_since));
+    add("feel_now", matchIds(g(r, idx.feel_now), "feel_now"));
+    add("activation", num(g(r, idx.activation)));
+    add("body_now", matchIds(g(r, idx.body_now), "body_now"), g(r, idx.body_now_other));
+    add("associate", bool(g(r, idx.associate_yes)) ? "yes" : "no", g(r, idx.associate_desc));
+    add("identity", bool(g(r, idx.identity_yes)) ? "yes" : "no", g(r, idx.identity_desc));
+    add("shift", bool(g(r, idx.shift_yes)) ? "yes" : "no", g(r, idx.shift_desc));
+    add("body_during", matchIds(g(r, idx.body_during), "body_during"), g(r, idx.body_during_other));
+    add("images", bool(g(r, idx.images_yes)) ? "yes" : "no", g(r, idx.images_desc));
+    add("sound_felt", matchIds(g(r, idx.sound_felt), "sound_felt"), g(r, idx.sound_felt_other));
+    add("inside", bool(g(r, idx.inside_yes)) ? "yes" : bool(g(r, idx.inside_no)) ? "no" : bool(g(r, idx.inside_unsure)) ? "unsure" : "", g(r, idx.inside_desc));
+    add("meaning", g(r, idx.meaning));
+    add("wish_hear", g(r, idx.wish_hear));
+    add("absence", g(r, idx.absence));
+    add("belonging", g(r, idx.belonging));
+    add("agree", bool(g(r, idx.agree_yes)) ? "agree" : "disagree", g(r, idx.agree_desc));
+    add("anything_else", g(r, idx.anything_else));
+
     const submittedAtStr = g(r, idx.submittedAt);
     const doc = {
       submissionId,
       respondentId: g(r, idx.respondentId),
       submittedAt: submittedAtStr ? new Date(submittedAtStr.replace(" ", "T")) : undefined,
       source: "research-import",
-      answers,
-      describes,
+      consent: bool(g(r, idx.consentYes)),
+      answers: A,
     };
     await CoquiSubmission.replaceOne({ submissionId }, doc, { upsert: true });
     count++;
   }
 
   const total = await CoquiSubmission.countDocuments();
-  console.log(`✅ Imported ${count} submissions (clean schema). Collection total: ${total}.`);
+  console.log(`✅ Imported ${count} submissions (question-bank shape). Collection total: ${total}.`);
   await mongoose.disconnect();
   process.exit(0);
 })().catch((err) => { console.error("❌ Import failed:", err.message); process.exit(1); });

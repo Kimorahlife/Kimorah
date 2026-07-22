@@ -1,10 +1,9 @@
 /**
- * "Echoes of Belonging" — Coquí Research Survey.
+ * "Echoes of Belonging" — Coquí Research Survey (client types + UI strings).
  *
- * Questions mirror the real research form (see coqui_submissions in the DB).
- * Every label is bilingual (English + Spanish); the survey renders the language
- * the visitor picks. Intended to be served from / posted to the backend later
- * (e.g. GET /api/research/coqui/survey · POST …/response).
+ * The questions themselves now live in the database (the `coqui_questions`
+ * bank) and are fetched from `GET /api/research/coqui/survey`. This file keeps
+ * only the shared types and the (bilingual) UI chrome strings.
  */
 export type Lang = "en" | "es";
 export type L = Record<Lang, string>;
@@ -23,14 +22,11 @@ export interface SurveyQuestion {
   helper?: L;
   options?: SurveyOption[];
   placeholder?: L;
-  /** For scale questions. */
   scaleMin?: number;
   scaleMax?: number;
   scaleMinLabel?: L;
   scaleMaxLabel?: L;
-  /** Optional inline free-text follow-up ("if yes, describe…"). */
   describe?: L;
-  /** Whether an answer is required to advance (text is optional by default). */
   optional?: boolean;
 }
 
@@ -49,210 +45,3 @@ export const surveyStrings = {
   viewData: { en: "View the research data", es: "Ver los datos de investigación" },
   describePlaceholder: { en: "Please describe…", es: "Por favor describe…" },
 } as const;
-
-const YES_NO: SurveyOption[] = [
-  { id: "yes", label: { en: "Yes", es: "Sí" } },
-  { id: "no", label: { en: "No", es: "No" } },
-];
-
-export const surveyQuestions: SurveyQuestion[] = [
-  {
-    id: "consent",
-    type: "consent",
-    prompt: {
-      en: "Do you agree to take part in this study about your emotional and physical responses to the sound of the Coquí frog?",
-      es: "¿Aceptas participar en este estudio sobre tus respuestas emocionales y físicas al sonido de la rana Coquí?",
-    },
-    options: [
-      { id: "yes", label: { en: "Yes, I agree to participate", es: "Sí, acepto participar" } },
-      { id: "no", label: { en: "No, I do not agree to participate", es: "No, no acepto participar" } },
-    ],
-  },
-  {
-    id: "age",
-    type: "number",
-    prompt: { en: "What is your age?", es: "¿Cuál es tu edad?" },
-    placeholder: { en: "e.g. 42", es: "ej. 42" },
-  },
-  {
-    id: "location_current",
-    type: "text",
-    prompt: { en: "Where do you currently live?", es: "¿Dónde vives actualmente?" },
-    placeholder: { en: "City, Country", es: "Ciudad, País" },
-  },
-  {
-    id: "location_heard",
-    type: "text",
-    prompt: { en: "Where did you used to hear the Coquí frogs regularly?", es: "¿Dónde solías escuchar las ranas Coquí con frecuencia?" },
-    placeholder: { en: "City, Country", es: "Ciudad, País" },
-  },
-  {
-    id: "years_lived",
-    type: "number",
-    prompt: { en: "How long did you live in that location?", es: "¿Cuánto tiempo viviste en ese lugar?" },
-    helper: { en: "In years.", es: "En años." },
-    placeholder: { en: "Years", es: "Años" },
-  },
-  {
-    id: "time_since",
-    type: "text",
-    prompt: { en: "How long has it been since you last heard the Coquí frogs naturally (in the wild)?", es: "¿Cuánto tiempo ha pasado desde la última vez que escuchaste las ranas Coquí de forma natural (en la naturaleza)?" },
-    placeholder: { en: "e.g. 3 years", es: "ej. 3 años" },
-  },
-  {
-    id: "feel_now",
-    type: "multi",
-    prompt: { en: "How do you feel right now?", es: "¿Cómo te sientes en este momento?" },
-    helper: { en: "Check any that apply.", es: "Marca todas las que apliquen." },
-    options: [
-      { id: "calm", label: { en: "Calm", es: "Tranquilo/a" } },
-      { id: "neutral", label: { en: "Neutral", es: "Neutral" } },
-      { id: "curious", label: { en: "Curious", es: "Curioso/a" } },
-      { id: "anxious", label: { en: "Anxious", es: "Ansioso/a" } },
-      { id: "tense", label: { en: "Tense", es: "Tenso/a" } },
-      { id: "sad", label: { en: "Sad", es: "Triste" } },
-      { id: "happy", label: { en: "Happy", es: "Feliz" } },
-    ],
-  },
-  {
-    id: "activation",
-    type: "scale",
-    prompt: { en: "How would you rate your current emotional or nervous system state?", es: "¿Cómo calificarías tu estado emocional o de tu sistema nervioso en este momento?" },
-    scaleMin: 0,
-    scaleMax: 10,
-    scaleMinLabel: { en: "very calm", es: "muy tranquilo" },
-    scaleMaxLabel: { en: "very activated", es: "muy activado" },
-  },
-  {
-    id: "body_now",
-    type: "multi",
-    prompt: { en: "What do you notice in your body right now?", es: "¿Qué notas en tu cuerpo en este momento?" },
-    helper: { en: "Check any that apply.", es: "Marca todas las que apliquen." },
-    options: [
-      { id: "breathing", label: { en: "Slow or fast breathing", es: "Respiración lenta o rápida" } },
-      { id: "flutter", label: { en: "Fluttering or tingling in the stomach", es: "Aleteo u hormigueo en el estómago" } },
-      { id: "temperature", label: { en: "Temperature change (warm, cool)", es: "Cambio de temperatura (calor, frío)" } },
-      { id: "jaw", label: { en: "Jaw tension", es: "Tensión en la mandíbula" } },
-      { id: "grounded", label: { en: "Grounded feet or leg sensations", es: "Sensación de arraigo en pies o piernas" } },
-      { id: "stomach", label: { en: "Stomach ache", es: "Dolor de estómago" } },
-      { id: "other", label: { en: "Other", es: "Otro" } },
-    ],
-    describe: { en: "If other, describe:", es: "Si es otro, describe:" },
-  },
-  {
-    id: "associate",
-    type: "single",
-    prompt: { en: "Do you associate the sound of the Coquí with any specific memories, people, or environments?", es: "¿Asocias el sonido del Coquí con recuerdos, personas o entornos específicos?" },
-    options: YES_NO,
-    describe: { en: "If yes, please describe:", es: "Si es así, por favor describe:" },
-  },
-  {
-    id: "identity",
-    type: "single",
-    prompt: { en: "Do you feel that the Coquí sound is part of your identity, memory, or cultural belonging?", es: "¿Sientes que el sonido del Coquí es parte de tu identidad, memoria o pertenencia cultural?" },
-    options: YES_NO,
-    describe: { en: "If yes or not sure, explain how:", es: "Si es así o no estás seguro/a, explica cómo:" },
-  },
-  {
-    id: "shift",
-    type: "single",
-    prompt: { en: "Did anything shift emotionally or physically during or after listening?", es: "¿Cambió algo emocional o físicamente durante o después de escuchar?" },
-    options: YES_NO,
-    describe: { en: "If yes, describe what changed:", es: "Si es así, describe qué cambió:" },
-  },
-  {
-    id: "body_during",
-    type: "multi",
-    prompt: { en: "What did your body do during the sound exposure?", es: "¿Qué hizo tu cuerpo durante la exposición al sonido?" },
-    helper: { en: "Check all that apply.", es: "Marca todas las que apliquen." },
-    options: [
-      { id: "relaxed", label: { en: "Muscles relaxed (e.g., shoulders, jaw)", es: "Músculos relajados (p. ej., hombros, mandíbula)" } },
-      { id: "grounded", label: { en: "Felt grounded or rooted", es: "Me sentí arraigado/a o con los pies en la tierra" } },
-      { id: "nostalgic", label: { en: "Nostalgic", es: "Nostálgico/a" } },
-      { id: "flutter", label: { en: "Fluttering or tingling", es: "Aleteo u hormigueo" } },
-      { id: "tears", label: { en: "Tears or emotional release", es: "Lágrimas o liberación emocional" } },
-      { id: "heart", label: { en: "Heart rate increased or decreased", es: "El ritmo cardíaco aumentó o disminuyó" } },
-      { id: "other", label: { en: "Other", es: "Otro" } },
-    ],
-    describe: { en: "If other, describe:", es: "Si es otro, describe:" },
-  },
-  {
-    id: "images",
-    type: "single",
-    prompt: { en: "Did any images, memories, or sensations arise while listening?", es: "¿Surgieron imágenes, recuerdos o sensaciones mientras escuchabas?" },
-    options: YES_NO,
-    describe: { en: "If yes, describe:", es: "Si es así, describe:" },
-  },
-  {
-    id: "sound_felt",
-    type: "multi",
-    prompt: { en: "Did the sound feel:", es: "¿El sonido se sintió:" },
-    helper: { en: "Check all that apply.", es: "Marca todas las que apliquen." },
-    options: [
-      { id: "comforting", label: { en: "Comforting", es: "Reconfortante" } },
-      { id: "familiar", label: { en: "Familiar", es: "Familiar" } },
-      { id: "evocative", label: { en: "Evocative or emotional", es: "Evocador o emocional" } },
-      { id: "home", label: { en: "Like part of home", es: "Como parte del hogar" } },
-      { id: "spiritual", label: { en: "Spiritually significant", es: "Espiritualmente significativo" } },
-      { id: "distant", label: { en: "Like a distant memory", es: "Como un recuerdo lejano" } },
-      { id: "other", label: { en: "Other", es: "Otro" } },
-    ],
-    describe: { en: "If other, describe:", es: "Si es otro, describe:" },
-  },
-  {
-    id: "inside",
-    type: "single",
-    prompt: { en: "Do you feel this sound lives “inside you” in some way?", es: "¿Sientes que este sonido vive “dentro de ti” de alguna manera?" },
-    options: [
-      { id: "yes", label: { en: "Yes", es: "Sí" } },
-      { id: "no", label: { en: "No", es: "No" } },
-      { id: "unsure", label: { en: "Unsure", es: "No estoy seguro/a" } },
-    ],
-    describe: { en: "Please describe your experience:", es: "Por favor describe tu experiencia:" },
-  },
-  {
-    id: "meaning",
-    type: "textarea",
-    prompt: { en: "In your own words: what does this frog sound mean to you now? Emotionally, physically, culturally, or spiritually.", es: "En tus propias palabras: ¿qué significa para ti ahora este sonido de rana? Emocional, física, cultural o espiritualmente." },
-    placeholder: { en: "Share what it means to you…", es: "Comparte lo que significa para ti…" },
-    optional: true,
-  },
-  {
-    id: "wish_hear",
-    type: "textarea",
-    prompt: { en: "Do you wish you could hear this sound more regularly again? Why or why not?", es: "¿Desearías poder escuchar este sonido con más frecuencia de nuevo? ¿Por qué sí o por qué no?" },
-    placeholder: { en: "Your thoughts…", es: "Tus pensamientos…" },
-    optional: true,
-  },
-  {
-    id: "absence",
-    type: "textarea",
-    prompt: { en: "How does the absence of familiar natural soundscapes—like the Coquí frog—affect your capacity to self-regulate mood and stress over time?", es: "¿Cómo afecta la ausencia de paisajes sonoros naturales y familiares —como la rana Coquí— tu capacidad para autorregular tu estado de ánimo y el estrés con el tiempo?" },
-    placeholder: { en: "Your thoughts…", es: "Tus pensamientos…" },
-    optional: true,
-  },
-  {
-    id: "belonging",
-    type: "textarea",
-    prompt: { en: "How does exposure to the Coquí frog call contribute to your sense of identity, cultural memory, or psychological belonging?", es: "¿Cómo contribuye la exposición al canto de la rana Coquí a tu sentido de identidad, memoria cultural o pertenencia psicológica?" },
-    placeholder: { en: "Your thoughts…", es: "Tus pensamientos…" },
-    optional: true,
-  },
-  {
-    id: "agree",
-    type: "single",
-    prompt: { en: "Do you agree or disagree with this statement: “Hearing the Coquí frog call again can help you feel better emotionally or physically if you hear it often.”", es: "¿Estás de acuerdo o en desacuerdo con esta afirmación: “Volver a escuchar el canto de la rana Coquí puede ayudarte a sentirte mejor emocional o físicamente si lo escuchas a menudo.”" },
-    options: [
-      { id: "agree", label: { en: "Agree", es: "De acuerdo" } },
-      { id: "disagree", label: { en: "Disagree", es: "En desacuerdo" } },
-    ],
-    describe: { en: "If you agree, how?", es: "Si estás de acuerdo, ¿cómo?" },
-  },
-  {
-    id: "anything_else",
-    type: "textarea",
-    prompt: { en: "Anything else you’d like to share about your experience or memory of this sound?", es: "¿Algo más que te gustaría compartir sobre tu experiencia o recuerdo de este sonido?" },
-    placeholder: { en: "Optional…", es: "Opcional…" },
-    optional: true,
-  },
-];

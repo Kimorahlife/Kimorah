@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded";
@@ -9,7 +9,7 @@ import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafR
 import { useNavigate } from "react-router-dom";
 import { api } from "../../../api";
 import CoquiShell from "./CoquiShell";
-import { Lang, L, surveyQuestions, surveyStrings } from "./survey-data";
+import { Lang, L, SurveyQuestion, surveyStrings } from "./survey-data";
 import { INK, MUTED, SUB } from "./components";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
@@ -76,10 +76,36 @@ const SurveyPage: React.FC = () => {
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [describes, setDescribes] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
+  const [loadError, setLoadError] = useState(false);
+
+  useEffect(() => {
+    api
+      .get("/api/research/coqui/survey")
+      .then((r) => setQuestions(r.data?.questions ?? []))
+      .catch(() => setLoadError(true));
+  }, []);
 
   const t = (l?: L) => (l ? l[lang] : "");
-  const total = surveyQuestions.length;
-  const q = surveyQuestions[index];
+  const total = questions.length;
+
+  if (!total) {
+    return (
+      <CoquiShell activeId="survey" heroTitle="COQUÍ RESEARCH SURVEY">
+        <Box sx={{ p: { xs: 2, sm: 3 } }}>
+          <Box sx={{ maxWidth: 940, mx: "auto", bgcolor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, p: { xs: 2.5, sm: 4 }, textAlign: "center", py: { xs: 6, sm: 8 } }}>
+            <Typography sx={{ color: SUB }}>
+              {loadError
+                ? lang === "es" ? "No se pudo cargar la encuesta." : "Couldn't load the survey."
+                : lang === "es" ? "Cargando encuesta…" : "Loading survey…"}
+            </Typography>
+          </Box>
+        </Box>
+      </CoquiShell>
+    );
+  }
+
+  const q = questions[index];
   const val = answers[q.id];
   const progress = Math.round(((index + 1) / total) * 100);
   const isLast = index === total - 1;
@@ -108,8 +134,16 @@ const SurveyPage: React.FC = () => {
   const goNext = async () => {
     if (!canProceed) return;
     if (isLast) {
+      const payload = questions.map((qq) => {
+        const entry: { questionId: string; value: any; describe?: string } = {
+          questionId: qq.id,
+          value: answers[qq.id] ?? (qq.type === "multi" ? [] : ""),
+        };
+        if (describes[qq.id]) entry.describe = describes[qq.id];
+        return entry;
+      });
       try {
-        await api.post("/api/research/coqui/response", { answers, describes, lang });
+        await api.post("/api/research/coqui/response", { answers: payload, lang });
       } catch (e) {
         // Don't block the thank-you screen if the API is unreachable.
         console.warn("Survey submit failed:", e);
