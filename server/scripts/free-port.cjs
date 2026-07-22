@@ -42,6 +42,28 @@ function kill(pid) {
   }
 }
 
+/**
+ * Kill lingering `tsx watch src/index.ts` supervisors for THIS server. A watch
+ * supervisor respawns the child (and re-grabs the port) after the listener is
+ * killed, so freeing just the port isn't enough — we have to stop the watcher.
+ */
+function killStaleWatchers() {
+  try {
+    if (isWin) {
+      const ps =
+        `Get-CimInstance Win32_Process -Filter "Name='node.exe'" | ` +
+        `Where-Object { $_.CommandLine -match 'tsx' -and $_.CommandLine -match 'src.index.ts' } | ` +
+        `ForEach-Object { Stop-Process -Id $_.ProcessId -Force -ErrorAction SilentlyContinue }`;
+      execSync(`powershell -NoProfile -Command "${ps.replace(/"/g, '\\"')}"`, { stdio: "ignore" });
+    } else {
+      execSync(`pkill -f "tsx watch src/index.ts"`, { stdio: "ignore" });
+    }
+  } catch {
+    // nothing matched, or the tool isn't available — fine
+  }
+}
+
+killStaleWatchers();
 const pids = pidsOnPort(port);
 if (!pids.length) {
   console.log(`✓ port ${port} is free`);
