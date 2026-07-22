@@ -4,16 +4,6 @@ import { CoquiResponse } from "../models/coqui-response-model";
 import HttpError from "../util/errors/http-error";
 import coquiSurvey from "../config/coqui-survey.json";
 
-// questionId -> optionId -> English label (for resolving stored ids to labels in charts)
-const OPTION_LABEL: Record<string, Record<string, string>> = {};
-for (const q of coquiSurvey.questions as any[]) {
-  if (Array.isArray(q.options)) {
-    OPTION_LABEL[q.id] = {};
-    for (const o of q.options) OPTION_LABEL[q.id][o.id] = o.label?.en ?? o.id;
-  }
-}
-const labelOf = (qid: string, oid: string): string => OPTION_LABEL[qid]?.[oid] ?? oid;
-
 const country = (loc: unknown): string => {
   const parts = String(loc ?? "").split(",");
   return (parts[parts.length - 1] || "").trim();
@@ -80,6 +70,17 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
     const subs = await db.collection("coqui_submissions").find({}).toArray();
     const responsesCount = await CoquiResponse.countDocuments();
     const n = subs.length;
+
+    // Resolve option ids -> labels from the question bank (DB is the source of truth)
+    const qdocs = await db.collection("coqui_questions").find({}).toArray();
+    const optionLabel: Record<string, Record<string, string>> = {};
+    for (const q of qdocs as any[]) {
+      if (Array.isArray(q.options)) {
+        optionLabel[q.questionId] = {};
+        for (const o of q.options) optionLabel[q.questionId][o.id] = o.label?.en ?? o.id;
+      }
+    }
+    const labelOf = (qid: string, oid: string): string => optionLabel[qid]?.[oid] ?? oid;
 
     const activations = subs.map((s) => val(s, "activation")).filter((x): x is number => typeof x === "number");
     const avgActivation = activations.length ? activations.reduce((a, b) => a + b, 0) / activations.length : 0;

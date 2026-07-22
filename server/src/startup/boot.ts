@@ -67,20 +67,25 @@ export async function seedDefaultRoles(): Promise<void> {
 }
 
 /**
- * Sync the Coquí survey question bank from config into `coqui_questions`.
- * Upserts by questionId and prunes any questions removed from config.
+ * Bootstrap the Coquí survey question bank ONLY when it's empty (e.g. a fresh
+ * database). After that the `coqui_questions` collection is the single source
+ * of truth — edit questions there and they persist across restarts/deploys.
+ * The config JSON is just the one-time initial content, never an override.
  */
 export async function seedCoquiQuestions(): Promise<void> {
+  const existing = await CoquiQuestion.estimatedDocumentCount();
+  if (existing > 0) {
+    console.log(`✅ Coquí questions present (${existing}) — DB is source of truth, not overwriting.`);
+    return;
+  }
   const questions = coquiSurvey.questions as Array<Record<string, unknown>>;
-  await CoquiQuestion.bulkWrite(
+  await CoquiQuestion.insertMany(
     questions.map((q) => {
       const { id, ...rest } = q as { id: string };
-      return { updateOne: { filter: { questionId: id }, update: { $set: { questionId: id, ...rest } }, upsert: true } };
+      return { questionId: id, ...rest };
     })
   );
-  const ids = questions.map((q) => (q as { id: string }).id);
-  await CoquiQuestion.deleteMany({ questionId: { $nin: ids } });
-  console.log(`✅ Coquí survey synced (${questions.length} questions)`);
+  console.log(`✅ Coquí questions seeded from config (${questions.length}) — manage them in the DB from now on.`);
 }
 
 /**
