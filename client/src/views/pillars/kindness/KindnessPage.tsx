@@ -16,6 +16,7 @@ import {
   INK,
   LegendList,
   MUTED,
+  NoData,
   Panel,
   SectionLabel,
   StatCard,
@@ -41,63 +42,54 @@ const KindnessPage: React.FC = () => {
   }, []);
 
   // Everything on this dashboard is driven by the survey responses (the
-  // `coqui_responses` collection) via GET /api/research/coqui/aggregates. The
-  // designed `kindness-data.ts` values are only a fallback when the API is
-  // unreachable (offline / server down).
-  const glance = d.glance.map((g, i) => {
-    if (!agg) return g;
-    if (i === 0) return { ...g, value: String(agg.totalParticipants) };
-    if (i === 1) return { ...g, value: String(agg.countriesRepresented) };
-    if (i === 2) return { ...g, value: String(agg.avgTimeSinceYears), unit: "yrs" };
-    if (i === 3) return { ...g, value: String(agg.avgActivation), unit: "/ 10", label: "Avg. Emotional Activation (0–10)" };
-    return g;
-  });
+  // `coqui_responses` collection) via GET /api/research/coqui/aggregates.
+  // When the API is unreachable or there's no data, we show honest zeros and
+  // empty states — never fabricated sample numbers.
+  const glance = [
+    { icon: "person", value: String(agg?.totalParticipants ?? 0), label: "Total Participants" },
+    { icon: "globe", value: String(agg?.countriesRepresented ?? 0), label: "Countries Represented" },
+    { icon: "calendar", value: String(agg?.avgTimeSinceYears ?? 0), unit: "yrs", label: "Avg. Time Since Last Exposure to Coquí" },
+    { icon: "heart", value: String(agg?.avgActivation ?? 0), unit: "/ 10", label: "Avg. Emotional Activation (0–10)" },
+  ];
 
   const IMPRINT_COLORS = d.imprinting.distribution.map((s) => s.color);
   const TOD_COLORS = d.timeOfExposure.map((s) => s.color);
   const withColors = (segs: any[], colors: string[]) => segs.map((s, i) => ({ ...s, color: colors[i] ?? colors[colors.length - 1] }));
 
-  const activation = agg?.activationBands?.length ? withColors(agg.activationBands, IMPRINT_COLORS) : d.imprinting.distribution;
-  const timeSince = agg?.timeSinceBuckets?.length ? agg.timeSinceBuckets : d.timeSinceExposure;
-  const inside = agg?.insideDistribution?.length ? withColors(agg.insideDistribution, TOD_COLORS) : d.timeOfExposure;
-  const emotional = agg?.topFeelings?.length ? agg.topFeelings : d.emotionalResponses;
-  const somatic = agg?.topBodyResponses?.length ? agg.topBodyResponses : d.somaticResponses;
-  const originalLoc = agg?.originalLocations?.length ? agg.originalLocations : d.originalLocation;
-  const currentLoc = agg?.currentLocations?.length ? agg.currentLocations : d.currentLocation;
-  const quotes = agg?.quotes?.length ? agg.quotes : d.participantQuotes;
+  const activation = agg?.activationBands?.length ? withColors(agg.activationBands, IMPRINT_COLORS) : [];
+  const timeSince = agg?.timeSinceBuckets?.length ? agg.timeSinceBuckets : [];
+  const inside = agg?.insideDistribution?.length ? withColors(agg.insideDistribution, TOD_COLORS) : [];
+  const emotional = agg?.topFeelings ?? [];
+  const somatic = agg?.topBodyResponses ?? [];
+  const originalLoc = agg?.originalLocations ?? [];
+  const currentLoc = agg?.currentLocations ?? [];
+  const quotes: string[] = agg?.quotes ?? [];
 
   // Word clouds: turn the top feeling / body tallies into weighted words.
-  const toWords = (items: any[] | undefined, fallback: typeof d.emotionalThemes) =>
-    items?.length ? items.map((x) => ({ word: String(x.label).toLowerCase(), weight: Math.max(0.35, x.value / (items[0].value || 1)) })) : fallback;
-  const emotionalThemes = toWords(agg?.topFeelings, d.emotionalThemes);
-  const somaticThemes = toWords(agg?.topBodyResponses, d.somaticThemes);
+  const toWords = (items: any[] | undefined) =>
+    items?.length ? items.map((x) => ({ word: String(x.label).toLowerCase(), weight: Math.max(0.35, x.value / (items[0].value || 1)) })) : [];
+  const emotionalThemes = toWords(agg?.topFeelings);
+  const somaticThemes = toWords(agg?.topBodyResponses);
 
-  // Key findings — yes-rates from single-choice questions.
+  // Key findings — yes-rates from single-choice questions (0 until there's data).
   const findings = [
-    { pct: agg?.associateRate ?? 92, label: "Associate it with specific memories, people, or places" },
-    { pct: agg?.identityBelongingRate ?? 88, label: "Feel it's part of their identity & cultural belonging" },
-    { pct: agg?.shiftRate ?? 79, label: "Felt an emotional or physical shift while listening" },
-    { pct: agg?.imagesRate ?? 85, label: "Had images, memories, or sensations arise" },
-    { pct: agg?.agreeRate ?? 90, label: "Agree hearing it again helps them feel better" },
+    { pct: agg?.associateRate ?? 0, label: "Associate it with specific memories, people, or places" },
+    { pct: agg?.identityBelongingRate ?? 0, label: "Feel it's part of their identity & cultural belonging" },
+    { pct: agg?.shiftRate ?? 0, label: "Felt an emotional or physical shift while listening" },
+    { pct: agg?.imagesRate ?? 0, label: "Had images, memories, or sensations arise" },
+    { pct: agg?.agreeRate ?? 0, label: "Agree hearing it again helps them feel better" },
   ];
-  const soundFelt = agg?.soundFelt?.length
-    ? agg.soundFelt
-    : [
-        { label: "Comforting", value: 78 },
-        { label: "Familiar", value: 74 },
-        { label: "Like part of home", value: 66 },
-        { label: "Evocative or emotional", value: 61 },
-        { label: "Spiritually significant", value: 40 },
-      ];
+  const soundFelt = agg?.soundFelt?.length ? agg.soundFelt : [];
   const demographics = [
-    { icon: <PersonRoundedIcon />, value: String(agg?.avgAge ?? 47), unit: "yrs", label: "Average age" },
-    { icon: <CalendarMonthRoundedIcon />, value: String(agg?.avgYearsLived ?? 22), unit: "yrs", label: "Avg. years lived where they heard it" },
+    { icon: <PersonRoundedIcon />, value: String(agg?.avgAge ?? 0), unit: "yrs", label: "Average age" },
+    { icon: <CalendarMonthRoundedIcon />, value: String(agg?.avgYearsLived ?? 0), unit: "yrs", label: "Avg. years lived where they heard it" },
   ];
 
   const tsMax = Math.max(10, ...timeSince.map((t: any) => t.value));
-  const aboutText = agg
-    ? `This data represents ${agg.totalParticipants} participant${agg.totalParticipants === 1 ? "" : "s"} who lived where the Coquí call was part of their environment and no longer do — ${agg.researchSubmissions} from the research study and ${agg.surveyResponses} from the live survey. Collected via survey.`
-    : d.about.text;
+  const aboutText =
+    agg && agg.totalParticipants > 0
+      ? `This data represents ${agg.totalParticipants} participant${agg.totalParticipants === 1 ? "" : "s"} who lived where the Coquí call was part of their environment and no longer do — ${agg.researchSubmissions} from the research study and ${agg.surveyResponses} from the live survey. Collected via survey.`
+      : "No survey responses to display yet. As responses come in, this dashboard fills in automatically.";
 
   return (
     <CoquiShell activeId="data" heroTitle={d.header.title}>
@@ -114,7 +106,7 @@ const KindnessPage: React.FC = () => {
               fontSize: 13,
             }}
           >
-            Live data unavailable — showing a sample layout. Start the API server to see the real survey responses.
+            Live data unavailable — the dashboard shows zeros until the API server is reachable. Start it to load the real survey responses.
           </Box>
         )}
         {/* At a glance */}
@@ -144,21 +136,25 @@ const KindnessPage: React.FC = () => {
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
           <Panel id="k-key-findings">
             <SectionLabel>EMOTIONAL ACTIVATION LEVEL</SectionLabel>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, flexWrap: "wrap", justifyContent: "center" }}>
-              <DonutChart segments={activation}>
-                <Typography sx={{ color: INK, fontSize: 30, fontWeight: 700, lineHeight: 1 }}>{agg ? agg.avgActivation : d.imprinting.average}</Typography>
-                <Typography sx={{ color: MUTED, fontSize: 11 }}>Avg. Activation</Typography>
-                <Typography sx={{ color: MUTED, fontSize: 10 }}>(out of 10)</Typography>
-              </DonutChart>
-              <Box sx={{ flexGrow: 1, minWidth: 180 }}>
-                <LegendList segments={activation} />
+            {activation.length ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, flexWrap: "wrap", justifyContent: "center" }}>
+                <DonutChart segments={activation}>
+                  <Typography sx={{ color: INK, fontSize: 30, fontWeight: 700, lineHeight: 1 }}>{agg?.avgActivation ?? 0}</Typography>
+                  <Typography sx={{ color: MUTED, fontSize: 11 }}>Avg. Activation</Typography>
+                  <Typography sx={{ color: MUTED, fontSize: 10 }}>(out of 10)</Typography>
+                </DonutChart>
+                <Box sx={{ flexGrow: 1, minWidth: 180 }}>
+                  <LegendList segments={activation} />
+                </Box>
               </Box>
-            </Box>
+            ) : (
+              <NoData />
+            )}
           </Panel>
 
           <Panel id="k-time">
             <SectionLabel>TIME SINCE LAST EXPOSURE</SectionLabel>
-            <VBarChart items={timeSince} gradient={["#6fae5a", "#4a86c4"]} max={tsMax} />
+            {timeSince.length ? <VBarChart items={timeSince} gradient={["#6fae5a", "#4a86c4"]} max={tsMax} /> : <NoData />}
           </Panel>
         </Box>
 
@@ -166,22 +162,26 @@ const KindnessPage: React.FC = () => {
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
           <Panel id="k-emotional">
             <SectionLabel>EMOTIONAL RESPONSES <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top Mentions)</Box></SectionLabel>
-            <HBarChart items={emotional} gradient={["#7fc07a", "#4f9e63"]} max={100} labelWidth={92} />
+            {emotional.length ? <HBarChart items={emotional} gradient={["#7fc07a", "#4f9e63"]} max={100} labelWidth={92} /> : <NoData />}
           </Panel>
           <Panel id="k-somatic">
             <SectionLabel>SOMATIC RESPONSES <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top Mentions)</Box></SectionLabel>
-            <HBarChart items={somatic} gradient={["#a99ee8", "#7a6cc8"]} max={100} labelWidth={108} />
+            {somatic.length ? <HBarChart items={somatic} gradient={["#a99ee8", "#7a6cc8"]} max={100} labelWidth={108} /> : <NoData />}
           </Panel>
           <Panel>
             <SectionLabel>DOES THE SOUND LIVE INSIDE YOU?</SectionLabel>
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap", justifyContent: "center" }}>
-              <DonutChart segments={inside} size={140} thickness={22}>
-                <FavoriteRoundedIcon sx={{ color: SUB, fontSize: 30 }} />
-              </DonutChart>
-              <Box sx={{ flexGrow: 1, minWidth: 130 }}>
-                <LegendList segments={inside} />
+            {inside.length ? (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap", justifyContent: "center" }}>
+                <DonutChart segments={inside} size={140} thickness={22}>
+                  <FavoriteRoundedIcon sx={{ color: SUB, fontSize: 30 }} />
+                </DonutChart>
+                <Box sx={{ flexGrow: 1, minWidth: 130 }}>
+                  <LegendList segments={inside} />
+                </Box>
               </Box>
-            </Box>
+            ) : (
+              <NoData />
+            )}
           </Panel>
         </Box>
 
@@ -189,7 +189,7 @@ const KindnessPage: React.FC = () => {
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
           <Panel id="k-sound-felt">
             <SectionLabel>HOW THE SOUND FELT <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top Mentions)</Box></SectionLabel>
-            <HBarChart items={soundFelt} gradient={["#7fa8e0", "#4f7fc4"]} max={100} labelWidth={150} />
+            {soundFelt.length ? <HBarChart items={soundFelt} gradient={["#7fa8e0", "#4f7fc4"]} max={100} labelWidth={150} /> : <NoData />}
           </Panel>
           <Panel id="k-who">
             <SectionLabel>WHO PARTICIPATED</SectionLabel>
@@ -207,22 +207,26 @@ const KindnessPage: React.FC = () => {
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
             <Box>
               <Typography sx={{ color: SUB, fontSize: 12, fontWeight: 600, mb: 1 }}>EMOTIONAL THEMES <Box component="span" sx={{ color: MUTED }}>(Word Cloud)</Box></Typography>
-              <WordCloud words={emotionalThemes} />
+              {emotionalThemes.length ? <WordCloud words={emotionalThemes} /> : <NoData />}
             </Box>
             <Box>
               <Typography sx={{ color: SUB, fontSize: 12, fontWeight: 600, mb: 1 }}>SOMATIC THEMES <Box component="span" sx={{ color: MUTED }}>(Word Cloud)</Box></Typography>
-              <WordCloud words={somaticThemes} />
+              {somaticThemes.length ? <WordCloud words={somaticThemes} /> : <NoData />}
             </Box>
             <Box>
               <Typography sx={{ color: SUB, fontSize: 12, fontWeight: 600, mb: 1 }}>WHAT THE COQUÍ CALL MEANS TO PARTICIPANTS</Typography>
-              <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
-                {quotes.map((q: string, i: number) => (
-                  <Box key={i} sx={{ display: "flex", gap: 1, alignItems: "flex-start", bgcolor: "rgba(255,255,255,0.05)", borderRadius: 2, p: 1.25 }}>
-                    <FormatQuoteRoundedIcon sx={{ color: "#9a8be6", fontSize: 18, flexShrink: 0, transform: "scaleX(-1)" }} />
-                    <Typography sx={{ color: SUB, fontSize: 13, fontStyle: "italic" }}>{q}</Typography>
-                  </Box>
-                ))}
-              </Box>
+              {quotes.length ? (
+                <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
+                  {quotes.map((q: string, i: number) => (
+                    <Box key={i} sx={{ display: "flex", gap: 1, alignItems: "flex-start", bgcolor: "rgba(255,255,255,0.05)", borderRadius: 2, p: 1.25 }}>
+                      <FormatQuoteRoundedIcon sx={{ color: "#9a8be6", fontSize: 18, flexShrink: 0, transform: "scaleX(-1)" }} />
+                      <Typography sx={{ color: SUB, fontSize: 13, fontStyle: "italic" }}>{q}</Typography>
+                    </Box>
+                  ))}
+                </Box>
+              ) : (
+                <NoData />
+              )}
             </Box>
           </Box>
         </Panel>
@@ -231,11 +235,11 @@ const KindnessPage: React.FC = () => {
         <Box id="k-location" sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
           <Panel>
             <SectionLabel>ORIGINAL LOCATION <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top 5)</Box></SectionLabel>
-            <HBarChart items={originalLoc} gradient={["#7fc07a", "#4f9e63"]} max={100} labelWidth={120} />
+            {originalLoc.length ? <HBarChart items={originalLoc} gradient={["#7fc07a", "#4f9e63"]} max={100} labelWidth={120} /> : <NoData />}
           </Panel>
           <Panel>
             <SectionLabel>CURRENT LOCATION <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top 5)</Box></SectionLabel>
-            <HBarChart items={currentLoc} gradient={["#7fa8e0", "#4f7fc4"]} max={100} labelWidth={92} />
+            {currentLoc.length ? <HBarChart items={currentLoc} gradient={["#7fa8e0", "#4f7fc4"]} max={100} labelWidth={92} /> : <NoData />}
           </Panel>
           <Panel id="k-about">
             <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 1 }}>

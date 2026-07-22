@@ -23,6 +23,13 @@ export const Panel: React.FC<{ children: ReactNode; id?: string; sx?: object }> 
   </Box>
 );
 
+/** Neutral empty state shown in a chart slot when there's no survey data yet. */
+export const NoData: React.FC<{ label?: string; minHeight?: number }> = ({ label = "No responses yet", minHeight = 90 }) => (
+  <Box sx={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight, color: MUTED, fontSize: 12.5, fontStyle: "italic" }}>
+    {label}
+  </Box>
+);
+
 export const SectionLabel: React.FC<{ children: ReactNode; action?: ReactNode }> = ({ children, action }) => (
   <Box sx={{ display: "flex", alignItems: "center", justifyContent: "space-between", mb: 1.5, gap: 1 }}>
     <Typography sx={{ color: SUB, fontWeight: 700, letterSpacing: 0.8, fontSize: 13 }}>{children}</Typography>
