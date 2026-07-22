@@ -8,6 +8,7 @@
     "node": ">=20 <23"
   },
   "scripts": {
+    "predev": "node scripts/free-port.cjs",
     "dev": "dotenv -e .env.development.local -- tsx watch src/index.ts",
     "build": "tsc -p tsconfig.backend.json",
     "postbuild": "node scripts/copy-config.cjs",
