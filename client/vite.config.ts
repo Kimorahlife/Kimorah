@@ -12,6 +12,12 @@ export default defineConfig(({ mode }) => {
   return {
     plugins: [react()],
     server: {
+      // Pin the dev server to one port. With strictPort, Vite fails loudly if
+      // 5173 is taken instead of silently drifting to 5174 and serving a second,
+      // stale copy of the app. The `predev` script frees 5173 first so this
+      // normally just works.
+      port: 5173,
+      strictPort: true,
       proxy: {
         "/api": {
           target: apiBase,
