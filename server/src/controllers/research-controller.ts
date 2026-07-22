@@ -67,9 +67,10 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
     const db = mongoose.connection.db;
     if (!db) return next(new HttpError("Database not ready", 503));
 
-    const subs = await db.collection("coqui_submissions").find({}).toArray();
-    const responsesCount = await CoquiResponse.countDocuments();
+    const subs = await db.collection("coqui_responses").find({}).toArray();
     const n = subs.length;
+    const researchN = subs.filter((s) => s.source === "research-import").length;
+    const appN = subs.filter((s) => s.source === "app").length;
 
     // Resolve option ids -> labels from the question bank (DB is the source of truth)
     const qdocs = await db.collection("coqui_questions").find({}).toArray();
@@ -92,9 +93,9 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
     const countries = new Set(subs.map((s) => country(val(s, "location_current"))).filter(Boolean));
 
     res.json({
-      totalParticipants: n + responsesCount,
-      researchSubmissions: n,
-      surveyResponses: responsesCount,
+      totalParticipants: n,
+      researchSubmissions: researchN,
+      surveyResponses: appN,
       countriesRepresented: countries.size,
       avgActivation: Number(avgActivation.toFixed(1)),
       agreeRate,

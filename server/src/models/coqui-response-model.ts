@@ -1,7 +1,9 @@
 import mongoose, { Schema } from "mongoose";
 
 /**
- * Survey responses submitted through the app. `answers` is an array of
+ * All Coquí survey responses — imported research records (source:
+ * "research-import") and app submissions (source: "app") live in the SAME
+ * collection, distinguished by `source`. `answers` is an array of
  * { questionId, value, describe? } referencing the question bank
  * (coqui_questions) by id — value holds option ids (single/multi), a number
  * (scale), or free text.

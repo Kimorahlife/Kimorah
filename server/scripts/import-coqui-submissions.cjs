@@ -43,8 +43,8 @@ for (const q of survey.questions) {
 const matchIds = (cell, qid) => (OPT[qid] || []).filter((o) => String(cell).includes(o.en)).map((o) => o.id);
 
 const schema = new mongoose.Schema(
-  { submissionId: { type: String, unique: true }, respondentId: String, submittedAt: Date, source: String, consent: Boolean, answers: Array },
-  { timestamps: true, strict: false, collection: "coqui_submissions" }
+  { submissionId: { type: String, unique: true, sparse: true }, respondentId: String, submittedAt: Date, source: String, consent: Boolean, answers: Array },
+  { timestamps: true, strict: false, collection: "coqui_responses" }
 );
 const CoquiSubmission = mongoose.model("CoquiSubmission", schema);
 
