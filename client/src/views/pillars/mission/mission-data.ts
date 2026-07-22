@@ -37,11 +37,23 @@ export interface PriorityResearchItem {
   imageUrl?: string;
 }
 
+export interface PriorityProgramItem {
+  title: string;
+  highlightedTitle: string;
+  description: string;
+  audience: string;
+  audienceDescription: string;
+  primaryAction: string;
+  secondaryAction: string;
+  imageUrl: string;
+}
+
 export interface MissionContent {
   title: string;
   tagline: string;
   description: string;
   causes: MissionCause[];
+  priorityProgram: PriorityProgramItem;
   priority: PriorityResearchItem;
   partners: MissionPartner[];
   cta: { heading: string; subtext: string; buttonLabel: string };
@@ -58,6 +70,18 @@ export const missionData: MissionContent = {
     { id: "arts",     title: "Arts & Culture",     subtitle: "Inspire. Create. Transform.",   icon: "palette", color: "#7b5ea6" },
     { id: "research", title: "Research & Science", subtitle: "Discover. Understand. Advance.", icon: "science", color: "#3f8f97" },
   ],
+  priorityProgram: {
+    title: "When the Earth Changes,",
+    highlightedTitle: "We Change Too",
+    description:
+      "A psychoeducational curriculum offering support and processing for people indirectly affected by the earthquake in Venezuela.",
+    audience: "DESIGNED FOR MENTAL HEALTH PROFESSIONALS",
+    audienceDescription:
+      "Evidence-based. Trauma-informed. Integrative and culturally sensitive approaches.",
+    primaryAction: "EXPLORE SESSIONS",
+    secondaryAction: "WATCH INTRODUCTORY VIDEO",
+    imageUrl: "/pillars/priority-program-portal.png",
+  },
   priority: {
     badge: "TOP PRIORITY",
     title: "Echoes of Belonging",

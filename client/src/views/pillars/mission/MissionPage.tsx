@@ -9,6 +9,7 @@ import { missionData } from "./mission-data";
 import CauseCard from "./CauseCard";
 import PartnerRow from "./PartnerRow";
 import PriorityResearchCard from "./PriorityResearchCard";
+import PriorityProgramCard from "./PriorityProgramCard";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 const INDIGO = "#2f2a63";
@@ -117,6 +118,10 @@ const MissionPage: React.FC = () => {
               <CauseCard key={c.id} cause={c} />
             ))}
           </Box>
+
+          {/* Priority Programs */}
+          <SectionHeading title="PRIORITY PROGRAMS" />
+          <PriorityProgramCard item={d.priorityProgram} onExplore={() => navigate("/mission/sessions")} />
 
           {/* Priority Research */}
           <SectionHeading title="PRIORITY RESEARCH" />
