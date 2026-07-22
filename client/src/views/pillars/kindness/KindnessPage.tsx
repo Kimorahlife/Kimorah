@@ -72,6 +72,28 @@ const KindnessPage: React.FC = () => {
   const emotionalThemes = toWords(agg?.topFeelings, d.emotionalThemes);
   const somaticThemes = toWords(agg?.topBodyResponses, d.somaticThemes);
 
+  // Key findings — yes-rates from single-choice questions.
+  const findings = [
+    { pct: agg?.associateRate ?? 92, label: "Associate it with specific memories, people, or places" },
+    { pct: agg?.identityBelongingRate ?? 88, label: "Feel it's part of their identity & cultural belonging" },
+    { pct: agg?.shiftRate ?? 79, label: "Felt an emotional or physical shift while listening" },
+    { pct: agg?.imagesRate ?? 85, label: "Had images, memories, or sensations arise" },
+    { pct: agg?.agreeRate ?? 90, label: "Agree hearing it again helps them feel better" },
+  ];
+  const soundFelt = agg?.soundFelt?.length
+    ? agg.soundFelt
+    : [
+        { label: "Comforting", value: 78 },
+        { label: "Familiar", value: 74 },
+        { label: "Like part of home", value: 66 },
+        { label: "Evocative or emotional", value: 61 },
+        { label: "Spiritually significant", value: 40 },
+      ];
+  const demographics = [
+    { icon: <PersonRoundedIcon />, value: String(agg?.avgAge ?? 47), unit: "yrs", label: "Average age" },
+    { icon: <CalendarMonthRoundedIcon />, value: String(agg?.avgYearsLived ?? 22), unit: "yrs", label: "Avg. years lived where they heard it" },
+  ];
+
   const tsMax = Math.max(10, ...timeSince.map((t: any) => t.value));
   const aboutText = agg
     ? `This data represents ${agg.totalParticipants} participant${agg.totalParticipants === 1 ? "" : "s"} who lived where the Coquí call was part of their environment and no longer do — ${agg.researchSubmissions} from the research study and ${agg.surveyResponses} from the live survey. Collected via survey.`
@@ -101,6 +123,19 @@ const KindnessPage: React.FC = () => {
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: { xs: 1.5, sm: 2 } }}>
             {glance.map((g, i) => (
               <StatCard key={i} icon={GLANCE_ICONS[g.icon]} value={g.value} unit={g.unit} label={g.label} />
+            ))}
+          </Box>
+        </Panel>
+
+        {/* Key findings — yes-rates */}
+        <Panel id="k-findings">
+          <SectionLabel>KEY FINDINGS <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Share of Participants)</Box></SectionLabel>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(5, 1fr)" }, gap: { xs: 1.5, sm: 2 } }}>
+            {findings.map((f, i) => (
+              <Box key={i} sx={{ bgcolor: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.09)", borderRadius: 3, p: 2, display: "flex", flexDirection: "column", gap: 0.75 }}>
+                <Typography sx={{ color: INK, fontSize: { xs: 26, sm: 30 }, fontWeight: 700, lineHeight: 1 }}>{f.pct}%</Typography>
+                <Typography sx={{ color: MUTED, fontSize: 12, lineHeight: 1.35 }}>{f.label}</Typography>
+              </Box>
             ))}
           </Box>
         </Panel>
@@ -146,6 +181,22 @@ const KindnessPage: React.FC = () => {
               <Box sx={{ flexGrow: 1, minWidth: 130 }}>
                 <LegendList segments={inside} />
               </Box>
+            </Box>
+          </Panel>
+        </Box>
+
+        {/* How the sound felt + Demographics */}
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "2fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
+          <Panel id="k-sound-felt">
+            <SectionLabel>HOW THE SOUND FELT <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Top Mentions)</Box></SectionLabel>
+            <HBarChart items={soundFelt} gradient={["#7fa8e0", "#4f7fc4"]} max={100} labelWidth={150} />
+          </Panel>
+          <Panel id="k-who">
+            <SectionLabel>WHO PARTICIPATED</SectionLabel>
+            <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: { xs: 1.5, sm: 2 } }}>
+              {demographics.map((s, i) => (
+                <StatCard key={i} icon={s.icon} value={s.value} unit={s.unit} label={s.label} />
+              ))}
             </Box>
           </Panel>
         </Box>

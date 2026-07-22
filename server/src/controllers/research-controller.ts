@@ -125,6 +125,21 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
     const insideDefs: Array<[string, string]> = [["yes", "Yes — it lives inside me"], ["unsure", "Unsure"], ["no", "No"]];
     const insideDistribution = insideDefs.map(([k, label]) => ({ label, value: insideVals.length ? Math.round((100 * insideVals.filter((v) => v === k).length) / insideVals.length) : 0 }));
 
+    // Demographics
+    const ages = subs.map((s) => val(s, "age")).filter((x): x is number => typeof x === "number");
+    const avgAge = ages.length ? ages.reduce((a, b) => a + b, 0) / ages.length : 0;
+    const yearsLived = subs.map((s) => val(s, "years_lived")).filter((x): x is number => typeof x === "number");
+    const avgYearsLived = yearsLived.length ? yearsLived.reduce((a, b) => a + b, 0) / yearsLived.length : 0;
+
+    // "Did the sound feel…" (multi-select)
+    const soundFelt = topCounts(subs.flatMap((s) => arr(s, "sound_felt").map((id) => labelOf("sound_felt", id))), n);
+
+    // Key-finding yes-rates
+    const rate = (qid: string, yes = "yes"): number => (n ? Math.round((100 * subs.filter((s) => val(s, qid) === yes).length) / n) : 0);
+    const associateRate = rate("associate");
+    const shiftRate = rate("shift");
+    const imagesRate = rate("images");
+
     res.json({
       totalParticipants: n,
       researchSubmissions: researchN,
@@ -137,6 +152,12 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
       insideDistribution,
       agreeRate,
       identityBelongingRate: n ? Math.round((100 * identityYes) / n) : 0,
+      avgAge: Number(avgAge.toFixed(1)),
+      avgYearsLived: Number(avgYearsLived.toFixed(1)),
+      soundFelt,
+      associateRate,
+      shiftRate,
+      imagesRate,
       topFeelings: topCounts(subs.flatMap((s) => arr(s, "feel_now").map((id) => labelOf("feel_now", id))), n),
       topBodyResponses: topCounts(subs.flatMap((s) => arr(s, "body_during").map((id) => labelOf("body_during", id))), n),
       currentLocations: topCounts(subs.map((s) => country(val(s, "location_current"))).filter(Boolean), n, 5),
