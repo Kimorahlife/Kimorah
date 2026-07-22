@@ -36,10 +36,23 @@ const GLANCE_ICONS: Record<string, ReactNode> = {
 const KindnessPage: React.FC = () => {
   const d = kindnessData;
   const [agg, setAgg] = useState<any>(null);
-  const [offline, setOffline] = useState(false);
+  const [status, setStatus] = useState<string>("loading");
   useEffect(() => {
-    api.get("/api/research/coqui/aggregates").then((r) => setAgg(r.data)).catch(() => setOffline(true));
+    const where = api.defaults.baseURL || "(same origin)";
+    api
+      .get("/api/research/coqui/aggregates")
+      .then((r) => {
+        if (r.data && typeof r.data === "object" && typeof r.data.totalParticipants === "number") {
+          setAgg(r.data);
+          setStatus("live");
+        } else {
+          const kind = typeof r.data === "string" ? "HTML/text (wrong URL?)" : "an object without totalParticipants";
+          setStatus(`unexpected response from ${where} — got ${kind}`);
+        }
+      })
+      .catch((e) => setStatus(`could not reach the API at ${where} — ${e?.message ?? "request failed"}`));
   }, []);
+  const offline = status !== "live" && status !== "loading";
 
   // Everything on this dashboard is driven by the survey responses (the
   // `coqui_responses` collection) via GET /api/research/coqui/aggregates.
@@ -106,7 +119,7 @@ const KindnessPage: React.FC = () => {
               fontSize: 13,
             }}
           >
-            Live data unavailable — the dashboard shows zeros until the API server is reachable. Start it to load the real survey responses.
+            Live data unavailable — {status}. The dashboard shows zeros until the API responds; start the server and reload.
           </Box>
         )}
         {/* At a glance */}
