@@ -4,9 +4,33 @@ import { CoquiResponse } from "../models/coqui-response-model";
 import HttpError from "../util/errors/http-error";
 import coquiSurvey from "../config/coqui-survey.json";
 
+const titleCase = (s: string): string => s.replace(/\b\w/g, (c) => c.toUpperCase());
+
+/** Merge free-text places that differ only by punctuation/spacing/case
+ * (e.g. "Caracas,Venezuela" and "Caracas Venezuela" → "Caracas Venezuela"). */
+const normPlace = (loc: unknown): string => {
+  const t = String(loc ?? "").toLowerCase().replace(/[.,]/g, " ").replace(/\s+/g, " ").trim();
+  return t ? titleCase(t) : "";
+};
+
+const COUNTRY_ALIASES: Record<string, string> = {
+  usa: "United States", us: "United States", "u s": "United States", "u s a": "United States",
+  "united states": "United States", "united states of america": "United States", america: "United States",
+  uk: "United Kingdom", "u k": "United Kingdom",
+};
+
+/** Reduce a current-location answer to a canonical country. Handles no-comma
+ * answers ("Weston USA" → United States) and common aliases. */
 const country = (loc: unknown): string => {
-  const parts = String(loc ?? "").split(",");
-  return (parts[parts.length - 1] || "").trim();
+  const raw = String(loc ?? "").trim();
+  if (!raw) return "";
+  const flat = raw.toLowerCase().replace(/[.,]/g, " ").replace(/\s+/g, " ").trim();
+  if (COUNTRY_ALIASES[flat]) return COUNTRY_ALIASES[flat];
+  const toks = flat.split(" ");
+  if (toks.includes("usa") || toks.includes("us") || (toks.includes("united") && toks.includes("states"))) return "United States";
+  const parts = raw.split(",");
+  const last = (parts[parts.length - 1] || "").trim();
+  return COUNTRY_ALIASES[last.toLowerCase()] ?? titleCase(last.toLowerCase());
 };
 
 interface Tally { label: string; value: number }
@@ -161,7 +185,7 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
       topFeelings: topCounts(subs.flatMap((s) => arr(s, "feel_now").map((id) => labelOf("feel_now", id))), n),
       topBodyResponses: topCounts(subs.flatMap((s) => arr(s, "body_during").map((id) => labelOf("body_during", id))), n),
       currentLocations: topCounts(subs.map((s) => country(val(s, "location_current"))).filter(Boolean), n, 5),
-      originalLocations: topCounts(subs.map((s) => String(val(s, "location_heard") ?? "").trim()).filter(Boolean), n, 5),
+      originalLocations: topCounts(subs.map((s) => normPlace(val(s, "location_heard"))).filter(Boolean), n, 5),
       quotes: subs.map((s) => String(val(s, "meaning") ?? "").trim()).filter(Boolean).slice(0, 4),
     });
   } catch (err: any) {
