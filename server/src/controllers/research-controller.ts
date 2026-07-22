@@ -16,6 +16,7 @@ const normPlace = (loc: unknown): string => {
 const COUNTRY_ALIASES: Record<string, string> = {
   usa: "United States", us: "United States", "u s": "United States", "u s a": "United States",
   "united states": "United States", "united states of america": "United States", america: "United States",
+  "estados unidos": "United States", eeuu: "United States", "ee uu": "United States", "e e u u": "United States",
   uk: "United Kingdom", "u k": "United Kingdom",
 };
 
@@ -27,7 +28,11 @@ const country = (loc: unknown): string => {
   const flat = raw.toLowerCase().replace(/[.,]/g, " ").replace(/\s+/g, " ").trim();
   if (COUNTRY_ALIASES[flat]) return COUNTRY_ALIASES[flat];
   const toks = flat.split(" ");
-  if (toks.includes("usa") || toks.includes("us") || (toks.includes("united") && toks.includes("states"))) return "United States";
+  if (
+    toks.includes("usa") || toks.includes("us") || toks.includes("eeuu") ||
+    (toks.includes("united") && toks.includes("states")) ||
+    (toks.includes("estados") && toks.includes("unidos"))
+  ) return "United States";
   const parts = raw.split(",");
   const last = (parts[parts.length - 1] || "").trim();
   return COUNTRY_ALIASES[last.toLowerCase()] ?? titleCase(last.toLowerCase());
@@ -124,10 +129,10 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
       if (!m) return null;
       const num = parseFloat(m[0]);
       if (isNaN(num)) return null;
-      if (/month/.test(t)) return num / 12;
-      if (/week/.test(t)) return num / 52;
-      if (/day/.test(t)) return num / 365;
-      return num; // years, or a bare number
+      if (/month|\bmes/.test(t)) return num / 12; // month(s) / mes(es)
+      if (/week|semana/.test(t)) return num / 52; // week(s) / semana(s)
+      if (/day|d[ií]a/.test(t)) return num / 365; // day(s) / día(s)
+      return num; // years / años, or a bare number
     };
     const years = subs.map((s) => parseYears(val(s, "time_since"))).filter((y): y is number => y !== null);
     const avgTimeSinceYears = years.length ? years.reduce((a, b) => a + b, 0) / years.length : 0;
