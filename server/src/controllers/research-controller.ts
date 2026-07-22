@@ -92,12 +92,49 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
     const identityYes = subs.filter((s) => val(s, "identity") === "yes").length;
     const countries = new Set(subs.map((s) => country(val(s, "location_current"))).filter(Boolean));
 
+    // Time since last exposure — parse free text ("3 months", "20", "11 years") to
+    // years, then average + bucket for the dashboard.
+    const parseYears = (s: unknown): number | null => {
+      const t = String(s ?? "").toLowerCase().trim();
+      const m = t.match(/[\d.]+/);
+      if (!m) return null;
+      const num = parseFloat(m[0]);
+      if (isNaN(num)) return null;
+      if (/month/.test(t)) return num / 12;
+      if (/week/.test(t)) return num / 52;
+      if (/day/.test(t)) return num / 365;
+      return num; // years, or a bare number
+    };
+    const years = subs.map((s) => parseYears(val(s, "time_since"))).filter((y): y is number => y !== null);
+    const avgTimeSinceYears = years.length ? years.reduce((a, b) => a + b, 0) / years.length : 0;
+    const tsLabels = ["< 1 year", "1 – 3 years", "4 – 10 years", "11 – 20 years", "> 20 years"];
+    const tsOf = (y: number): string => (y < 1 ? tsLabels[0] : y <= 3 ? tsLabels[1] : y <= 10 ? tsLabels[2] : y <= 20 ? tsLabels[3] : tsLabels[4]);
+    const tsCount = new Map<string, number>(tsLabels.map((b) => [b, 0]));
+    for (const y of years) tsCount.set(tsOf(y), (tsCount.get(tsOf(y)) ?? 0) + 1);
+    const timeSinceBuckets = tsLabels.map((label) => ({ label, value: years.length ? Math.round((100 * (tsCount.get(label) ?? 0)) / years.length) : 0 }));
+
+    // Emotional activation (0–10) → High / Moderate / Low bands for the donut.
+    const actLabels = ["High (8 – 10)", "Moderate (5 – 7)", "Low (0 – 4)"];
+    const actOf = (a: number): string => (a >= 8 ? actLabels[0] : a >= 5 ? actLabels[1] : actLabels[2]);
+    const actCount = new Map<string, number>(actLabels.map((b) => [b, 0]));
+    for (const a of activations) actCount.set(actOf(a), (actCount.get(actOf(a)) ?? 0) + 1);
+    const activationBands = actLabels.map((label) => ({ label, value: activations.length ? Math.round((100 * (actCount.get(label) ?? 0)) / activations.length) : 0 }));
+
+    // "Do you feel this sound lives inside you?" → yes / unsure / no.
+    const insideVals = subs.map((s) => String(val(s, "inside") ?? "").trim()).filter(Boolean);
+    const insideDefs: Array<[string, string]> = [["yes", "Yes — it lives inside me"], ["unsure", "Unsure"], ["no", "No"]];
+    const insideDistribution = insideDefs.map(([k, label]) => ({ label, value: insideVals.length ? Math.round((100 * insideVals.filter((v) => v === k).length) / insideVals.length) : 0 }));
+
     res.json({
       totalParticipants: n,
       researchSubmissions: researchN,
       surveyResponses: appN,
       countriesRepresented: countries.size,
       avgActivation: Number(avgActivation.toFixed(1)),
+      avgTimeSinceYears: Number(avgTimeSinceYears.toFixed(1)),
+      timeSinceBuckets,
+      activationBands,
+      insideDistribution,
       agreeRate,
       identityBelongingRate: n ? Math.round((100 * identityYes) / n) : 0,
       topFeelings: topCounts(subs.flatMap((s) => arr(s, "feel_now").map((id) => labelOf("feel_now", id))), n),

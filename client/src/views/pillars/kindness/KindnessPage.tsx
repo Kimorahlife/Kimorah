@@ -4,7 +4,6 @@ import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
 import CalendarMonthRoundedIcon from "@mui/icons-material/CalendarMonthRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
-import DarkModeRoundedIcon from "@mui/icons-material/DarkModeRounded";
 import FormatQuoteRoundedIcon from "@mui/icons-material/FormatQuoteRounded";
 import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
@@ -40,20 +39,42 @@ const KindnessPage: React.FC = () => {
     api.get("/api/research/coqui/aggregates").then((r) => setAgg(r.data)).catch(() => {});
   }, []);
 
-  // Real aggregates from the uploaded submissions where available; otherwise the
-  // designed sample data. (Imprinting / time-since / time-of-exposure have no
-  // survey source, so they stay as illustrative sample data.)
+  // Everything on this dashboard is driven by the survey responses (the
+  // `coqui_responses` collection) via GET /api/research/coqui/aggregates. The
+  // designed `kindness-data.ts` values are only a fallback when the API is
+  // unreachable (offline / server down).
   const glance = d.glance.map((g, i) => {
     if (!agg) return g;
     if (i === 0) return { ...g, value: String(agg.totalParticipants) };
     if (i === 1) return { ...g, value: String(agg.countriesRepresented) };
+    if (i === 2) return { ...g, value: String(agg.avgTimeSinceYears), unit: "yrs" };
+    if (i === 3) return { ...g, value: String(agg.avgActivation), unit: "/ 10", label: "Avg. Emotional Activation (0–10)" };
     return g;
   });
+
+  const IMPRINT_COLORS = d.imprinting.distribution.map((s) => s.color);
+  const TOD_COLORS = d.timeOfExposure.map((s) => s.color);
+  const withColors = (segs: any[], colors: string[]) => segs.map((s, i) => ({ ...s, color: colors[i] ?? colors[colors.length - 1] }));
+
+  const activation = agg?.activationBands?.length ? withColors(agg.activationBands, IMPRINT_COLORS) : d.imprinting.distribution;
+  const timeSince = agg?.timeSinceBuckets?.length ? agg.timeSinceBuckets : d.timeSinceExposure;
+  const inside = agg?.insideDistribution?.length ? withColors(agg.insideDistribution, TOD_COLORS) : d.timeOfExposure;
   const emotional = agg?.topFeelings?.length ? agg.topFeelings : d.emotionalResponses;
   const somatic = agg?.topBodyResponses?.length ? agg.topBodyResponses : d.somaticResponses;
   const originalLoc = agg?.originalLocations?.length ? agg.originalLocations : d.originalLocation;
   const currentLoc = agg?.currentLocations?.length ? agg.currentLocations : d.currentLocation;
   const quotes = agg?.quotes?.length ? agg.quotes : d.participantQuotes;
+
+  // Word clouds: turn the top feeling / body tallies into weighted words.
+  const toWords = (items: any[] | undefined, fallback: typeof d.emotionalThemes) =>
+    items?.length ? items.map((x) => ({ word: String(x.label).toLowerCase(), weight: Math.max(0.35, x.value / (items[0].value || 1)) })) : fallback;
+  const emotionalThemes = toWords(agg?.topFeelings, d.emotionalThemes);
+  const somaticThemes = toWords(agg?.topBodyResponses, d.somaticThemes);
+
+  const tsMax = Math.max(10, ...timeSince.map((t: any) => t.value));
+  const aboutText = agg
+    ? `This data represents ${agg.totalParticipants} participant${agg.totalParticipants === 1 ? "" : "s"} who lived where the Coquí call was part of their environment and no longer do — ${agg.researchSubmissions} from the research study and ${agg.surveyResponses} from the live survey. Collected via survey.`
+    : d.about.text;
 
   return (
     <CoquiShell activeId="data" heroTitle={d.header.title}>
@@ -71,22 +92,22 @@ const KindnessPage: React.FC = () => {
         {/* Imprinting + Time since exposure */}
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
           <Panel id="k-key-findings">
-            <SectionLabel>IMPRINTING SCORE DISTRIBUTION</SectionLabel>
+            <SectionLabel>EMOTIONAL ACTIVATION LEVEL</SectionLabel>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2.5, flexWrap: "wrap", justifyContent: "center" }}>
-              <DonutChart segments={d.imprinting.distribution}>
-                <Typography sx={{ color: INK, fontSize: 30, fontWeight: 700, lineHeight: 1 }}>{d.imprinting.average}</Typography>
-                <Typography sx={{ color: MUTED, fontSize: 11 }}>Average Score</Typography>
-                <Typography sx={{ color: MUTED, fontSize: 10 }}>({d.imprinting.outOf})</Typography>
+              <DonutChart segments={activation}>
+                <Typography sx={{ color: INK, fontSize: 30, fontWeight: 700, lineHeight: 1 }}>{agg ? agg.avgActivation : d.imprinting.average}</Typography>
+                <Typography sx={{ color: MUTED, fontSize: 11 }}>Avg. Activation</Typography>
+                <Typography sx={{ color: MUTED, fontSize: 10 }}>(out of 10)</Typography>
               </DonutChart>
               <Box sx={{ flexGrow: 1, minWidth: 180 }}>
-                <LegendList segments={d.imprinting.distribution} />
+                <LegendList segments={activation} />
               </Box>
             </Box>
           </Panel>
 
           <Panel id="k-time">
             <SectionLabel>TIME SINCE LAST EXPOSURE</SectionLabel>
-            <VBarChart items={d.timeSinceExposure} gradient={["#6fae5a", "#4a86c4"]} max={40} />
+            <VBarChart items={timeSince} gradient={["#6fae5a", "#4a86c4"]} max={tsMax} />
           </Panel>
         </Box>
 
@@ -101,13 +122,13 @@ const KindnessPage: React.FC = () => {
             <HBarChart items={somatic} gradient={["#a99ee8", "#7a6cc8"]} max={100} labelWidth={108} />
           </Panel>
           <Panel>
-            <SectionLabel>TIME OF EXPOSURE <Box component="span" sx={{ color: MUTED, fontWeight: 400 }}>(Most Impactful)</Box></SectionLabel>
+            <SectionLabel>DOES THE SOUND LIVE INSIDE YOU?</SectionLabel>
             <Box sx={{ display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap", justifyContent: "center" }}>
-              <DonutChart segments={d.timeOfExposure} size={140} thickness={22}>
-                <DarkModeRoundedIcon sx={{ color: SUB, fontSize: 30 }} />
+              <DonutChart segments={inside} size={140} thickness={22}>
+                <FavoriteRoundedIcon sx={{ color: SUB, fontSize: 30 }} />
               </DonutChart>
               <Box sx={{ flexGrow: 1, minWidth: 130 }}>
-                <LegendList segments={d.timeOfExposure} />
+                <LegendList segments={inside} />
               </Box>
             </Box>
           </Panel>
@@ -119,11 +140,11 @@ const KindnessPage: React.FC = () => {
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr 1fr" }, gap: { xs: 2, sm: 2.5 } }}>
             <Box>
               <Typography sx={{ color: SUB, fontSize: 12, fontWeight: 600, mb: 1 }}>EMOTIONAL THEMES <Box component="span" sx={{ color: MUTED }}>(Word Cloud)</Box></Typography>
-              <WordCloud words={d.emotionalThemes} />
+              <WordCloud words={emotionalThemes} />
             </Box>
             <Box>
               <Typography sx={{ color: SUB, fontSize: 12, fontWeight: 600, mb: 1 }}>SOMATIC THEMES <Box component="span" sx={{ color: MUTED }}>(Word Cloud)</Box></Typography>
-              <WordCloud words={d.somaticThemes} />
+              <WordCloud words={somaticThemes} />
             </Box>
             <Box>
               <Typography sx={{ color: SUB, fontSize: 12, fontWeight: 600, mb: 1 }}>WHAT THE COQUÍ CALL MEANS TO PARTICIPANTS</Typography>
@@ -156,7 +177,7 @@ const KindnessPage: React.FC = () => {
               </Box>
               <Typography sx={{ color: SUB, fontWeight: 700, letterSpacing: 0.8, fontSize: 13 }}>ABOUT THIS DATA</Typography>
             </Box>
-            <Typography sx={{ color: MUTED, fontSize: 12.5, lineHeight: 1.5 }}>{d.about.text}</Typography>
+            <Typography sx={{ color: MUTED, fontSize: 12.5, lineHeight: 1.5 }}>{aboutText}</Typography>
             <Button
               variant="contained"
               endIcon={<ChevronRightRoundedIcon />}
