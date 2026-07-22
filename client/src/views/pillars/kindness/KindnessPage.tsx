@@ -35,8 +35,9 @@ const GLANCE_ICONS: Record<string, ReactNode> = {
 const KindnessPage: React.FC = () => {
   const d = kindnessData;
   const [agg, setAgg] = useState<any>(null);
+  const [offline, setOffline] = useState(false);
   useEffect(() => {
-    api.get("/api/research/coqui/aggregates").then((r) => setAgg(r.data)).catch(() => {});
+    api.get("/api/research/coqui/aggregates").then((r) => setAgg(r.data)).catch(() => setOffline(true));
   }, []);
 
   // Everything on this dashboard is driven by the survey responses (the
@@ -79,6 +80,21 @@ const KindnessPage: React.FC = () => {
   return (
     <CoquiShell activeId="data" heroTitle={d.header.title}>
       <Box sx={{ p: { xs: 2, sm: 3 }, display: "flex", flexDirection: "column", gap: { xs: 2, sm: 2.5 } }}>
+        {offline && (
+          <Box
+            sx={{
+              bgcolor: "rgba(201, 162, 74, 0.14)",
+              border: "1px solid rgba(201, 162, 74, 0.4)",
+              borderRadius: 3,
+              px: 2,
+              py: 1.25,
+              color: "#e6cf95",
+              fontSize: 13,
+            }}
+          >
+            Live data unavailable — showing a sample layout. Start the API server to see the real survey responses.
+          </Box>
+        )}
         {/* At a glance */}
         <Panel id="k-overview">
           <SectionLabel>AT A GLANCE</SectionLabel>
