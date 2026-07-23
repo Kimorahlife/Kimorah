@@ -9,6 +9,7 @@ import Dashboard from "./views/dashboard/Dashboard";
 import Roles from "./views/roles/Roles";
 import Users from "./views/users/Users";
 import CoquiQuestions from "./views/coqui/CoquiQuestions";
+import Diagnostics from "./views/shared/Diagnostics";
 import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
@@ -33,7 +34,7 @@ import SiteHeader from "./views/shared/SiteHeader";
 import { useAutoTranslate } from "./views/shared/useAutoTranslate";
 
 // Pages that manage their own top-of-page chrome (no global SiteHeader).
-const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/roles", "/users", "/coqui-questions"]);
+const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/roles", "/users", "/coqui-questions", "/diagnostics"]);
 // Auth screens keep a floating language switcher; the landing page has its own.
 const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
 
@@ -61,6 +62,8 @@ const App: React.FC = () => {
       <Route path="/roles" element={<PrivateRoute element={<Roles />} />} />
       <Route path="/users" element={<PrivateRoute element={<Users />} />} />
       <Route path="/coqui-questions" element={<PrivateRoute element={<CoquiQuestions />} />} />
+      {/* Public env/connectivity self-check */}
+      <Route path="/diagnostics" element={<Diagnostics />} />
 
       {/* Full data-driven component pages */}
       <Route path="/mission" element={<MissionPage />} />
