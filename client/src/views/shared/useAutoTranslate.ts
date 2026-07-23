@@ -18,12 +18,31 @@ const translatePublicText = (language: string) => {
   while (node) {
     const parent = node.parentElement;
     if (parent && !parent.closest("[data-language-switcher]")) {
-      const original = originals.get(node) ?? node.data;
-      if (!originals.has(node)) originals.set(node, original);
-      const trimmed = original.trim();
-      const translated = spanish ? KIMORAH_ES[trimmed] : undefined;
-      if (spanish && translated) node.data = original.replace(trimmed, translated);
-      else if (!spanish && originals.has(node)) node.data = original;
+      const current = node.data;
+      const trimmed = current.trim();
+      if (trimmed) {
+        if (spanish) {
+          // Translate recognised English text; remember what we replaced so we
+          // can revert on switch-back. (Already-Spanish text has no map entry.)
+          const es = KIMORAH_ES[trimmed];
+          if (es) {
+            originals.set(node, current);
+            node.data = current.replace(trimmed, es);
+          }
+        } else {
+          // English: only revert nodes WE translated — i.e. whose current text
+          // is the Spanish rendering of a remembered original. Never clobber
+          // fresh English content (e.g. dynamic nav labels that React updates).
+          const original = originals.get(node);
+          if (original !== undefined) {
+            const es = KIMORAH_ES[original.trim()];
+            if (es && trimmed === es.trim()) {
+              node.data = original;
+              originals.delete(node);
+            }
+          }
+        }
+      }
     }
     node = walker.nextNode() as Text | null;
   }

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 
-type UseTokenReturn = [string | null, (newToken: string) => void, boolean];
+type UseTokenReturn = [string | null, (newToken: string) => void, boolean, () => void];
 
 interface TokenPayload {
   exp: number;
@@ -126,5 +126,5 @@ export const useToken = (p0?: string): UseTokenReturn => {
     };
   }, [token, checkTokenValidity, getTokenExpirationTime]);
 
-  return [token, setToken, isValid];
+  return [token, setToken, isValid, removeToken];
 };

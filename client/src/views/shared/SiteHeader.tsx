@@ -31,31 +31,31 @@ const SiteHeader: React.FC = () => {
 
   return (
     <Box component="header" sx={{ position: "sticky", top: 0, zIndex: 1100, background: "linear-gradient(90deg,#141336 0%,#1a1a44 100%)", borderBottom: "1px solid rgba(255,255,255,.09)", boxShadow: "0 6px 20px rgba(16,12,40,.28)" }}>
-      <Container maxWidth="xl" sx={{ py: { xs: 1, md: 1.25 } }}>
-        <Box component="nav" aria-label={spanish ? "Navegación principal" : "Primary navigation"} sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, lg: 2.5 }, width: "100%" }}>
+      <Container maxWidth={false} sx={{ py: { xs: 1.25, md: 1.75 }, px: { xs: 2, sm: 3, md: 5 } }}>
+        <Box component="nav" aria-label={spanish ? "Navegación principal" : "Primary navigation"} sx={{ display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: { xs: 1.5, lg: 2.5 }, width: "100%" }}>
           {/* Brand */}
-          <Box onClick={() => navigate("/")} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") navigate("/"); }} sx={{ display: "flex", alignItems: "center", cursor: "pointer", flexShrink: 0, textAlign: "left" }}>
-            <LogoBadge size={{ xs: 42, md: 52 }} />
-            <Box sx={{ ml: 1.25, display: { xs: "none", sm: "block" } }}>
-              <Typography sx={{ fontFamily: SERIF, color: "#fff", fontSize: { xs: 15, md: 17 }, letterSpacing: 4, lineHeight: 1 }}>KIMORAH</Typography>
-              <Typography sx={{ color: "rgba(255,255,255,.8)", fontSize: 9, letterSpacing: .55, mt: .7 }}>{spanish ? "CURRÍCULO PSICOEDUCATIVO" : "PSYCHOEDUCATIONAL CURRICULUM"}</Typography>
+          <Box onClick={() => navigate("/")} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") navigate("/"); }} sx={{ justifySelf: "start", display: "flex", alignItems: "center", cursor: "pointer", flexShrink: 0, textAlign: "left" }}>
+            <LogoBadge size={{ xs: 60, md: 82 }} />
+            <Box sx={{ ml: 1.75, display: { xs: "none", sm: "block" } }}>
+              <Typography sx={{ fontFamily: SERIF, color: "#fff", fontSize: { xs: 23, md: 31 }, letterSpacing: 4, lineHeight: 1 }}>KIMORAH</Typography>
+              <Typography sx={{ color: "rgba(255,255,255,.8)", fontSize: { xs: 11, md: 13 }, letterSpacing: .6, mt: .8 }}>{spanish ? "CURRÍCULO PSICOEDUCATIVO" : "PSYCHOEDUCATIONAL CURRICULUM"}</Typography>
             </Box>
           </Box>
 
           {/* KIMORAH tabs — shown on wide screens */}
-          <Box sx={{ ml: "auto", display: { xs: "none", lg: "flex" }, alignItems: "center", gap: 2.25, minWidth: 0, overflowX: "auto", "&::-webkit-scrollbar": { display: "none" }, scrollbarWidth: "none" }}>
+          <Box sx={{ justifySelf: "center", display: { xs: "none", lg: "flex" }, alignItems: "center", gap: 2.25, minWidth: 0, overflowX: "auto", "&::-webkit-scrollbar": { display: "none" }, scrollbarWidth: "none" }}>
             {NAV_ITEMS.map((item) => {
               const active = isActive(item.path);
               return (
-                <Button key={item.path} onClick={() => navigate(item.path)} aria-current={active ? "page" : undefined} sx={{ position: "relative", p: 0, minWidth: 0, whiteSpace: "nowrap", color: active ? "#fff" : "rgba(255,255,255,.82)", fontSize: 11.5, fontWeight: active ? 800 : 700, textTransform: "none", "&:hover": { color: "#fff", bgcolor: "transparent" }, "&::after": { content: '""', position: "absolute", left: 0, right: 0, bottom: -6, height: 2, borderRadius: 2, bgcolor: active ? "#fff" : "transparent" } }}>{spanish ? item.es : item.label}</Button>
+                <Button key={item.path} onClick={() => navigate(item.path)} aria-current={active ? "page" : undefined} sx={{ position: "relative", p: 0, minWidth: 0, whiteSpace: "nowrap", color: active ? "#fff" : "rgba(255,255,255,.82)", fontSize: 20, fontWeight: active ? 800 : 700, textTransform: "none", "&:hover": { color: "#fff", bgcolor: "transparent" }, "&::after": { content: '""', position: "absolute", left: 0, right: 0, bottom: -6, height: 2, borderRadius: 2, bgcolor: active ? "#fff" : "transparent" } }}>{spanish ? item.es : item.label}</Button>
               );
             })}
           </Box>
 
           {/* Actions */}
-          <Box sx={{ ml: { xs: "auto", lg: 0 }, display: "flex", alignItems: "center", gap: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
-            <Button onClick={() => navigate("/login")} variant="contained" sx={{ bgcolor: PURPLE, color: "#fff", borderRadius: 99, px: { xs: 1.75, sm: 2.25 }, py: 1.05, fontSize: 10, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "none", "&:hover": { bgcolor: "#553599", color: "#fff", boxShadow: "none" } }}>{spanish ? "MIEMBROS" : "MEMBERS"}</Button>
-            <LanguageMenu variant="onDark" />
+          <Box sx={{ justifySelf: "end", display: "flex", alignItems: "center", gap: { xs: 1.25, sm: 2 }, flexShrink: 0 }}>
+            <Button onClick={() => navigate("/login")} variant="contained" sx={{ bgcolor: PURPLE, color: "#fff", borderRadius: 99, px: { xs: 2.5, sm: 3.25 }, py: 1.4, fontSize: { xs: 12, sm: 13.5 }, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "none", "&:hover": { bgcolor: "#553599", color: "#fff", boxShadow: "none" } }}>{spanish ? "MIEMBROS" : "MEMBERS"}</Button>
+            <LanguageMenu variant="onDark" sx={{ fontSize: { xs: 12.5, sm: 14 }, px: { xs: 1.9, sm: 2.3 }, py: { xs: 0.8, sm: 0.95 } }} />
           </Box>
         </Box>
       </Container>

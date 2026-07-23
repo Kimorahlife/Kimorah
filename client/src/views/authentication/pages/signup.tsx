@@ -4,11 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { useToken } from "../components/useToken";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { api } from "../../../api";
-import { loadUserIds } from "../../../store/slices/presence";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
 import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
+import LogoBadge from "../../landing/LogoBadge";
+import LandingBackground from "../../landing/LandingBackground";
 
 interface State {
   name: string;
@@ -62,7 +61,6 @@ const reducer = (state: State, action: Action): State => {
 };
 
 const Signup: React.FC = () => {
-  const dispatched = useDispatch<AppDispatch>();
   const [state, dispatch] = useReducer(reducer, initialState);
   const { name, email, password, confirmPassword, error, loading, touched } = state;
   const [, setToken] = useToken();
@@ -111,7 +109,6 @@ const Signup: React.FC = () => {
         password,
       });
       setToken(response.data.token);
-      dispatched(loadUserIds(response.data.token));
       navigate("/dashboard");
     } catch (error: any) {
       dispatch({
@@ -133,28 +130,50 @@ const Signup: React.FC = () => {
             borderRadius: 0,
           }}
         >
-          {/* Left side - Branding Content */}
+          {/* Left side - landing-page background with the logo centered on top */}
           <Box
             sx={{
               flex: 0.6,
-              backgroundColor: "primary.main",
+              position: "relative",
+              overflow: "hidden",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              backgroundColor: "#cfc8e6",
             }}
           >
-            <Typography
-              variant="h1"
-              sx={{ color: "#ffffff", fontWeight: 700, letterSpacing: 1 }}
-            >
-              Kimorah
-            </Typography>
+            {/* Layer 1 — SVG valley scene (default backdrop) */}
+            <LandingBackground />
+            {/* Layer 2 — optional real photo; covers the SVG when present at public/landing-bg.jpg */}
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                backgroundImage: "url('/landing-bg.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+            {/* Layer 3 — legibility overlay (matches the landing page) */}
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(180deg, rgba(20,12,40,0.32) 0%, rgba(20,12,40,0.14) 32%, rgba(20,12,40,0) 58%)",
+              }}
+            />
+            {/* Logo, centered on top of the background */}
+            <Box sx={{ position: "relative", zIndex: 1, display: "flex" }}>
+              <LogoBadge size={{ xs: 150, sm: 220 }} />
+            </Box>
           </Box>
 
           {/* Right side - Signup Form */}
           <Box
             sx={{
-              flex: 2.4,
+              flex: 1.4,
               p: 6,
               display: "flex",
               flexDirection: "column",

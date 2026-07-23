@@ -5,11 +5,10 @@ import { useToken } from "../components/useToken";
 import { useNavigate } from "react-router-dom";
 import { AppProvider } from "@toolpad/core/AppProvider";
 import { api } from "../../../api";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
-import { loadUserIds } from "../../../store/slices/presence";
 import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
+import LogoBadge from "../../landing/LogoBadge";
+import LandingBackground from "../../landing/LandingBackground";
 
 // Validation functions
 const validateEmail = (email: string): boolean =>
@@ -22,7 +21,6 @@ const Login: React.FC = () => {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [, setToken] = useToken();
   const navigate = useNavigate();
-  const dispatch = useDispatch<AppDispatch>();
   const theme = useTheme();
   const { t } = useTranslation();
 
@@ -57,7 +55,6 @@ const Login: React.FC = () => {
 
       const jwt = response.data.token;
       setToken(jwt);
-      dispatch(loadUserIds(jwt));
       navigate("/dashboard");
     } catch (error: any) {
       setError(error.response?.data?.message || t("auth.login.errorInvalidCredentials"));
@@ -76,22 +73,44 @@ const Login: React.FC = () => {
             borderRadius: 0,
           }}
         >
-          {/* Left side - Branding Content (smaller) */}
+          {/* Left side - landing-page background with the logo centered on top */}
           <Box
             sx={{
               flex: 0.6,
-              backgroundColor: "primary.main",
+              position: "relative",
+              overflow: "hidden",
               display: "flex",
               justifyContent: "center",
               alignItems: "center",
+              backgroundColor: "#cfc8e6",
             }}
           >
-            <Typography
-              variant="h1"
-              sx={{ color: "#ffffff", fontWeight: 700, letterSpacing: 1 }}
-            >
-              Kimorah
-            </Typography>
+            {/* Layer 1 — SVG valley scene (default backdrop) */}
+            <LandingBackground />
+            {/* Layer 2 — optional real photo; covers the SVG when present at public/landing-bg.jpg */}
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                backgroundImage: "url('/landing-bg.jpg')",
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat",
+              }}
+            />
+            {/* Layer 3 — legibility overlay (matches the landing page) */}
+            <Box
+              sx={{
+                position: "absolute",
+                inset: 0,
+                background:
+                  "linear-gradient(180deg, rgba(20,12,40,0.32) 0%, rgba(20,12,40,0.14) 32%, rgba(20,12,40,0) 58%)",
+              }}
+            />
+            {/* Logo, centered on top of the background */}
+            <Box sx={{ position: "relative", zIndex: 1, display: "flex" }}>
+              <LogoBadge size={{ xs: 150, sm: 220 }} />
+            </Box>
           </Box>
 
           {/* Right side - Login Form (larger) with WHITE background */}

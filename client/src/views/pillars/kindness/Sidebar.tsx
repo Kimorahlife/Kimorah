@@ -13,7 +13,6 @@ import DescriptionRoundedIcon from "@mui/icons-material/DescriptionRounded";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
 import AssignmentRoundedIcon from "@mui/icons-material/AssignmentRounded";
 import { useNavigate } from "react-router-dom";
-import LogoBadge from "../../landing/LogoBadge";
 import { NavItem } from "./kindness-data";
 
 const ICONS: Record<string, React.ElementType> = {
@@ -61,10 +60,6 @@ const Sidebar: React.FC<{ nav: NavItem[]; quote: string; activeId: string }> = (
         overflowY: "auto",
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 1 }}>
-        <LogoBadge size={72} />
-      </Box>
-
       <Button
         onClick={() => navigate("/mission")}
         startIcon={<ArrowBackIosNewRoundedIcon sx={{ fontSize: 14 }} />}

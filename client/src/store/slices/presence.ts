@@ -44,6 +44,8 @@ const presenceSlice = createSlice({
 const { userIdPersisted, userAdded, markOffline, resetPresence, userLoading } =
   presenceSlice.actions;
 
+export { resetPresence, userAdded, markOffline };
+
 export default presenceSlice.reducer;
 
 export const loadUserIds =
