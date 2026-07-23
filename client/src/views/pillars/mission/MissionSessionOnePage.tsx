@@ -80,27 +80,6 @@ const MissionSessionOnePage: React.FC = () => {
     <Box data-language-switcher sx={{ minHeight: "100dvh", color: INK, bgcolor: "#f4f0fa", backgroundImage: "radial-gradient(circle at 12% 45%,rgba(136,94,193,.08),transparent 32%),radial-gradient(circle at 88% 60%,rgba(136,94,193,.07),transparent 30%)" }}>
       <Box component="header" sx={{ position: "relative", overflow: "hidden", color: "white", textAlign: "center", background: "radial-gradient(circle at 50% 44%,#292455 0%,#17173d 48%,#10122f 100%)", pb: { xs: 9, md: 10.5 }, "&::after": { content: '""', position: "absolute", left: "-5%", right: "-5%", bottom: -45, height: 80, bgcolor: "#f4f0fa", borderRadius: "50% 50% 0 0 / 100% 100% 0 0" } }}>
         <Container maxWidth="xl" sx={{ pt: 2.25, position: "relative", zIndex: 1 }}>
-          <Box component="nav" aria-label={copy(lang, "Primary navigation", "Navegación principal")} sx={{ display: "flex", alignItems: "center", gap: 2.5 }}>
-            <Box onClick={() => navigate("/")} sx={{ display: "flex", alignItems: "center", cursor: "pointer", textAlign: "left" }}>
-              <LogoBadge size={{ xs: 50, md: 62 }} />
-              <Box sx={{ ml: 1.25 }}>
-                <Typography sx={{ fontFamily: SERIF, fontSize: 17, letterSpacing: 4, lineHeight: 1 }}>KIMORAH</Typography>
-                <Typography sx={{ fontSize: 9, letterSpacing: .55, mt: .7 }}>{copy(lang, "PSYCHOEDUCATIONAL CURRICULUM", "CURRÍCULO PSICOEDUCATIVO")}</Typography>
-              </Box>
-            </Box>
-            <Box sx={{ ml: "auto", display: { xs: "none", lg: "flex" }, alignItems: "center", gap: 4 }}>
-              {[
-                [copy(lang, "Home", "Inicio"), "/"],
-                [copy(lang, "Curriculum", "Currículo"), "/mission/sessions"],
-                [copy(lang, "Therapeutic approach", "Enfoque terapéutico"), "#psychoeducation"],
-                [copy(lang, "Professional resources", "Recursos profesionales"), "/mission"],
-                [copy(lang, "About the program", "Acerca del programa"), "/mission/sessions"],
-              ].map(([label, href]) => (
-                <Button key={label} onClick={() => href.startsWith("#") ? scrollTo(href.slice(1)) : navigate(href)} sx={{ color: "white", fontSize: 10.5, fontWeight: 700, p: 0, minWidth: 0, whiteSpace: "nowrap" }}>{label}</Button>
-              ))}
-              <Button onClick={() => navigate("/mission")} variant="contained" sx={{ bgcolor: PURPLE, borderRadius: 99, px: 2.25, py: 1.2, fontSize: 10, fontWeight: 800, boxShadow: "none", "&:hover": { bgcolor: "#8763c4" } }}>{copy(lang, "FOR PROFESSIONALS", "PARA PROFESIONALES")}</Button>
-            </Box>
-          </Box>
 
           <Box sx={{ maxWidth: 780, mx: "auto", pt: { xs: 6, md: 4.5 } }}>
             <Box sx={{ display: "inline-block", bgcolor: PURPLE, px: 3.2, py: .8, borderRadius: 99, fontSize: 15, fontWeight: 800, letterSpacing: 1.2 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>

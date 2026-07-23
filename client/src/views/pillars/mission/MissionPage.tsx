@@ -57,26 +57,6 @@ const MissionPage: React.FC = () => {
     >
       {/* Legibility overlay */}
       <Box sx={{ minHeight: "100dvh", background: "linear-gradient(180deg, rgba(245,243,252,0.30) 0%, rgba(238,236,250,0.55) 45%, rgba(238,236,250,0.6) 100%)" }}>
-        <Button
-          onClick={() => navigate("/")}
-          startIcon={<ArrowBackRoundedIcon />}
-          sx={{
-            position: "fixed",
-            top: 16,
-            left: 16,
-            zIndex: 10,
-            color: "#fff",
-            textTransform: "none",
-            fontWeight: 600,
-            px: 2,
-            borderRadius: 999,
-            bgcolor: "rgba(20,12,40,0.5)",
-            backdropFilter: "blur(4px)",
-            "&:hover": { bgcolor: "rgba(20,12,40,0.7)" },
-          }}
-        >
-          Back
-        </Button>
 
         <Container maxWidth="lg" sx={{ py: { xs: 6, sm: 7 } }}>
           {/* Header */}

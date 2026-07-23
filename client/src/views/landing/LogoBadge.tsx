@@ -1,10 +1,10 @@
 import React from "react";
 import Box from "@mui/material/Box";
-import { SxProps, Theme } from "@mui/material/styles";
+import { ResponsiveStyleValue } from "@mui/system";
 
 interface LogoBadgeProps {
   /** Responsive size (px). Width and height stay equal — the logo is square. */
-  size?: SxProps<Theme>["width"];
+  size?: ResponsiveStyleValue<number | string>;
 }
 
 /**

@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
-import { Box, Typography } from "@mui/material";
+import { Box, Tooltip, Typography } from "@mui/material";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { BarItem, Segment, WordItem } from "./kindness-data";
 
 // Dark-surface ink tokens
@@ -37,7 +38,7 @@ export const SectionLabel: React.FC<{ children: ReactNode; action?: ReactNode }>
   </Box>
 );
 
-export const StatCard: React.FC<{ icon: ReactNode; value: string; unit?: string; label: string }> = ({ icon, value, unit, label }) => (
+export const StatCard: React.FC<{ icon: ReactNode; value: string; unit?: string; label: string; sublabel?: string; info?: string }> = ({ icon, value, unit, label, sublabel, info }) => (
   <Box
     sx={{
       bgcolor: "rgba(255,255,255,0.06)",
@@ -50,14 +51,24 @@ export const StatCard: React.FC<{ icon: ReactNode; value: string; unit?: string;
       minWidth: 0,
     }}
   >
-    <Box sx={{ width: 40, height: 40, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: SUB }}>
-      {icon}
+    <Box sx={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 1 }}>
+      <Box sx={{ width: 40, height: 40, borderRadius: "50%", bgcolor: "rgba(255,255,255,0.1)", display: "flex", alignItems: "center", justifyContent: "center", color: SUB }}>
+        {icon}
+      </Box>
+      {info && (
+        <Tooltip title={info} arrow enterTouchDelay={0} leaveTouchDelay={6000}>
+          <InfoOutlinedIcon sx={{ fontSize: 18, color: MUTED, cursor: "help", flexShrink: 0 }} />
+        </Tooltip>
+      )}
     </Box>
     <Box sx={{ display: "flex", alignItems: "baseline", gap: 0.5 }}>
       <Typography sx={{ color: INK, fontSize: { xs: 26, sm: 32 }, fontWeight: 700, lineHeight: 1 }}>{value}</Typography>
       {unit && <Typography sx={{ color: SUB, fontSize: 14, fontWeight: 600 }}>{unit}</Typography>}
     </Box>
-    <Typography sx={{ color: MUTED, fontSize: 12, lineHeight: 1.3 }}>{label}</Typography>
+    <Box>
+      <Typography sx={{ color: MUTED, fontSize: 12, lineHeight: 1.3 }}>{label}</Typography>
+      {sublabel && <Typography sx={{ color: SUB, fontSize: 11, fontStyle: "italic", mt: 0.25 }}>{sublabel}</Typography>}
+    </Box>
   </Box>
 );
 

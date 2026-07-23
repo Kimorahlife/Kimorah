@@ -47,13 +47,6 @@ const MissionSessionsPage: React.FC = () => {
       <Box sx={{ position: "relative", overflow: "hidden", color: "white", background: "#10132f" }}>
         <Box sx={{ position: "absolute", inset: 0, backgroundImage: "linear-gradient(90deg,rgba(12,15,43,.98) 0%,rgba(15,17,47,.86) 42%,rgba(15,17,47,.12) 77%), url('/pillars/priority-program-portal.png')", backgroundSize: "cover", backgroundPosition: "center" }} />
         <Container maxWidth="lg" sx={{ position: "relative", py: { xs: 3, md: 4 } }}>
-          <Box component="nav" sx={{ display: "flex", alignItems: "center", gap: 3, pr: { xs: 0, md: 18 } }}>
-            <Button onClick={() => navigate("/mission")} startIcon={<ArrowBackRoundedIcon />} sx={{ color: "white", fontWeight: 700, textTransform: "none" }}>{lang === "es" ? "Misión" : "Mission"}</Button>
-            <Typography sx={{ fontWeight: 800, letterSpacing: 4 }}>KIMORAH</Typography>
-            <Box sx={{ ml: "auto", display: { xs: "none", md: "flex" }, gap: 3 }}>
-              {[bi("Home", "Inicio"), bi("Curriculum", "Currículo"), bi("Therapeutic Approach", "Enfoque terapéutico"), bi("Professional Resources", "Recursos profesionales"), bi("About", "Acerca del programa")].map((x) => <Typography key={x.en} sx={{ fontSize: 11, textTransform: "uppercase", letterSpacing: 1 }}>{t(x)}</Typography>)}
-            </Box>
-          </Box>
 
           <Box sx={{ maxWidth: 590, pt: { xs: 8, md: 11 }, pb: { xs: 8, md: 9 } }}>
             <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 48, sm: 68, md: 78 }, lineHeight: .98 }}>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation } from "react-router-dom";
 import Login from "./views/authentication/pages/login";
 import Signup from "./views/authentication/pages/signup";
 import ForgotPassword from "./views/authentication/pages/forgot-password";
@@ -13,6 +13,7 @@ import MissionSessionsPage from "./views/pillars/mission/MissionSessionsPage";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
+import MissionPsychoeducationPage from "./views/pillars/mission/MissionPsychoeducationPage";
 import SessionOneComingSoonPage from "./views/pillars/mission/SessionOneComingSoonPage";
 import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
 import KindnessPage from "./views/pillars/kindness/KindnessPage"; // Coquí Research Data dashboard (lives under Mission)
@@ -25,11 +26,23 @@ import WordsOfKindnessPage from "./views/pillars/kindness/WordsOfKindnessPage";
 import LendAHandPage from "./views/pillars/kindness/LendAHandPage";
 import HarmonyPage from "./views/pillars/harmony/HarmonyPage";
 import LanguageSwitcher from "./views/shared/LanguageSwitcher";
+import SiteHeader from "./views/shared/SiteHeader";
+import { useAutoTranslate } from "./views/shared/useAutoTranslate";
+
+// Pages that manage their own top-of-page chrome (no global SiteHeader).
+const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password"]);
+// Auth screens keep a floating language switcher; the landing page has its own.
+const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
 
 const App: React.FC = () => {
+  useAutoTranslate();
+  const { pathname } = useLocation();
+  const showHeader = !NO_HEADER.has(pathname);
+  const showFloatingLang = AUTH_PAGES.has(pathname);
   return (
     <>
-      <LanguageSwitcher />
+      {showHeader && <SiteHeader />}
+      {showFloatingLang && <LanguageSwitcher />}
       <Routes>
       {/* Public landing — the front door */}
       <Route path="/" element={<Landing />} />
@@ -49,6 +62,7 @@ const App: React.FC = () => {
       <Route path="/mission/sessions/1" element={<MissionSessionOnePage />} />
       <Route path="/mission/sessions/1/concepts" element={<MissionConceptsPage />} />
       <Route path="/mission/sessions/1/objectives" element={<MissionObjectivesPage />} />
+      <Route path="/mission/sessions/1/psychoeducation" element={<MissionPsychoeducationPage />} />
       <Route path="/mission/sessions/1/:section" element={<SessionOneComingSoonPage />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}
       <Route path="/mission/coqui" element={<KindnessPage />} />

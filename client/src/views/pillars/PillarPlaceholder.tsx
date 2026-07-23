@@ -27,26 +27,6 @@ const PillarPlaceholder: React.FC<{ title: string; bg?: string }> = ({ title, bg
     >
       <Box sx={{ position: "absolute", inset: 0, background: "linear-gradient(180deg, rgba(20,12,40,0.5) 0%, rgba(20,12,40,0.72) 100%)" }} />
 
-      <Button
-        onClick={() => navigate("/")}
-        startIcon={<ArrowBackRoundedIcon />}
-        sx={{
-          position: "fixed",
-          top: 16,
-          left: 16,
-          zIndex: 10,
-          color: "#fff",
-          textTransform: "none",
-          fontWeight: 600,
-          px: 2,
-          borderRadius: 999,
-          bgcolor: "rgba(20,12,40,0.5)",
-          backdropFilter: "blur(4px)",
-          "&:hover": { bgcolor: "rgba(20,12,40,0.7)" },
-        }}
-      >
-        Back
-      </Button>
 
       <Box sx={{ position: "relative", display: "flex", flexDirection: "column", alignItems: "center", gap: 2, p: 3 }}>
         <LogoBadge size={{ xs: 110, sm: 140 }} />

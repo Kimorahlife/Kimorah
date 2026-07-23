@@ -92,7 +92,6 @@ const KindnessPillarPage: React.FC = () => {
 
   return (
     <Box component="main" sx={{ minHeight: "100dvh", width: "100%", backgroundImage: "linear-gradient(rgba(255,255,255,.68), rgba(255,255,255,.57)), url('/pillars/kindness-page-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center", backgroundAttachment: { md: "fixed" } }}>
-      <IconButton aria-label="Back to home" onClick={() => navigate("/")} sx={{ position: "fixed", top: { xs: 14, sm: 26 }, left: { xs: 14, sm: 26 }, zIndex: 5, width: { xs: 54, sm: 70 }, height: { xs: 54, sm: 70 }, color: INDIGO, bgcolor: "rgba(169,142,207,.82)", backdropFilter: "blur(6px)", "&:hover": { bgcolor: "rgba(157,123,203,.94)" } }}><ArrowBackRoundedIcon sx={{ fontSize: { xs: 30, sm: 38 } }} /></IconButton>
 
       <Container maxWidth="md" sx={{ py: { xs: 3, sm: 3.5 }, px: { xs: 1.5, sm: 3 } }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", color: INDIGO }}>

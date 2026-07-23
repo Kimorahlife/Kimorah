@@ -91,10 +91,14 @@ export const submitResponse = async (req: Request, res: Response, next: NextFunc
 };
 
 /** GET /api/research/coqui/aggregates — dashboard numbers from the submissions. */
-export const getAggregates = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const getAggregates = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
     const db = mongoose.connection.db;
     if (!db) return next(new HttpError("Database not ready", 503));
+
+    // Preferred language for the quote ordering: the current UI language's
+    // responses come first (then the rest, so we still fill up to the limit).
+    const reqLang = String(req.query.lang ?? "en").startsWith("es") ? "es" : "en";
 
     const subs = await db.collection("coqui_responses").find({}).toArray();
     const n = subs.length;
@@ -191,7 +195,15 @@ export const getAggregates = async (_req: Request, res: Response, next: NextFunc
       topBodyResponses: topCounts(subs.flatMap((s) => arr(s, "body_during").map((id) => labelOf("body_during", id))), n),
       currentLocations: topCounts(subs.map((s) => country(val(s, "location_current"))).filter(Boolean), n, 5),
       originalLocations: topCounts(subs.map((s) => normPlace(val(s, "location_heard"))).filter(Boolean), n, 5),
-      quotes: subs.map((s) => String(val(s, "meaning") ?? "").trim()).filter(Boolean).slice(0, 4),
+      quotes: (() => {
+        const entries = subs
+          .map((s) => ({ text: String(val(s, "meaning") ?? "").trim(), lang: s.lang === "es" ? "es" : "en" }))
+          .filter((q) => q.text);
+        return [
+          ...entries.filter((q) => q.lang === reqLang),
+          ...entries.filter((q) => q.lang !== reqLang),
+        ].slice(0, 4).map((q) => q.text);
+      })(),
     });
   } catch (err: any) {
     return next(new HttpError(`Could not compute aggregates: ${err.message}`, 500));

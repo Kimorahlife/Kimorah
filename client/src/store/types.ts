@@ -21,6 +21,14 @@ export interface permissionSlice extends slice {
   list: Array<Permission>;
 }
 
+export interface coquiSlice extends slice {
+  // The aggregates object returned by GET /api/research/coqui/aggregates
+  // (totalParticipants, countriesRepresented, topFeelings, …). Shape is
+  // dynamic, so we keep it loosely typed here.
+  data: Record<string, any> | null;
+  loaded: boolean;
+}
+
 export interface ApiCallPayload {
   url: string;
   method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";

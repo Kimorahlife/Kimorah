@@ -34,26 +34,6 @@ const PillarDetail: React.FC = () => {
         backgroundColor: "#2a2140",
       }}
     >
-      <Button
-        onClick={() => navigate("/")}
-        startIcon={<ArrowBackRoundedIcon />}
-        sx={{
-          position: "fixed",
-          top: 16,
-          left: 16,
-          zIndex: 10,
-          color: "#fff",
-          textTransform: "none",
-          fontWeight: 600,
-          px: 2,
-          borderRadius: 999,
-          bgcolor: "rgba(20,12,40,0.5)",
-          backdropFilter: "blur(4px)",
-          "&:hover": { bgcolor: "rgba(20,12,40,0.7)" },
-        }}
-      >
-        Back
-      </Button>
 
       <Box
         component="img"

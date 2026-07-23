@@ -36,7 +36,6 @@ const LendAHandPage: React.FC = () => {
 
   return (
     <Box component="main" sx={{ minHeight: "100dvh", width: "100%", background: "radial-gradient(circle at 50% 43%, rgba(255,249,239,.98) 0%, rgba(252,246,243,.96) 50%, rgba(232,220,246,.92) 100%)", color: INDIGO }}>
-      <IconButton aria-label="Back to kindness" onClick={() => navigate("/kindness")} sx={{ position: "fixed", top: { xs: 14, sm: 24 }, left: { xs: 14, sm: 24 }, zIndex: 5, width: { xs: 50, sm: 58 }, height: { xs: 50, sm: 58 }, color: INDIGO, bgcolor: "rgba(205,184,232,.8)", backdropFilter: "blur(7px)", "&:hover": { bgcolor: "rgba(185,157,222,.96)" } }}><ArrowBackRoundedIcon /></IconButton>
 
       <Container maxWidth="md" sx={{ py: { xs: 7.5, sm: 6 }, px: { xs: 2.2, sm: 5 } }}>
         <Box sx={{ textAlign: "center" }}>

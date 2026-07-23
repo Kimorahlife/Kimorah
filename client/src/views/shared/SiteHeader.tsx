@@ -1,0 +1,66 @@
+import React from "react";
+import { Box, Button, Container, Typography } from "@mui/material";
+import { useTranslation } from "react-i18next";
+import { useLocation, useNavigate } from "react-router-dom";
+import LogoBadge from "../landing/LogoBadge";
+import { PILLARS } from "../landing/pillars";
+import LanguageMenu from "./LanguageMenu";
+
+const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
+const PURPLE = "#6540b2";
+
+// Home + the seven KIMORAH pillars (letters spell K-I-M-O-R-A-H).
+const NAV_ITEMS: { label: string; es: string; path: string }[] = [
+  { label: "Home", es: "Inicio", path: "/" },
+  ...PILLARS.map((p) => ({ label: p.label, es: p.label, path: p.path })),
+];
+
+/**
+ * Shared site header — rendered once globally (App) on every page except the
+ * landing and auth screens. Self-contained sticky dark bar: brand + KIMORAH
+ * nav + Members button + language dropdown. The language switcher lives here
+ * per design, so pages that show this header need no separate control.
+ */
+const SiteHeader: React.FC = () => {
+  const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const { i18n } = useTranslation();
+  const spanish = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es");
+
+  const isActive = (path: string) => (path === "/" ? pathname === "/" : pathname.startsWith(path));
+
+  return (
+    <Box component="header" sx={{ position: "sticky", top: 0, zIndex: 1100, background: "linear-gradient(90deg,#141336 0%,#1a1a44 100%)", borderBottom: "1px solid rgba(255,255,255,.09)", boxShadow: "0 6px 20px rgba(16,12,40,.28)" }}>
+      <Container maxWidth="xl" sx={{ py: { xs: 1, md: 1.25 } }}>
+        <Box component="nav" aria-label={spanish ? "Navegación principal" : "Primary navigation"} sx={{ display: "flex", alignItems: "center", gap: { xs: 1.5, lg: 2.5 }, width: "100%" }}>
+          {/* Brand */}
+          <Box onClick={() => navigate("/")} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter") navigate("/"); }} sx={{ display: "flex", alignItems: "center", cursor: "pointer", flexShrink: 0, textAlign: "left" }}>
+            <LogoBadge size={{ xs: 42, md: 52 }} />
+            <Box sx={{ ml: 1.25, display: { xs: "none", sm: "block" } }}>
+              <Typography sx={{ fontFamily: SERIF, color: "#fff", fontSize: { xs: 15, md: 17 }, letterSpacing: 4, lineHeight: 1 }}>KIMORAH</Typography>
+              <Typography sx={{ color: "rgba(255,255,255,.8)", fontSize: 9, letterSpacing: .55, mt: .7 }}>{spanish ? "CURRÍCULO PSICOEDUCATIVO" : "PSYCHOEDUCATIONAL CURRICULUM"}</Typography>
+            </Box>
+          </Box>
+
+          {/* KIMORAH tabs — shown on wide screens */}
+          <Box sx={{ ml: "auto", display: { xs: "none", lg: "flex" }, alignItems: "center", gap: 2.25, minWidth: 0, overflowX: "auto", "&::-webkit-scrollbar": { display: "none" }, scrollbarWidth: "none" }}>
+            {NAV_ITEMS.map((item) => {
+              const active = isActive(item.path);
+              return (
+                <Button key={item.path} onClick={() => navigate(item.path)} aria-current={active ? "page" : undefined} sx={{ position: "relative", p: 0, minWidth: 0, whiteSpace: "nowrap", color: active ? "#fff" : "rgba(255,255,255,.82)", fontSize: 11.5, fontWeight: active ? 800 : 700, textTransform: "none", "&:hover": { color: "#fff", bgcolor: "transparent" }, "&::after": { content: '""', position: "absolute", left: 0, right: 0, bottom: -6, height: 2, borderRadius: 2, bgcolor: active ? "#fff" : "transparent" } }}>{spanish ? item.es : item.label}</Button>
+              );
+            })}
+          </Box>
+
+          {/* Actions */}
+          <Box sx={{ ml: { xs: "auto", lg: 0 }, display: "flex", alignItems: "center", gap: { xs: 1, sm: 1.5 }, flexShrink: 0 }}>
+            <Button onClick={() => navigate("/login")} variant="contained" sx={{ bgcolor: PURPLE, color: "#fff", borderRadius: 99, px: { xs: 1.75, sm: 2.25 }, py: 1.05, fontSize: 10, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "none", "&:hover": { bgcolor: "#553599", color: "#fff", boxShadow: "none" } }}>{spanish ? "MIEMBROS" : "MEMBERS"}</Button>
+            <LanguageMenu variant="onDark" />
+          </Box>
+        </Box>
+      </Container>
+    </Box>
+  );
+};
+
+export default SiteHeader;

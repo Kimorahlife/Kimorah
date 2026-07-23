@@ -75,9 +75,6 @@ const RevitalizationPage: React.FC = () => {
 
   return (
     <Box component="main" sx={{ position: "relative", minHeight: "100dvh", backgroundImage: "linear-gradient(rgba(255,255,255,.38), rgba(255,255,255,.38)), url('/pillars/revitalization-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundAttachment: { md: "fixed" }, overflow: "hidden" }}>
-      <IconButton aria-label="Back to home" onClick={() => navigate("/")} sx={{ position: "fixed", top: { xs: 14, sm: 28 }, left: { xs: 14, sm: 28 }, zIndex: 5, width: { xs: 54, sm: 76 }, height: { xs: 54, sm: 76 }, color: INDIGO, bgcolor: "rgba(171,143,209,.78)", backdropFilter: "blur(5px)", "&:hover": { bgcolor: "rgba(158,126,201,.94)" } }}>
-        <ArrowBackRoundedIcon sx={{ fontSize: { xs: 30, sm: 41 } }} />
-      </IconButton>
 
       <Container maxWidth="md" sx={{ position: "relative", py: { xs: 3, sm: 3.5 }, px: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center" }}>

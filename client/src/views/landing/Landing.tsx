@@ -1,7 +1,9 @@
 import React from "react";
-import { Box, ButtonBase, Typography } from "@mui/material";
+import { Box, Button, ButtonBase, Typography } from "@mui/material";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import LanguageMenu from "../shared/LanguageMenu";
 import LogoBadge from "./LogoBadge";
 import LandingBackground from "./LandingBackground";
 import { PILLARS, Pillar } from "./pillars";
@@ -152,6 +154,8 @@ const Divider: React.FC = () => (
  */
 const Landing: React.FC = () => {
   const navigate = useNavigate();
+  const { i18n } = useTranslation();
+  const spanish = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es");
 
   // Open full component pages or image-based pillar pages. Pillars without
   // either kind of page continue to the signup flow.
@@ -198,6 +202,43 @@ const Landing: React.FC = () => {
             "linear-gradient(180deg, rgba(20,12,40,0.32) 0%, rgba(20,12,40,0.14) 32%, rgba(20,12,40,0) 58%)",
         }}
       />
+
+      {/* Top-right: language dropdown + ghost Members button (white text) */}
+      <Box
+        data-language-switcher
+        sx={{
+          position: "absolute",
+          top: { xs: 12, sm: 22 },
+          right: { xs: 12, sm: 24 },
+          zIndex: 3,
+          display: "flex",
+          alignItems: "center",
+          gap: { xs: 1, sm: 1.5 },
+        }}
+      >
+        <Button
+          onClick={() => navigate("/login")}
+          variant="outlined"
+          sx={{
+            color: "#fff",
+            borderColor: "rgba(255,255,255,.7)",
+            borderRadius: 99,
+            px: { xs: 1.75, sm: 2.25 },
+            py: { xs: .55, sm: .7 },
+            fontSize: { xs: 11.5, sm: 13 },
+            fontWeight: 800,
+            textTransform: "uppercase",
+            whiteSpace: "nowrap",
+            bgcolor: "rgba(255,255,255,.12)",
+            backdropFilter: "blur(6px)",
+            boxShadow: "0 4px 14px rgba(0,0,0,.25)",
+            "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,.22)" },
+          }}
+        >
+          {spanish ? "Miembros" : "Members"}
+        </Button>
+        <LanguageMenu variant="ghost" />
+      </Box>
 
       <Box
         sx={{

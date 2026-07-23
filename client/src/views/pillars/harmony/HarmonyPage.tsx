@@ -49,7 +49,6 @@ const HarmonyPage: React.FC = () => {
 
   return (
     <Box component="main" sx={{ minHeight: "100dvh", width: "100%", backgroundImage: "linear-gradient(rgba(255,255,255,.18), rgba(255,255,255,.1)), url('/pillars/harmony-bg.png')", backgroundSize: "cover", backgroundPosition: "center", backgroundAttachment: { md: "fixed" }, overflow: "hidden" }}>
-      <IconButton aria-label="Back to home" onClick={() => navigate("/")} sx={{ position: "fixed", top: { xs: 14, sm: 24 }, left: { xs: 14, sm: 24 }, zIndex: 5, width: { xs: 54, sm: 62 }, height: { xs: 54, sm: 62 }, color: INDIGO, bgcolor: "rgba(196,158,226,.85)", border: "1px solid rgba(255,255,255,.55)", boxShadow: "0 8px 24px rgba(19,14,64,.22)", backdropFilter: "blur(7px)", "&:hover": { bgcolor: "rgba(218,185,240,.95)" } }}><ArrowBackRoundedIcon sx={{ fontSize: { xs: 30, sm: 35 } }} /></IconButton>
 
       <Container maxWidth="md" sx={{ py: { xs: 3, sm: 3.5 }, px: { xs: 2, sm: 3 } }}>
         <Box sx={{ display: "flex", flexDirection: "column", alignItems: "center", textAlign: "center", color: "#fff" }}>

@@ -1,4 +1,6 @@
-import React, { ReactNode, useEffect, useState } from "react";
+import React, { ReactNode, useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useTranslation } from "react-i18next";
 import { Box, Button, Typography } from "@mui/material";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
@@ -8,7 +10,8 @@ import FormatQuoteRoundedIcon from "@mui/icons-material/FormatQuoteRounded";
 import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { kindnessData } from "./kindness-data";
-import { api } from "../../../api";
+import { AppDispatch, getCoqui } from "../../../store/store";
+import { loadCoquiAggregates } from "../../../store/slices/coqui";
 import CoquiShell from "./CoquiShell";
 import {
   DonutChart,
@@ -35,34 +38,43 @@ const GLANCE_ICONS: Record<string, ReactNode> = {
 /** Coquí Research Data dashboard (under Mission → Review Data). */
 const KindnessPage: React.FC = () => {
   const d = kindnessData;
-  const [agg, setAgg] = useState<any>(null);
-  const [status, setStatus] = useState<string>("loading");
+  const dispatch = useDispatch<AppDispatch>();
+  const { i18n } = useTranslation();
+  const lang = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es") ? "es" : "en";
+  const { data: agg, loaded, error } = useSelector(getCoqui);
+
+  // Fetch aggregates into the Redux store on mount (and whenever the UI
+  // language changes). Because the data lives in the store (not component-local
+  // state), a StrictMode remount or client-side navigation never drops it, and
+  // the persisted slice rehydrates the last numbers instantly on a full page
+  // refresh. Passing `lang` lets the server order survey quotes so the current
+  // language's responses come first.
   useEffect(() => {
-    const where = api.defaults.baseURL || "(same origin)";
-    api
-      .get("/api/research/coqui/aggregates")
-      .then((r) => {
-        if (r.data && typeof r.data === "object" && typeof r.data.totalParticipants === "number") {
-          setAgg(r.data);
-          setStatus("live");
-        } else {
-          const kind = typeof r.data === "string" ? "HTML/text (wrong URL?)" : "an object without totalParticipants";
-          setStatus(`unexpected response from ${where} — got ${kind}`);
-        }
-      })
-      .catch((e) => setStatus(`could not reach the API at ${where} — ${e?.message ?? "request failed"}`));
-  }, []);
-  const offline = status !== "live" && status !== "loading";
+    dispatch(loadCoquiAggregates(lang));
+  }, [dispatch, lang]);
+
+  // "Offline" = we've finished a fetch attempt that failed, and have nothing
+  // cached to fall back on. While loading, or with persisted data present, we
+  // show the numbers rather than an error banner.
+  const offline = !!error && !agg;
+  const status = error || (loaded ? "live" : "loading");
 
   // Everything on this dashboard is driven by the survey responses (the
   // `coqui_responses` collection) via GET /api/research/coqui/aggregates.
   // When the API is unreachable or there's no data, we show honest zeros and
   // empty states — never fabricated sample numbers.
-  const glance = [
+  const glance: Array<{ icon: string; value: string; unit?: string; label: string; sublabel?: string; info?: string }> = [
     { icon: "person", value: String(agg?.totalParticipants ?? 0), label: "Total Participants" },
     { icon: "globe", value: String(agg?.countriesRepresented ?? 0), label: "Countries Represented" },
     { icon: "calendar", value: String(agg?.avgTimeSinceYears ?? 0), unit: "yrs", label: "Avg. Time Since Last Exposure to Coquí" },
-    { icon: "heart", value: String(agg?.avgActivation ?? 0), unit: "/ 10", label: "Avg. Emotional Activation (0–10)" },
+    {
+      icon: "heart",
+      value: String(agg?.avgActivation ?? 0),
+      unit: "/ 10",
+      label: "Sonic Imprinting Index Score",
+      sublabel: "Qualitative · Memory-based",
+      info: "Sonic imprinting is the lasting emotional, cognitive, and bodily associations formed by repeated exposure to meaningful sounds during formative years. Familiar sounds—like the coquí's call—become tied to safety, belonging, home, and identity, so re-encountering them later (especially after displacement) can reawaken memories, emotions, and physical sensations, supporting nostalgia, place attachment, and emotional regulation.",
+    },
   ];
 
   const IMPRINT_COLORS = d.imprinting.distribution.map((s) => s.color);
@@ -127,7 +139,7 @@ const KindnessPage: React.FC = () => {
           <SectionLabel>AT A GLANCE</SectionLabel>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" }, gap: { xs: 1.5, sm: 2 } }}>
             {glance.map((g, i) => (
-              <StatCard key={i} icon={GLANCE_ICONS[g.icon]} value={g.value} unit={g.unit} label={g.label} />
+              <StatCard key={i} icon={GLANCE_ICONS[g.icon]} value={g.value} unit={g.unit} label={g.label} sublabel={g.sublabel} info={g.info} />
             ))}
           </Box>
         </Panel>

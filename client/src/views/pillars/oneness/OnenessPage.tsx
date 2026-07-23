@@ -48,26 +48,6 @@ const OnenessPage: React.FC = () => {
       }}
     >
       <Box sx={{ minHeight: "100dvh", background: "linear-gradient(180deg, rgba(232,244,240,0.42) 0%, rgba(224,240,238,0.6) 100%)" }}>
-        <Button
-          onClick={() => navigate("/")}
-          startIcon={<ArrowBackRoundedIcon />}
-          sx={{
-            position: "fixed",
-            top: 16,
-            left: 16,
-            zIndex: 10,
-            color: GREEN,
-            textTransform: "none",
-            fontWeight: 700,
-            px: 2,
-            borderRadius: 999,
-            bgcolor: "rgba(255,255,255,0.75)",
-            backdropFilter: "blur(4px)",
-            "&:hover": { bgcolor: "rgba(255,255,255,0.9)" },
-          }}
-        >
-          Back
-        </Button>
 
         <Container maxWidth="lg" sx={{ py: { xs: 6, sm: 7 } }}>
           {/* Header */}

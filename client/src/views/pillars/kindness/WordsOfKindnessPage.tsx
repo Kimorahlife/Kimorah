@@ -50,7 +50,6 @@ const WordsOfKindnessPage: React.FC = () => {
 
   return (
     <Box component="main" sx={{ minHeight: "100dvh", width: "100%", overflow: "hidden", background: "radial-gradient(circle at 50% 45%, rgba(255,248,237,.97) 0%, rgba(252,245,242,.95) 45%, rgba(233,222,247,.93) 100%)", color: INDIGO }}>
-      <IconButton aria-label="Back to kindness" onClick={() => navigate("/kindness")} sx={{ position: "fixed", top: { xs: 14, sm: 24 }, left: { xs: 14, sm: 24 }, zIndex: 5, width: { xs: 50, sm: 58 }, height: { xs: 50, sm: 58 }, color: INDIGO, bgcolor: "rgba(205,184,232,.78)", backdropFilter: "blur(7px)", "&:hover": { bgcolor: "rgba(185,157,222,.95)" } }}><ArrowBackRoundedIcon /></IconButton>
 
       <Container maxWidth="lg" sx={{ py: { xs: 8, sm: 7 }, px: { xs: 2, sm: 4 } }}>
         <Typography component="h1" sx={{ ...floatingSx(0, 6.8), fontSize: { xs: 36, sm: 52, md: 58 }, fontWeight: 500, letterSpacing: { xs: 6, sm: 13, md: 17 }, textAlign: "center", lineHeight: 1.15 }}>WORDS OF KINDNESS</Typography>
