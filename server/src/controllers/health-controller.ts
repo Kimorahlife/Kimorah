@@ -1,18 +1,9 @@
 import { Request, Response } from "express";
 import mongoose from "mongoose";
 import config from "../config";
+import { isCorsOriginAllowed } from "../middleware/cors";
 
 const isProd = process.env.NODE_ENV === "production";
-const localhostRe = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
-
-/** Replicates middleware/cors.ts so the report can tell you if THIS request's
- * origin would be accepted by the real CORS policy. */
-const isOriginAllowed = (origin?: string): boolean => {
-  if (!origin) return true; // no Origin header (server-to-server / same-origin)
-  if (origin === config.ORIGIN_URL) return true;
-  if (!isProd && localhostRe.test(origin)) return true;
-  return false;
-};
 
 /**
  * GET /api/health — connectivity + configuration self-check.
@@ -26,7 +17,7 @@ const isOriginAllowed = (origin?: string): boolean => {
  */
 export const healthCheck = (req: Request, res: Response): void => {
   const requestOrigin = req.headers.origin as string | undefined;
-  const originAllowed = isOriginAllowed(requestOrigin);
+  const originAllowed = isCorsOriginAllowed(requestOrigin);
   const dbReady = mongoose.connection.readyState === 1;
 
   res.status(200).json({
