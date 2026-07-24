@@ -20,7 +20,8 @@ import { useToken } from "../authentication/components/useToken";
 import { AppDispatch, getUser, getRole, getCoqui } from "../../store/store";
 import { loadUsers } from "../../store/slices/users";
 import { loadCoquiAggregates } from "../../store/slices/coqui";
-import { useCan, useFeatureUiAccess } from "../shared/permissions";
+import { useCan, useFeatureUiAccess, useCurrentRole } from "../shared/permissions";
+import AccessRestricted from "../shared/AccessRestricted";
 
 /** A single stat tile with a coloured left accent. */
 const StatCard = ({
@@ -84,6 +85,8 @@ export default function Dashboard() {
   const canReadUsers = useCan("users", "read");
   const showUsers = useFeatureUiAccess("users");
   const showRoles = useFeatureUiAccess("roles");
+  const showResearch = useFeatureUiAccess("research");
+  const { isGlobal, permissions } = useCurrentRole();
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
 
@@ -99,6 +102,12 @@ export default function Dashboard() {
       dispatch(loadUsers(token));
     }
   }, [token, canReadUsers, users.list.length, dispatch]);
+
+  // A user with no role / no permissions (and not global) can't do anything —
+  // show a "contact your administrator" notice instead of an empty dashboard.
+  if (!isGlobal && permissions.length === 0) {
+    return <AccessRestricted />;
+  }
 
   const stats = [
     showUsers && {
@@ -133,7 +142,7 @@ export default function Dashboard() {
   const quickActions = [
     showRoles && { label: t("dashboard.manageRoles", "Manage Roles"), to: "/roles" },
     showUsers && { label: t("dashboard.manageUsers", "Manage Users"), to: "/users" },
-    { label: t("dashboard.coquiQuestions", "Coquí Questions"), to: "/coqui-questions" },
+    showResearch && { label: t("dashboard.coquiQuestions", "Coquí Questions"), to: "/coqui-questions" },
     { label: t("dashboard.reviewCoqui", "Review Coquí Data"), to: "/mission/coqui" },
     { label: t("dashboard.mission", "Mission"), to: "/mission" },
   ].filter(Boolean) as Array<{ label: string; to: string }>;

@@ -27,6 +27,7 @@ type DisplayGroup = { label: string; members: string[] };
 const DISPLAY_GROUPS: DisplayGroup[] = [
   { label: "Users", members: ["Users"] },
   { label: "Roles", members: ["Roles"] },
+  { label: "Research", members: ["Research"] },
 ];
 
 type Props = {

@@ -48,13 +48,16 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
     if (token) dispatch(loadRoles(token));
   }, [token, dispatch]);
 
-  // Resolve the current user's permission keys from the DB-loaded roles list.
-  const userPermissions = useMemo(() => {
-    const userRole = roleState.list.find((r) => r.name === user?.roles);
-    return userRole?.permissions ?? [];
-  }, [roleState.list, user?.roles]);
+  // Resolve the current user's role from the DB-loaded roles list: its
+  // permission keys and whether it's a global (full-access) role.
+  const userRole = useMemo(
+    () => roleState.list.find((r) => r.name === user?.roles),
+    [roleState.list, user?.roles]
+  );
+  const userPermissions = userRole?.permissions ?? [];
+  const isGlobal = userRole?.isGlobal ?? false;
 
-  const canReadUsers = canDoOn(userPermissions, "users", "read");
+  const canReadUsers = canDoOn(userPermissions, "users", "read", isGlobal);
 
   // Presence ("who's online") is a users:read admin feature — load it only when
   // permitted, so a plain User never hits the users:read-guarded /api/users/all.
@@ -78,8 +81,8 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
   );
 
   const navigation = useMemo(
-    () => getVisibleNavigation(userPermissions, t),
-    [userPermissions, t]
+    () => getVisibleNavigation(userPermissions, isGlobal, t),
+    [userPermissions, isGlobal, t]
   );
 
   if (!isTokenValid) {

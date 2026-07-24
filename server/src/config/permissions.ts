@@ -28,4 +28,10 @@ export const KNOWN_PERMISSIONS: KnownPermission[] = [
   { key: "roles:add",    label: "Roles – Add",    group: "Roles", action: "add"    },
   { key: "roles:write",  label: "Roles – Edit",   group: "Roles", action: "write"  },
   { key: "roles:delete", label: "Roles – Delete", group: "Roles", action: "delete" },
+
+  // Research (Coquí survey questions)
+  { key: "research:read",   label: "Research – View",   group: "Research", action: "read"   },
+  { key: "research:add",    label: "Research – Add",    group: "Research", action: "add"    },
+  { key: "research:write",  label: "Research – Edit",   group: "Research", action: "write"  },
+  { key: "research:delete", label: "Research – Delete", group: "Research", action: "delete" },
 ];

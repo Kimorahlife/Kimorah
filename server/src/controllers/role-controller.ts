@@ -3,8 +3,6 @@ import { Roles } from "../models/roles-model";
 import { Users } from "../models/user-model";
 import HttpError from "../util/errors/http-error";
 import { refreshCache } from "../services/permission-cache";
-import { DEFAULT_ROLE_PERMISSIONS } from "../startup/boot";
-import { ROLE_CODE_MAP } from "../config/role-codes";
 
 interface RoleBody {
   name: string;
@@ -49,12 +47,9 @@ export const createRole = async (
   const { name, permissions, isGlobal } = req.body;
 
   try {
-    const seededPermissions = permissions?.length
-      ? permissions
-      : (DEFAULT_ROLE_PERMISSIONS[name] ?? []);
     const role = await Roles.create({
       name,
-      permissions: seededPermissions,
+      permissions: permissions ?? [],
       isGlobal: isGlobal ?? false,
     });
     await refreshCache(); // Must refresh cache after role change
@@ -106,14 +101,18 @@ export const deleteRole = async (
       return next(new HttpError("Role not found", 404));
     }
 
-    // Guard the system roles — deleting them would strip everyone's access.
-    if (Object.values(ROLE_CODE_MAP).includes(role.name as any)) {
-      return next(new HttpError(`Cannot delete the system role '${role.name}'.`, 403));
+    // Never allow deleting the last global role — that would strip all admin
+    // access and lock everyone out. (Flag-based, not a hard-coded role name.)
+    if (role.isGlobal) {
+      const globalCount = await Roles.countDocuments({ isGlobal: true });
+      if (globalCount <= 1) {
+        return next(new HttpError("Cannot delete the only global role — at least one must remain.", 403));
+      }
     }
 
-    // Reassign any users holding this role back to the default User role,
-    // then remove the role and refresh the RBAC cache.
-    await Users.updateMany({ roles: role.name }, { $set: { roles: ROLE_CODE_MAP.User } });
+    // Clear the role from any users who held it (they revert to no role /
+    // no access), then remove the role and refresh the RBAC cache.
+    await Users.updateMany({ roles: role.name }, { $set: { roles: "" } });
     await Roles.findByIdAndDelete(id);
     await refreshCache();
 

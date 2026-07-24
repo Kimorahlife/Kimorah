@@ -2,23 +2,10 @@ import { Permission } from "../models/permission-model";
 import { Roles } from "../models/roles-model";
 import { refreshCache } from "../services/permission-cache";
 import { KNOWN_PERMISSIONS } from "../config/permissions";
-import { ROLE_CODE_MAP } from "../config/role-codes";
 import { CoquiQuestion } from "../models/coqui-question-model";
 import coquiSurvey from "../config/coqui-survey.json";
 
 const ALL_PERMISSION_KEYS = KNOWN_PERMISSIONS.map((p) => p.key);
-
-const { GlobalAdmin, Admin, User } = ROLE_CODE_MAP;
-
-/**
- * Fallback role permission seed used by `createRole` when an admin creates a
- * role without specifying permissions, and by seedDefaultRoles() on first boot.
- */
-export const DEFAULT_ROLE_PERMISSIONS: Record<string, string[]> = {
-  [GlobalAdmin]: ALL_PERMISSION_KEYS,
-  [Admin]: ["users:read", "users:write", "roles:read"],
-  [User]: [],
-};
 
 /**
  * Upserts every entry in KNOWN_PERMISSIONS into the Permission collection so
@@ -47,23 +34,31 @@ export async function syncPermissions(): Promise<void> {
 }
 
 /**
- * Seed the well-known system roles if they don't already exist, so a fresh
- * database has a usable Global Admin / Admin / User out of the box. Only
- * inserts missing roles — never overwrites an existing role's grants.
+ * Bootstrap: on a brand-new database (no roles at all), seed a SINGLE global
+ * role so there is always an admin to start from. A global role (isGlobal:true)
+ * bypasses every permission check (see isGlobalRole), so it can do everything
+ * and manage all other roles through the UI.
+ *
+ * This is the only role ever created automatically. Once any role exists it
+ * never runs again — there are no hard-coded system roles; everything else is
+ * created and managed in the app. Access is driven by the `isGlobal` flag and
+ * the permission matrix, never by role names.
  */
-export async function seedDefaultRoles(): Promise<void> {
-  for (const [name, permissions] of Object.entries(DEFAULT_ROLE_PERMISSIONS)) {
-    const exists = await Roles.findOne({ name });
-    if (!exists) {
-      await Roles.create({
-        name,
-        permissions,
-        isGlobal: name === GlobalAdmin,
-        bypassFeatureChecks: name === GlobalAdmin,
-      });
-      console.log(`✅ Seeded default role: ${name}`);
+export async function seedBootstrapRole(): Promise<void> {
+  const count = await Roles.estimatedDocumentCount();
+  if (count > 0) {
+    const hasGlobal = await Roles.exists({ isGlobal: true });
+    if (!hasGlobal) {
+      console.warn("⚠️  No global (isGlobal) role exists — flag one role as global to grant admin access.");
     }
+    return;
   }
+  await Roles.create({
+    name: "Global Admin",
+    isGlobal: true,
+    permissions: ALL_PERMISSION_KEYS,
+  });
+  console.log("✅ Seeded bootstrap role 'Global Admin' (isGlobal) on empty database.");
 }
 
 /**
@@ -89,13 +84,13 @@ export async function seedCoquiQuestions(): Promise<void> {
 }
 
 /**
- * Boot sequence. Data is only ever additive here (upsert permissions, insert
- * missing default roles, sync survey questions) — deploying never mutates
- * existing role, user, or response data.
+ * Boot sequence. Data is only ever additive here (upsert permissions, seed the
+ * bootstrap role on an empty DB, sync survey questions) — deploying never
+ * mutates existing role, user, or response data.
  */
 export async function boot(): Promise<void> {
   await syncPermissions();
-  await seedDefaultRoles();
+  await seedBootstrapRole();
   await seedCoquiQuestions();
   await refreshCache();
 }

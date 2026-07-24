@@ -3,25 +3,38 @@ import { getRole } from "../../../store/store";
 import { useUser } from "../../authentication/components/useUser";
 import { canDoOn, type Action, type Feature } from "./featurePermissions";
 
+interface CurrentRole {
+  permissions: string[];
+  /** A global role can do everything, regardless of individual permissions. */
+  isGlobal: boolean;
+}
+
 /**
- * Returns the current user's permission key list. Empty when the user has no
- * role or the role lookup fails — callers should treat that as "no perms".
+ * Resolves the current user's role from the loaded roles list, returning its
+ * permission keys and whether it's a global role. Empty / non-global when the
+ * user has no role or the lookup fails.
  */
-export function useUserPermissions(): string[] {
+export function useCurrentRole(): CurrentRole {
   const user = useUser();
-  const roleSlice = useSelector(getRole) as { list?: Array<{ name: string; permissions?: string[] }> } | undefined;
+  const roleSlice = useSelector(getRole) as
+    | { list?: Array<{ name: string; permissions?: string[]; isGlobal?: boolean }> }
+    | undefined;
   const roles = roleSlice?.list ?? [];
-  if (!user?.roles) return [];
+  if (!user?.roles) return { permissions: [], isGlobal: false };
   const role = roles.find((r) => r.name === user.roles);
-  return role?.permissions ?? [];
+  return { permissions: role?.permissions ?? [], isGlobal: role?.isGlobal ?? false };
+}
+
+/** Current user's permission key list (empty when no role). */
+export function useUserPermissions(): string[] {
+  return useCurrentRole().permissions;
 }
 
 /**
  * Returns true if the current user can perform `action` on `feature`.
- *
- *   const canEditRoles   = useCan("roles", "write");
- *   const canDeleteUsers = useCan("users", "delete");
+ * A global role always returns true.
  */
 export function useCan(feature: Feature, action: Action): boolean {
-  return canDoOn(useUserPermissions(), feature, action);
+  const { permissions, isGlobal } = useCurrentRole();
+  return canDoOn(permissions, feature, action, isGlobal);
 }

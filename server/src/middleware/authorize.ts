@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import HttpError from "../util/errors/http-error";
 import { extractAndVerifyToken } from "../util/jwt/jwt";
-import { hasPermission, hasAnyPermission, getCachedRole } from "../services/permission-cache";
+import { hasPermission, hasAnyPermission, getCachedRole, isGlobalRole } from "../services/permission-cache";
 
 /**
  * Group-prefix permission match. Used for :read requirements only —
@@ -39,6 +39,9 @@ export function authorize(permission: string) {
       if (!roleName) {
         return next(new HttpError("No role assigned to this user", 403));
       }
+
+      // A global role can do everything — no per-permission check.
+      if (isGlobalRole(roleName)) return next();
 
       // For :read requirements, accept any granted permission in the same group
       // (e.g. `users:write` satisfies a route guarded by `users:read`).
@@ -78,6 +81,9 @@ export function authorizeAny(permissions: string[]) {
       if (!roleName) {
         return next(new HttpError("No role assigned to this user", 403));
       }
+
+      // A global role can do everything — no per-permission check.
+      if (isGlobalRole(roleName)) return next();
 
       if (!hasAnyPermission(roleName, permissions)) {
         return next(new HttpError("You do not have permission to perform this action", 403));

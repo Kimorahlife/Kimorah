@@ -1,6 +1,5 @@
 import { Request, Response, NextFunction } from "express";
 import { Users, IUser } from "../models/user-model";
-import { ROLE_CODE_MAP } from "../config/role-codes";
 import { listRoleNamesWithPermission } from "../services/permission-cache";
 import HttpError from "../util/errors/http-error";
 import bcrypt from "bcrypt";
@@ -78,7 +77,7 @@ export const signupUser = async (
         name,
         email: email.toLowerCase(),
         passwordHash,
-        roles: ROLE_CODE_MAP.User,
+        roles: "", // no role by default — an admin assigns access via the Users UI
         isVerified: false,
       });
     } catch (err: unknown) {

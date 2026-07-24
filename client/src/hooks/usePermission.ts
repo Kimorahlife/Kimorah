@@ -17,5 +17,6 @@ export function usePermission(permission: string): boolean {
   const role = roles.find((r) => r.name === user.roles);
   if (!role) return false;
 
+  if (role.isGlobal) return true; // global role can do everything
   return role.permissions.includes(permission);
 }
