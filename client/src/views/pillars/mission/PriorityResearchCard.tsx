@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar, Box, Button, Typography } from "@mui/material";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import { useTranslation } from "react-i18next";
 import { PriorityResearchItem } from "./mission-data";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
@@ -10,7 +11,10 @@ const PriorityResearchCard: React.FC<{
   item: PriorityResearchItem;
   onTakeSurvey?: () => void;
   onReviewData?: () => void;
-}> = ({ item, onTakeSurvey, onReviewData }) => (
+}> = ({ item, onTakeSurvey, onReviewData }) => {
+  const { i18n } = useTranslation();
+  const spanish = (i18n.resolvedLanguage || i18n.language).startsWith("es");
+  return (
   <Box
     sx={{
       display: "flex",
@@ -59,18 +63,19 @@ const PriorityResearchCard: React.FC<{
           onClick={onTakeSurvey}
           sx={{ bgcolor: "#5a4a9c", color: "#fff", textTransform: "none", borderRadius: 999, boxShadow: "none", "&:hover": { bgcolor: "#4c3f88", boxShadow: "none" } }}
         >
-          Take Survey ›
+          {spanish ? "Realizar encuesta ›" : "Take Survey ›"}
         </Button>
         <Button
           variant="outlined"
           onClick={onReviewData}
           sx={{ color: "#5a4a9c", borderColor: "#5a4a9c", textTransform: "none", borderRadius: 999, "&:hover": { borderColor: "#4c3f88", bgcolor: "rgba(90,74,156,0.08)" } }}
         >
-          Review Data ›
+          {spanish ? "Revisar datos ›" : "Review Data ›"}
         </Button>
       </Box>
     </Box>
   </Box>
-);
+  );
+};
 
 export default PriorityResearchCard;

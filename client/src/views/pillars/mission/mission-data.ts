@@ -61,9 +61,9 @@ export interface MissionContent {
 
 export const missionData: MissionContent = {
   title: "MISSION",
-  tagline: "We rise together. We give back.",
+  tagline: "Healing People. Revitalizing Communities. Protecting Our Earth.",
   description:
-    "Supporting organizations and research that heal our planet, empower our children, inspire through art, and expand our collective knowledge.",
+    "We believe healing is the foundation of a thriving world. Through compassionate mental health care, transformative education, meaningful research, creativity, humanitarian service, and environmental stewardship, KIMORAH LIFE empowers individuals to overcome adversity, strengthens communities through connection and purpose, and fosters a healthier relationship with our planet. Together, we are building a future where every act of healing creates lasting change for people, communities, and the Earth.",
   causes: [
     { id: "earth",    title: "Earth & Climate",    subtitle: "Protect our home",              icon: "globe",   color: "#5f8c48" },
     { id: "children", title: "Children Education", subtitle: "Invest in their future",        icon: "book",    color: "#3f6fb0" },
@@ -94,13 +94,57 @@ export const missionData: MissionContent = {
     imageUrl: "/pillars/mission-frog.png",
   },
   partners: [
-    { id: "rainforest", name: "Rainforest Trust",                 description: "Protecting rainforests and wildlife for a healthier planet.", accent: "#3f7d55", logoUrl: "/pillars/partner-rainforest.png" },
-    { id: "unicef",     name: "UNICEF",                           description: "Providing education and resources for every child to thrive.", accent: "#2f7fc0", logoUrl: "/pillars/partner-unicef.png" },
-    { id: "nea",        name: "National Endowment for the Arts",  description: "Strengthening communities through the power of the arts.",     accent: "#6b5b9a", logoUrl: "/pillars/partner-nea.png", logoBg: "#141414" },
+    { id: "humanamente", name: "Humanamente", description: "Humanamente connects people still experiencing the consequences of the earthquake in Venezuela with verified mental health professionals, free of charge.", accent: "#4f91cb", logoUrl: "/pillars/partner-humanamente.svg" },
+    { id: "gem", name: "Global Empowerment Mission", description: "GEM: One of the world's most effective disaster relief organizations.", accent: "#31568f", logoUrl: "/pillars/partner-gem.svg" },
   ],
   cta: {
     heading: "Want to get involved?",
     subtext: "Your support fuels change.",
     buttonLabel: "Make an Impact",
+  },
+};
+
+export const missionDataEs: MissionContent = {
+  title: "MISIÓN",
+  tagline: "Sanando personas. Revitalizando comunidades. Protegiendo nuestra Tierra.",
+  description:
+    "Creemos que la sanación es la base de un mundo próspero. A través de una atención compasiva de la salud mental, educación transformadora, investigación significativa, creatividad, servicio humanitario y responsabilidad ambiental, KIMORAH LIFE empodera a las personas para superar la adversidad, fortalece las comunidades mediante la conexión y el propósito, y fomenta una relación más saludable con nuestro planeta. Juntos, estamos construyendo un futuro donde cada acto de sanación genera un cambio duradero para las personas, las comunidades y la Tierra.",
+  causes: [
+    { id: "earth", title: "Tierra y clima", subtitle: "Protege nuestro hogar", icon: "globe", color: "#5f8c48" },
+    { id: "children", title: "Educación infantil", subtitle: "Invierte en su futuro", icon: "book", color: "#3f6fb0" },
+    { id: "arts", title: "Arte y cultura", subtitle: "Inspira. Crea. Transforma.", icon: "palette", color: "#7b5ea6" },
+    { id: "research", title: "Investigación y ciencia", subtitle: "Descubre. Comprende. Avanza.", icon: "science", color: "#3f8f97" },
+  ],
+  priorityProgram: {
+    title: "Cuando la Tierra cambia,",
+    highlightedTitle: "Nosotros también",
+    description:
+      "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas indirectamente por el terremoto de Venezuela.",
+    audience: "DISEÑADO PARA PROFESIONALES DE LA SALUD MENTAL",
+    audienceDescription:
+      "Basado en evidencia. Informado por trauma. Enfoques integrativos y culturalmente sensibles.",
+    primaryAction: "EXPLORAR SESIONES",
+    secondaryAction: "VER VIDEO INTRODUCTORIO",
+    imageUrl: "/pillars/priority-program-portal.png",
+  },
+  priority: {
+    badge: "PRIORIDAD PRINCIPAL",
+    title: "Ecos de pertenencia",
+    subtitle:
+      "Investigación de las respuestas emocionales y somáticas al canto del coquí en poblaciones venezolanas desplazadas",
+    description:
+      "Exploramos el impacto emocional y somático del canto del coquí en quienes alguna vez convivieron con él y ya no lo hacen. Consulta datos anteriores, apoya el estudio y ayúdanos a comprender el poder del sonido, la memoria y el sentido de pertenencia.",
+    surveyUrl: "#",
+    dataUrl: "#",
+    imageUrl: "/pillars/mission-frog.png",
+  },
+  partners: [
+    { id: "humanamente", name: "Humanamente", description: "Humanamente conecta a quienes siguen sintiendo las consecuencias del terremoto en Venezuela con profesionales de salud mental verificados, de forma gratuita.", accent: "#4f91cb", logoUrl: "/pillars/partner-humanamente.svg" },
+    { id: "gem", name: "Global Empowerment Mission", description: "GEM: Una de las organizaciones de ayuda en desastres más eficaces del mundo.", accent: "#31568f", logoUrl: "/pillars/partner-gem.svg" },
+  ],
+  cta: {
+    heading: "¿Quieres participar?",
+    subtext: "Tu apoyo impulsa el cambio.",
+    buttonLabel: "Genera un impacto",
   },
 };

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 -36 520 217" role="img" aria-labelledby="title">
+  <title id="title">GEM Global Empowerment Mission</title>
+  <rect y="-36" width="520" height="217" rx="10" fill="#f6f5f2"/>
+  <g transform="translate(18 13)">
+    <circle cx="59" cy="59" r="50" fill="none" stroke="#222" stroke-width="2"/>
+    <circle cx="59" cy="59" r="29" fill="#31568f"/>
+    <path d="M39 47l12-12 10 4 6 10 13 6-5 12-12 3-5 17-12-8-5-14-10-6z" fill="#1f2022"/>
+    <g fill="#f2ad32">
+      <circle cx="59" cy="3" r="3"/><circle cx="82" cy="9" r="3"/><circle cx="100" cy="25" r="3"/>
+      <circle cx="109" cy="48" r="3"/><circle cx="108" cy="73" r="3"/><circle cx="96" cy="95" r="3"/>
+      <circle cx="76" cy="109" r="3"/><circle cx="52" cy="114" r="3"/><circle cx="28" cy="105" r="3"/>
+      <circle cx="12" cy="87" r="3"/><circle cx="6" cy="62" r="3"/><circle cx="12" cy="37" r="3"/>
+      <circle cx="29" cy="17" r="3"/>
+    </g>
+    <g stroke="#f2ad32" stroke-width="1.5"><path d="M59 8v18M81 13L72 30M97 28L82 40M104 49L86 53M103 72L84 67M92 92L78 78M75 104L68 86M52 108l3-19M30 99l12-16M17 84l18-9M11 62l20-2M17 39l18 10M31 21l12 17"/></g>
+  </g>
+  <text x="132" y="96" fill="#1d1d1f" font-family="Arial, Helvetica, sans-serif" font-size="88" font-weight="800">GEM</text>
+  <g fill="#222" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700">
+    <path d="M363 24h142v2H363zM363 119h142v2H363z"/>
+    <text x="365" y="51">GLOBAL</text>
+    <text x="365" y="74">EMPOWERMENT</text>
+    <text x="365" y="97">MISSION</text>
+  </g>
+</svg>

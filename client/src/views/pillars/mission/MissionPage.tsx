@@ -4,8 +4,9 @@ import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafRounded";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import LogoBadge from "../../landing/LogoBadge";
-import { missionData } from "./mission-data";
+import { missionData, missionDataEs } from "./mission-data";
 import CauseCard from "./CauseCard";
 import PartnerRow from "./PartnerRow";
 import PriorityResearchCard from "./PriorityResearchCard";
@@ -42,7 +43,9 @@ const SectionHeading: React.FC<{ title: string; action?: string; onAction?: () =
  */
 const MissionPage: React.FC = () => {
   const navigate = useNavigate();
-  const d = missionData;
+  const { i18n } = useTranslation();
+  const spanish = (i18n.resolvedLanguage || i18n.language).startsWith("es");
+  const d = spanish ? missionDataEs : missionData;
 
   return (
     <Box
@@ -76,17 +79,52 @@ const MissionPage: React.FC = () => {
             <EnergySavingsLeafRoundedIcon sx={{ color: GOLD, fontSize: 20 }} />
           </Box>
 
-          <Typography sx={{ fontFamily: SERIF, fontWeight: 700, color: INDIGO, fontSize: { xs: 30, sm: 44 }, lineHeight: 1.1 }}>
+          <Typography
+            sx={{
+              fontFamily: SERIF,
+              fontWeight: 700,
+              color: INDIGO,
+              fontSize: spanish
+                ? { xs: 25, sm: 28, md: 31 }
+                : { xs: 27, sm: 33, md: 38 },
+              lineHeight: 1.15,
+              letterSpacing: spanish ? "-0.3px" : "normal",
+              width: "100%",
+            }}
+          >
             {d.tagline}
           </Typography>
           <Typography
-            sx={{ color: "#ffffff", textShadow: "0 1px 4px rgba(0,0,0,0.4)", fontSize: { xs: 15, sm: 18 }, mt: 2, maxWidth: 640 }}
+            sx={{
+              color: INDIGO,
+              fontSize: { xs: 15, sm: 17 },
+              fontWeight: 500,
+              lineHeight: 1.6,
+              mt: 2,
+              width: "100%",
+            }}
           >
             {d.description}
           </Typography>
 
+          {/* Priority Programs */}
+          <SectionHeading title={spanish ? "PROGRAMAS PRIORITARIOS" : "PRIORITY PROGRAMS"} />
+          <PriorityProgramCard item={d.priorityProgram} onExplore={() => navigate("/mission/sessions")} />
+
+          {/* Priority Research */}
+          <SectionHeading title={spanish ? "INVESTIGACIÓN PRIORITARIA" : "PRIORITY RESEARCH"} />
+          <PriorityResearchCard item={d.priority} onReviewData={() => navigate("/mission/coqui")} />
+
+          {/* Featured Partners */}
+          <SectionHeading title={spanish ? "ORGANIZACIONES DESTACADAS" : "FEATURED ORGANIZATIONS"} />
+          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
+            {d.partners.map((p) => (
+              <PartnerRow key={p.id} partner={p} />
+            ))}
+          </Box>
+
           {/* Explore Causes */}
-          <SectionHeading title="EXPLORE CAUSES" action="View All ›" />
+          <SectionHeading title={spanish ? "EXPLORA CAUSAS" : "EXPLORE CAUSES"} action={spanish ? "Ver todo ›" : "View All ›"} />
           <Box
             sx={{
               display: "grid",
@@ -96,22 +134,6 @@ const MissionPage: React.FC = () => {
           >
             {d.causes.map((c) => (
               <CauseCard key={c.id} cause={c} />
-            ))}
-          </Box>
-
-          {/* Priority Programs */}
-          <SectionHeading title="PRIORITY PROGRAMS" />
-          <PriorityProgramCard item={d.priorityProgram} onExplore={() => navigate("/mission/sessions")} />
-
-          {/* Priority Research */}
-          <SectionHeading title="PRIORITY RESEARCH" />
-          <PriorityResearchCard item={d.priority} onReviewData={() => navigate("/mission/coqui")} />
-
-          {/* Featured Partners */}
-          <SectionHeading title="FEATURED PARTNERS" />
-          <Box sx={{ display: "flex", flexDirection: "column", gap: 1.5 }}>
-            {d.partners.map((p) => (
-              <PartnerRow key={p.id} partner={p} />
             ))}
           </Box>
 
