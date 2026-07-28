@@ -93,7 +93,7 @@ export const KIMORAH_ES: Record<string, string> = {
   // Mission page
   "EXPLORE CAUSES": "EXPLORA CAUSAS", "PRIORITY PROGRAMS": "PROGRAMAS PRIORITARIOS", "PRIORITY RESEARCH": "INVESTIGACIÓN PRIORITARIA", "FEATURED PARTNERS": "ORGANIZACIONES DESTACADAS", "View All ›": "Ver todo ›", "Protect our home": "Protege nuestro hogar", "Invest in their future": "Invierte en su futuro", "Inspire. Create. Transform.": "Inspira. Crea. Transforma.", "Discover. Understand. Advance.": "Descubre. Comprende. Avanza.",
   "When the Earth Changes,": "Cuando la Tierra Cambia,", "We Change Too": "Nosotros También",
-  "A psychoeducational curriculum offering support and processing for people indirectly affected by the earthquake in Venezuela.": "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas indirectamente por el terremoto de Venezuela.",
+  "A psychoeducational curriculum offering support and processing for people directly and indirectly affected by the earthquake in Venezuela.": "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas directa e indirectamente por el terremoto de Venezuela.",
   "DESIGNED FOR MENTAL HEALTH PROFESSIONALS": "DISEÑADO PARA PROFESIONALES DE LA SALUD MENTAL",
   "Evidence-based. Trauma-informed. Integrative and culturally sensitive approaches.": "Basado en evidencia. Informado por trauma. Enfoques integrativos y culturalmente sensibles.",
   "EXPLORE SESSIONS": "EXPLORAR SESIONES", "WATCH INTRODUCTORY VIDEO": "VER VIDEO INTRODUCTORIO",

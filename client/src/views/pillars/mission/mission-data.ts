@@ -74,7 +74,7 @@ export const missionData: MissionContent = {
     title: "When the Earth Changes,",
     highlightedTitle: "We Change Too",
     description:
-      "A psychoeducational curriculum offering support and processing for people indirectly affected by the earthquake in Venezuela.",
+      "A psychoeducational curriculum offering support and processing for people directly and indirectly affected by the earthquake in Venezuela.",
     audience: "DESIGNED FOR MENTAL HEALTH PROFESSIONALS",
     audienceDescription:
       "Evidence-based. Trauma-informed. Integrative and culturally sensitive approaches.",
@@ -119,7 +119,7 @@ export const missionDataEs: MissionContent = {
     title: "Cuando la Tierra cambia,",
     highlightedTitle: "Nosotros también",
     description:
-      "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas indirectamente por el terremoto de Venezuela.",
+      "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas directa e indirectamente por el terremoto de Venezuela.",
     audience: "DISEÑADO PARA PROFESIONALES DE LA SALUD MENTAL",
     audienceDescription:
       "Basado en evidencia. Informado por trauma. Enfoques integrativos y culturalmente sensibles.",
