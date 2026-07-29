@@ -41,9 +41,17 @@ export interface PriorityProgramItem {
   title: string;
   highlightedTitle: string;
   description: string;
+  purpose: string;
+  curricula: Array<{
+    number: number;
+    title: string;
+    highlightedTitle?: string;
+    description: string;
+    action: string;
+    accent: string;
+  }>;
   audience: string;
   audienceDescription: string;
-  primaryAction: string;
   secondaryAction: string;
   imageUrl: string;
 }
@@ -71,16 +79,35 @@ export const missionData: MissionContent = {
     { id: "research", title: "Research & Science", subtitle: "Discover. Understand. Advance.", icon: "science", color: "#3f8f97" },
   ],
   priorityProgram: {
-    title: "When the Earth Changes,",
-    highlightedTitle: "We Change Too",
+    title: "When the earth changes",
+    highlightedTitle: "and love remains",
     description:
-      "A psychoeducational curriculum offering support and processing for people directly and indirectly affected by the earthquake in Venezuela.",
+      "Psychoeducational curricula designed to accompany, heal, and revitalize after the earthquake in Venezuela.",
+    purpose: "TWO CURRICULA, ONE PURPOSE: ACCOMPANY, HEAL, AND REVITALIZE.",
+    curricula: [
+      {
+        number: 1,
+        title: "When the Earth Changes,",
+        highlightedTitle: "We Change Too",
+        description:
+          "A psychoeducational support and processing curriculum for people directly and indirectly affected by the earthquake in Venezuela.",
+        action: "EXPLORE CURRICULUM",
+        accent: "#7950c3",
+      },
+      {
+        number: 2,
+        title: "When Love Remains",
+        description:
+          "A psychoeducational support and processing curriculum for people grieving the death of a loved one after the earthquake in Venezuela.",
+        action: "EXPLORE CURRICULUM",
+        accent: "#aa3f7b",
+      },
+    ],
     audience: "DESIGNED FOR MENTAL HEALTH PROFESSIONALS",
     audienceDescription:
       "Evidence-based. Trauma-informed. Integrative and culturally sensitive approaches.",
-    primaryAction: "EXPLORE SESSIONS",
     secondaryAction: "WATCH INTRODUCTORY VIDEO",
-    imageUrl: "/pillars/priority-program-portal.png",
+    imageUrl: "/pillars/priority-program-sunset.png",
   },
   priority: {
     badge: "TOP PRIORITY",
@@ -116,16 +143,35 @@ export const missionDataEs: MissionContent = {
     { id: "research", title: "Investigación y ciencia", subtitle: "Descubre. Comprende. Avanza.", icon: "science", color: "#3f8f97" },
   ],
   priorityProgram: {
-    title: "Cuando la Tierra cambia,",
-    highlightedTitle: "Nosotros también",
+    title: "Cuando la tierra cambia",
+    highlightedTitle: "y el amor permanece",
     description:
-      "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas directa e indirectamente por el terremoto de Venezuela.",
+      "Currículos psicoeducativos diseñados para acompañar, sanar y revitalizar tras el terremoto de Venezuela.",
+    purpose: "DOS CURRÍCULOS, UN MISMO PROPÓSITO: ACOMPAÑAR, SANAR Y REVITALIZAR.",
+    curricula: [
+      {
+        number: 1,
+        title: "Cuando la Tierra cambia,",
+        highlightedTitle: "Nosotros también",
+        description:
+          "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas directa e indirectamente por el terremoto de Venezuela.",
+        action: "EXPLORAR CURRÍCULO",
+        accent: "#7950c3",
+      },
+      {
+        number: 2,
+        title: "Cuando el Amor Permanece",
+        description:
+          "Currículo psicoeducativo de apoyo y procesamiento para personas en duelo por la muerte de un ser querido tras el terremoto de Venezuela.",
+        action: "EXPLORAR CURRÍCULO",
+        accent: "#aa3f7b",
+      },
+    ],
     audience: "DISEÑADO PARA PROFESIONALES DE LA SALUD MENTAL",
     audienceDescription:
       "Basado en evidencia. Informado por trauma. Enfoques integrativos y culturalmente sensibles.",
-    primaryAction: "EXPLORAR SESIONES",
     secondaryAction: "VER VIDEO INTRODUCTORIO",
-    imageUrl: "/pillars/priority-program-portal.png",
+    imageUrl: "/pillars/priority-program-sunset.png",
   },
   priority: {
     badge: "PRIORIDAD PRINCIPAL",

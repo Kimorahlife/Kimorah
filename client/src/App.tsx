@@ -19,6 +19,7 @@ import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
 import MissionPsychoeducationPage from "./views/pillars/mission/MissionPsychoeducationPage";
 import SessionOneComingSoonPage from "./views/pillars/mission/SessionOneComingSoonPage";
+import GriefCurriculumPage from "./views/pillars/mission/GriefCurriculumPage";
 import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
 import KindnessPage from "./views/pillars/kindness/KindnessPage"; // Coquí Research Data dashboard (lives under Mission)
 import SurveyPage from "./views/pillars/kindness/SurveyPage";
@@ -73,6 +74,7 @@ const App: React.FC = () => {
       <Route path="/mission/sessions/1/objectives" element={<MissionObjectivesPage />} />
       <Route path="/mission/sessions/1/psychoeducation" element={<MissionPsychoeducationPage />} />
       <Route path="/mission/sessions/1/:section" element={<SessionOneComingSoonPage />} />
+      <Route path="/mission/grief/session/1/:section" element={<GriefCurriculumPage />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}
       <Route path="/mission/coqui" element={<KindnessPage />} />
       <Route path="/mission/coqui/survey" element={<SurveyPage />} />

@@ -109,7 +109,11 @@ const MissionPage: React.FC = () => {
 
           {/* Priority Programs */}
           <SectionHeading title={spanish ? "PROGRAMAS PRIORITARIOS" : "PRIORITY PROGRAMS"} />
-          <PriorityProgramCard item={d.priorityProgram} onExplore={() => navigate("/mission/sessions")} />
+          <PriorityProgramCard
+            item={d.priorityProgram}
+            onExplore={() => navigate("/mission/sessions")}
+            onExploreSecondary={() => navigate("/mission/grief/session/1/introduction")}
+          />
 
           {/* Priority Research */}
           <SectionHeading title={spanish ? "INVESTIGACIÓN PRIORITARIA" : "PRIORITY RESEARCH"} />
