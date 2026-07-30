@@ -89,7 +89,6 @@ const MissionSessionOnePage: React.FC = () => {
             <Box sx={{ width: 42, borderTop: "1px solid rgba(255,255,255,.9)", mx: "auto", my: 2.5 }} />
             <Typography sx={{ fontSize: 11, letterSpacing: 1.3, color: "#c9b8e6" }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography>
             <Typography sx={{ fontFamily: SERIF, fontSize: { xs: 18, md: 21 }, mt: .8 }}>{copy(lang, "Vulnerability · Vicarious trauma · “What now?”", "Vulnerabilidad · Trauma vicario · “¿Y ahora qué?”")}</Typography>
-            <Typography sx={{ maxWidth: 680, mx: "auto", mt: 2.25, fontSize: { xs: 15, md: 17 }, lineHeight: 1.6, color: "rgba(255,255,255,.92)" }}>{copy(lang, "This session is designed to establish a space of trust, validate what you are experiencing, and begin building connection with others who understand.", "Esta sesión está diseñada para establecer un espacio de confianza, validar lo que estás viviendo y comenzar a construir conexión con otros que comprenden.")}</Typography>
           </Box>
         </Container>
       </Box>
@@ -128,7 +127,7 @@ const MissionSessionOnePage: React.FC = () => {
         <Typography sx={{ fontSize: 12, mt: .25 }}>{copy(lang, "Take the first step toward your well-being and that of those you support.", "Da el primer paso hacia tu bienestar y el de quienes acompañas.")}</Typography>
         <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 2, mt: 1 }}>
           <Button variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ bgcolor: PURPLE, borderRadius: 99, px: 3.5, py: .7, fontSize: 11, fontWeight: 800, boxShadow: "none", "&:hover": { bgcolor: "#6742a7" } }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button>
-          <Button onClick={() => navigate("/mission/sessions")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ color: INK, borderColor: PURPLE, borderRadius: 99, px: 3.5, py: .7, fontSize: 11, fontWeight: 800 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button>
+          <Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ color: INK, borderColor: PURPLE, borderRadius: 99, px: 3.5, py: .7, fontSize: 11, fontWeight: 800 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button>
         </Box>
       </Box>
       <Box component="footer" sx={{ py: .75, display: "flex", justifyContent: "center", alignItems: "center", gap: 1, bgcolor: "white" }}><InfoOutlinedIcon sx={{ fontSize: 18 }} /><Typography sx={{ fontSize: 12 }}>{copy(lang, "Therapeutic approach: Trauma-Informed Care (TIC), Mindfulness and ACT", "Enfoque terapéutico: Atención Informada por Trauma (TIC), Mindfulness y ACT")}</Typography></Box>

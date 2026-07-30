@@ -79,14 +79,69 @@ const GriefCurriculumPage: React.FC = () => {
       return <Box><Typography sx={{ fontFamily: SERIF, fontSize: 35 }}>{pageTitle}</Typography><Typography sx={{ mb: 3 }}>{copy(lang, "A space to reflect, share, and find meaning in the experience.", "Espacio para reflexionar, compartir y encontrar significado en la experiencia.")}</Typography><Typography sx={{ textAlign: "center", fontFamily: SERIF, fontSize: 24, bgcolor: "#e8ddf8", borderRadius: 99, py: 1, mb: 2 }}>{copy(lang, "Suggested questions for the group", "Preguntas sugeridas para el grupo")}</Typography><Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2 }}>{processing[lang].map((question, index) => <Box key={question} sx={{ ...card, minHeight: 130, p: 3, display: "grid", placeItems: "center", textAlign: "center", bgcolor: index % 2 ? "#faf0f8" : "#f3effc" }}><Typography sx={{ fontFamily: SERIF, fontSize: 24, color: index % 2 ? "#9c4ca1" : INK }}>“{question}”</Typography></Box>)}</Box></Box>;
     }
     if (active === "closing") {
-      return <Box><Box sx={{ ...card, p: 3 }}><Typography sx={{ fontFamily: SERIF, fontSize: 31 }}>{copy(lang, "Psychoeducational closing", "Cierre psicoeducativo")}</Typography><Typography sx={{ mt: 2, maxWidth: 760, lineHeight: 1.8 }}>{copy(lang, "The first grief responses are natural attempts by the body and mind to protect us from a profoundly painful reality. There is no right or wrong way to react. Accepting the reality of death does not mean forgetting or ceasing to love the person who died; it means gradually learning to live with their absence while love continues to be part of our story.", "Las primeras respuestas del duelo son intentos naturales del cuerpo y de la mente por protegernos frente a una realidad profundamente dolorosa. No existe una manera correcta o incorrecta de reaccionar. Aceptar la realidad de la muerte no significa olvidar ni dejar de amar a quien falleció; significa aprender poco a poco a vivir con esa ausencia mientras el amor continúa formando parte de nuestra historia.")}</Typography></Box><Box sx={{ ...card, p: 3, mt: 2 }}><Typography sx={{ fontFamily: SERIF, fontSize: 25 }}>{copy(lang, "Feedback and a positive closing", "Feedback y cierre en una nota positiva")}</Typography><Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2, mt: 2 }}>{[copy(lang, "Share one word that describes how you are leaving today.", "Comparte una palabra con la que te vas hoy."), copy(lang, "What learning or reflection are you taking from this first session?", "¿Qué aprendizaje o reflexión te llevas de esta primera sesión?")].map((text) => <Box key={text} sx={{ bgcolor: "#f3eef9", borderRadius: 2, p: 2.5, fontSize: 16 }}>“ {text}</Box>)}</Box></Box></Box>;
+      return <Box><Box sx={{ ...card, p: 3 }}><Typography sx={{ fontFamily: SERIF, fontSize: 31 }}>{copy(lang, "Psychoeducational closing", "Cierre psicoeducativo")}</Typography><Typography sx={{ mt: 2, maxWidth: 760, lineHeight: 1.8 }}>{copy(lang, "The first grief responses are natural attempts by the body and mind to protect us from a profoundly painful reality. There is no right or wrong way to react. Accepting the reality of death does not mean forgetting or ceasing to love the person who died; it means gradually learning to live with their absence while love continues to be part of our story.", "Las primeras respuestas del duelo son intentos naturales del cuerpo y de la mente por protegernos frente a una realidad profundamente dolorosa. No existe una manera correcta o incorrecta de reaccionar. Aceptar la realidad de la muerte no significa olvidar ni dejar de amar a quien falleció; significa aprender poco a poco a vivir con esa ausencia mientras el amor continúa formando parte de nuestra historia.")}</Typography></Box><Box sx={{ ...card, p: 3, mt: 2 }}><Typography sx={{ fontFamily: SERIF, fontSize: 25 }}>{copy(lang, "Feedback and a positive closing", "Feedback y cierre en una nota positiva")}</Typography><Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1fr 1fr" }, gap: 2, mt: 2 }}>{[copy(lang, "Share one word that describes how you are leaving today.", "Comparte una palabra con la que te vas hoy."), copy(lang, "What learning or reflection are you taking from this first session?", "¿Qué aprendizaje o reflexión te llevas de esta primera sesión?")].map((text) => <Box key={text} sx={{ bgcolor: "#f3eef9", borderRadius: 2, p: 2.5, fontSize: 16 }}>“ {text}</Box>)}</Box><Box sx={{ display: "flex", justifyContent: "center", mt: 4 }}><Button variant="contained" endIcon={<ArrowForwardRoundedIcon sx={{ fontSize: 30 }} />} sx={{ width: { xs: "100%", sm: 420 }, minHeight: 70, bgcolor: PURPLE, borderRadius: 99, px: 4, fontSize: { xs: 15, sm: 18 }, fontWeight: 800, boxShadow: "none", "&:hover": { bgcolor: "#6742a7", boxShadow: "none" } }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button></Box></Box></Box>;
     }
     return <Box><Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.1fr .9fr" }, gap: 3 }}><Box sx={{ ...card, p: 3 }}><Typography sx={{ fontFamily: SERIF, fontSize: 29 }}>{copy(lang, "Participant introductions", "Presentación de los participantes")}</Typography><Typography sx={{ mt: 2, lineHeight: 1.75 }}>{copy(lang, "Each participant will have the opportunity to introduce themselves, sharing only what feels comfortable. This is a safe space where all emotions are welcome and sharing is an invitation, not an obligation.", "Cada participante tendrá la oportunidad de presentarse compartiendo únicamente aquello con lo que se sienta cómodo(a). Este es un espacio seguro donde todas las emociones son bienvenidas y compartir es una invitación, no una obligación.")}</Typography></Box><Box sx={{ ...card, p: 3, bgcolor: "#f4effb" }}><Typography sx={{ fontFamily: SERIF, fontSize: 25 }}>{copy(lang, "Suggested questions", "Preguntas sugeridas")}</Typography>{[copy(lang, "How would you like us to address you?", "¿Cómo te gustaría que te llamáramos durante el grupo?"), copy(lang, "What motivated you to participate?", "¿Qué te motivó a participar en este espacio?"), copy(lang, "Is there anything the group should know to support you?", "¿Hay algo que quisieras que el grupo supiera para apoyarte mejor?")].map((text) => <Box key={text} sx={{ bgcolor: "white", p: 1.5, mt: 1, borderRadius: 2 }}>{text}</Box>)}</Box></Box><Box sx={{ ...card, p: 3, mt: 2 }}><Typography sx={{ fontFamily: SERIF, fontSize: 26 }}>{copy(lang, "Group agreements", "Acuerdos del grupo")}</Typography><Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "repeat(3,1fr)" }, gap: 2, mt: 2 }}>{[copy(lang, "Respect confidentiality.", "Respetar la confidencialidad."), copy(lang, "Listen with empathy and without judgment.", "Escuchar con empatía y sin juicios."), copy(lang, "Share only what feels safe.", "Compartir únicamente aquello para lo que se sienta preparado."), copy(lang, "Respect silence as part of grief.", "Respetar los silencios como parte del duelo."), copy(lang, "There is no correct way to grieve.", "No existe una manera correcta de vivir el duelo."), copy(lang, "Each person decides how much to share.", "Cada persona decide cuánto desea compartir.")].map((text) => <Box key={text} sx={{ display: "flex", gap: 1 }}><CheckCircleOutlineRoundedIcon sx={{ color: PURPLE }} /><Typography>{text}</Typography></Box>)}</Box></Box></Box>;
   };
 
   return <Box data-language-switcher sx={{ minHeight: "100dvh", bgcolor: "#f5f1fa", color: INK }}>
-    <Container maxWidth="xl" sx={{ py: 1.5 }}>
-      <Box component="nav" sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(4,1fr)", lg: "repeat(7,1fr)" }, bgcolor: "rgba(255,255,255,.9)", borderRadius: 3, overflow: "hidden", boxShadow: "0 8px 22px rgba(61,36,128,.08)" }}>{tabs.map(({ id, icon: Icon, en, es }) => { const selected = id === active; return <Box component="button" type="button" key={id} onClick={() => navigate(`/mission/grief/session/1/${id}`)} sx={{ border: 0, borderBottom: selected ? `4px solid ${PURPLE}` : "4px solid transparent", bgcolor: selected ? "#f1ebfa" : "transparent", color: selected ? PURPLE : INK, py: 1.5, cursor: "pointer" }}><Icon sx={{ fontSize: 29 }} /><Typography sx={{ fontSize: 10, fontWeight: 800 }}>{copy(lang, en, es).toUpperCase()}</Typography></Box>; })}</Box>
+    <Box
+      component="header"
+      sx={{
+        minHeight: { xs: 330, md: 390 },
+        px: 2,
+        pt: { xs: 5, md: 6 },
+        pb: { xs: 8, md: 9 },
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        color: "white",
+        background: "radial-gradient(circle at 50% 20%, #252050 0%, #17183e 48%, #111331 100%)",
+      }}
+    >
+      <Box
+        sx={{
+          minWidth: 145,
+          px: 3,
+          py: .7,
+          mb: 2.5,
+          bgcolor: PURPLE,
+          borderRadius: 99,
+          fontSize: 15,
+          fontWeight: 800,
+          letterSpacing: .7,
+        }}
+      >
+        {copy(lang, "SESSION 1", "SESIÓN 1")}
+      </Box>
+      <Typography
+        component="h1"
+        sx={{
+          maxWidth: 900,
+          fontFamily: SERIF,
+          fontSize: { xs: 42, sm: 56, md: 68 },
+          lineHeight: 1.05,
+          fontWeight: 500,
+        }}
+      >
+        {copy(lang, "Accepting the reality of loss", "Aceptando la realidad de la pérdida")}
+      </Typography>
+      <Box sx={{ width: 48, borderTop: "2px solid rgba(255,255,255,.65)", mt: 3, mb: 2 }} />
+      <Typography sx={{ color: "rgba(255,255,255,.68)", fontSize: 11, fontWeight: 800, letterSpacing: 1.4 }}>
+        {copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}
+      </Typography>
+      <Typography sx={{ mt: 1, fontFamily: SERIF, fontSize: { xs: 17, sm: 21 }, fontWeight: 600 }}>
+        {copy(
+          lang,
+          "Shock · Denial · Anticipatory grief · The reality of loss",
+          "Shock · Negación · Duelo anticipado · La realidad de la pérdida",
+        )}
+      </Typography>
+    </Box>
+    <Container maxWidth="xl" sx={{ py: 1.5, mt: { xs: -6, md: -7 }, position: "relative", zIndex: 1 }}>
+      <Box component="nav" sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(4,1fr)", lg: "repeat(7,1fr)" }, bgcolor: "#fff", borderRadius: 3, overflow: "hidden", boxShadow: "0 8px 22px rgba(61,36,128,.08)" }}>{tabs.map(({ id, icon: Icon, en, es }) => { const selected = id === active; return <Box component="button" type="button" key={id} onClick={() => navigate(`/mission/grief/session/1/${id}`)} sx={{ border: 0, borderBottom: selected ? `4px solid ${PURPLE}` : "4px solid transparent", bgcolor: "transparent", color: selected ? PURPLE : INK, py: 1.5, cursor: "pointer" }}><Icon sx={{ fontSize: 29 }} /><Typography sx={{ fontSize: 10, fontWeight: 800 }}>{copy(lang, en, es).toUpperCase()}</Typography></Box>; })}</Box>
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px 1fr" }, gap: 2, mt: 2 }}>
         <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 330, md: 820 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,248,251,.76),rgba(238,229,250,.7)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}><Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box><Typography sx={{ fontFamily: SERIF, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Accepting the reality of loss", "Aceptando la realidad de la pérdida")}</Typography><Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} /><Typography sx={{ color: PURPLE, fontSize: 11, fontWeight: 800 }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography><Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>{copy(lang, "Shock · Denial · Anticipatory grief · The reality of loss", "Shock · Negación · Duelo anticipado · La realidad de la pérdida")}</Typography><Box sx={{ position: { md: "absolute" }, bottom: 40, left: 28, right: 28, bgcolor: "rgba(255,255,255,.6)", borderRadius: 3, p: 2.5, mt: 5 }}><FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 38 }} /><Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{copy(lang, "This is a space to accompany one another with respect, compassion, and humanity.", "Este es un espacio para acompañarnos con respeto, compasión y humanidad.")}</Typography></Box></Box>
         <Box component="main" sx={{ ...card, p: { xs: 2.5, md: 4 } }}>{renderContent()}</Box>
@@ -104,7 +159,7 @@ const GriefCurriculumPage: React.FC = () => {
           borderRadius: 2,
         }}
       >
-        <Button
+        {active !== "closing" && <Button
           variant="contained"
           endIcon={<ArrowForwardRoundedIcon />}
           sx={{
@@ -119,7 +174,7 @@ const GriefCurriculumPage: React.FC = () => {
           }}
         >
           {copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}
-        </Button>
+        </Button>}
         <Button
           onClick={() => navigate("/mission")}
           variant="outlined"

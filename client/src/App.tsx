@@ -13,7 +13,6 @@ import Diagnostics from "./views/shared/Diagnostics";
 import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
-import MissionSessionsPage from "./views/pillars/mission/MissionSessionsPage";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
@@ -68,7 +67,7 @@ const App: React.FC = () => {
 
       {/* Full data-driven component pages */}
       <Route path="/mission" element={<MissionPage />} />
-      <Route path="/mission/sessions" element={<MissionSessionsPage />} />
+      <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
       <Route path="/mission/sessions/1" element={<MissionSessionOnePage />} />
       <Route path="/mission/sessions/1/concepts" element={<MissionConceptsPage />} />
       <Route path="/mission/sessions/1/objectives" element={<MissionObjectivesPage />} />

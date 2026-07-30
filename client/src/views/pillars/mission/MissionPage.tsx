@@ -111,7 +111,7 @@ const MissionPage: React.FC = () => {
           <SectionHeading title={spanish ? "PROGRAMAS PRIORITARIOS" : "PRIORITY PROGRAMS"} />
           <PriorityProgramCard
             item={d.priorityProgram}
-            onExplore={() => navigate("/mission/sessions")}
+            onExplore={() => navigate("/mission/sessions/1")}
             onExploreSecondary={() => navigate("/mission/grief/session/1/introduction")}
           />
 
