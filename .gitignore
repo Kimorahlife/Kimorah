@@ -37,3 +37,7 @@ dist-ssr
 
 # Personal reminder
 REMINDER.md
+
+# Legacy Wix site archive (~83 MB of HTML + media) — keep it local, not in git.
+# Delete these lines if you'd rather version the snapshot.
+old-website/
