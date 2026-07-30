@@ -14,7 +14,8 @@ import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import SpaOutlinedIcon from "@mui/icons-material/SpaOutlined";
 import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 
-const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
+const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
+const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
 const INK = "#131b70";
 const PURPLE = "#7650c5";
 type SectionId = "introduction" | "concepts" | "objectives" | "psychoeducation" | "intervention" | "processing" | "closing";
@@ -120,7 +121,7 @@ const GriefCurriculumPage: React.FC = () => {
         component="h1"
         sx={{
           maxWidth: 900,
-          fontFamily: SERIF,
+          fontFamily: TITLE_FONT,
           fontSize: { xs: 42, sm: 56, md: 68 },
           lineHeight: 1.05,
           fontWeight: 500,
@@ -143,7 +144,7 @@ const GriefCurriculumPage: React.FC = () => {
     <Container maxWidth="xl" sx={{ py: 1.5, mt: { xs: -6, md: -7 }, position: "relative", zIndex: 1 }}>
       <Box component="nav" sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(4,1fr)", lg: "repeat(7,1fr)" }, bgcolor: "#fff", borderRadius: 3, overflow: "hidden", boxShadow: "0 8px 22px rgba(61,36,128,.08)" }}>{tabs.map(({ id, icon: Icon, en, es }) => { const selected = id === active; return <Box component="button" type="button" key={id} onClick={() => navigate(`/mission/grief/session/1/${id}`)} sx={{ border: 0, borderBottom: selected ? `4px solid ${PURPLE}` : "4px solid transparent", bgcolor: "transparent", color: selected ? PURPLE : INK, py: 1.5, cursor: "pointer" }}><Icon sx={{ fontSize: 29 }} /><Typography sx={{ fontSize: 10, fontWeight: 800 }}>{copy(lang, en, es).toUpperCase()}</Typography></Box>; })}</Box>
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px 1fr" }, gap: 2, mt: 2 }}>
-        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 330, md: 820 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,248,251,.76),rgba(238,229,250,.7)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}><Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box><Typography sx={{ fontFamily: SERIF, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Accepting the reality of loss", "Aceptando la realidad de la pérdida")}</Typography><Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} /><Typography sx={{ color: PURPLE, fontSize: 11, fontWeight: 800 }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography><Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>{copy(lang, "Shock · Denial · Anticipatory grief · The reality of loss", "Shock · Negación · Duelo anticipado · La realidad de la pérdida")}</Typography><Box sx={{ position: { md: "absolute" }, bottom: 40, left: 28, right: 28, bgcolor: "rgba(255,255,255,.6)", borderRadius: 3, p: 2.5, mt: 5 }}><FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 38 }} /><Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{copy(lang, "This is a space to accompany one another with respect, compassion, and humanity.", "Este es un espacio para acompañarnos con respeto, compasión y humanidad.")}</Typography></Box></Box>
+        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 330, md: 820 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,248,251,.76),rgba(238,229,250,.7)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}><Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box><Typography sx={{ fontFamily: TITLE_FONT, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Accepting the reality of loss", "Aceptando la realidad de la pérdida")}</Typography><Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} /><Typography sx={{ color: PURPLE, fontSize: 11, fontWeight: 800 }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography><Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>{copy(lang, "Shock · Denial · Anticipatory grief · The reality of loss", "Shock · Negación · Duelo anticipado · La realidad de la pérdida")}</Typography><Box sx={{ position: { md: "absolute" }, bottom: 40, left: 28, right: 28, bgcolor: "rgba(255,255,255,.6)", borderRadius: 3, p: 2.5, mt: 5 }}><FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 38 }} /><Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{copy(lang, "This is a space to accompany one another with respect, compassion, and humanity.", "Este es un espacio para acompañarnos con respeto, compasión y humanidad.")}</Typography></Box></Box>
         <Box component="main" sx={{ ...card, p: { xs: 2.5, md: 4 } }}>{renderContent()}</Box>
       </Box>
       <Box

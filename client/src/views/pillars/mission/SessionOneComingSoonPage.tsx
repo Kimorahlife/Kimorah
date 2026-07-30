@@ -6,7 +6,7 @@ import HourglassEmptyRoundedIcon from "@mui/icons-material/HourglassEmptyRounded
 import LogoBadge from "../../landing/LogoBadge";
 import SessionOneTabs, { SessionOneTab } from "./SessionOneTabs";
 
-const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
+const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
 const PURPLE = "#7650b3";
 const INK = "#211866";
 

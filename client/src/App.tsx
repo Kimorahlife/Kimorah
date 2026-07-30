@@ -17,6 +17,9 @@ import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
 import MissionPsychoeducationPage from "./views/pillars/mission/MissionPsychoeducationPage";
+import MissionInterventionPage from "./views/pillars/mission/MissionInterventionPage";
+import MissionProcessingPage from "./views/pillars/mission/MissionProcessingPage";
+import MissionClosingPage from "./views/pillars/mission/MissionClosingPage";
 import SessionOneComingSoonPage from "./views/pillars/mission/SessionOneComingSoonPage";
 import GriefCurriculumPage from "./views/pillars/mission/GriefCurriculumPage";
 import ImmersivePage from "./views/pillars/immersive/ImmersivePage";
@@ -72,6 +75,9 @@ const App: React.FC = () => {
       <Route path="/mission/sessions/1/concepts" element={<MissionConceptsPage />} />
       <Route path="/mission/sessions/1/objectives" element={<MissionObjectivesPage />} />
       <Route path="/mission/sessions/1/psychoeducation" element={<MissionPsychoeducationPage />} />
+      <Route path="/mission/sessions/1/intervention" element={<MissionInterventionPage />} />
+      <Route path="/mission/sessions/1/processing" element={<MissionProcessingPage />} />
+      <Route path="/mission/sessions/1/closing" element={<MissionClosingPage />} />
       <Route path="/mission/sessions/1/:section" element={<SessionOneComingSoonPage />} />
       <Route path="/mission/grief/session/1/:section" element={<GriefCurriculumPage />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}

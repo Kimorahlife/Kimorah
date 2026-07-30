@@ -16,6 +16,7 @@ import { getVisibleNavigation } from "./navigation";
 import { getSession, SidebarFooter } from "./appProviderHelper";
 import ToolbarActions from "./theme/ToolbarActions";
 import AppTitle from "./theme/AppTitle";
+import { resolveRoleName } from "../../utils/roleAliases";
 
 interface PrivateRouteProps {
   element: ReactNode;
@@ -51,7 +52,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
   // Resolve the current user's role from the DB-loaded roles list: its
   // permission keys and whether it's a global (full-access) role.
   const userRole = useMemo(
-    () => roleState.list.find((r) => r.name === user?.roles),
+    () => roleState.list.find((r) => r.name === resolveRoleName(user?.roles)),
     [roleState.list, user?.roles]
   );
   const userPermissions = userRole?.permissions ?? [];
@@ -81,8 +82,8 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
   );
 
   const navigation = useMemo(
-    () => getVisibleNavigation(userPermissions, isGlobal, t),
-    [userPermissions, isGlobal, t]
+    () => getVisibleNavigation(userPermissions, isGlobal, t, user?.roles),
+    [userPermissions, isGlobal, t, user?.roles]
   );
 
   if (!isTokenValid) {

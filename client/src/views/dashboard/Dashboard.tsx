@@ -22,6 +22,7 @@ import { loadUsers } from "../../store/slices/users";
 import { loadCoquiAggregates } from "../../store/slices/coqui";
 import { useCan, useFeatureUiAccess, useCurrentRole } from "../shared/permissions";
 import AccessRestricted from "../shared/AccessRestricted";
+import ProfessionalDashboard from "./ProfessionalDashboard";
 
 /** A single stat tile with a coloured left accent. */
 const StatCard = ({
@@ -89,6 +90,7 @@ export default function Dashboard() {
   const { isGlobal, permissions } = useCurrentRole();
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
+  const isProfessional = user?.roles === "Professional";
 
   // Coquí participant count comes from the public aggregates endpoint.
   useEffect(() => {
@@ -105,6 +107,10 @@ export default function Dashboard() {
 
   // A user with no role / no permissions (and not global) can't do anything —
   // show a "contact your administrator" notice instead of an empty dashboard.
+  if (isProfessional) {
+    return <ProfessionalDashboard firstName={firstName} />;
+  }
+
   if (!isGlobal && permissions.length === 0) {
     return <AccessRestricted />;
   }

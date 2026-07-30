@@ -17,7 +17,8 @@ import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 import LogoBadge from "../../landing/LogoBadge";
 import SessionOneTabs from "./SessionOneTabs";
 
-const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
+const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
+const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
 const INK = "#151c5c";
 const PURPLE = "#6540b2";
 const CARD = "rgba(255,255,255,.72)";
@@ -45,22 +46,57 @@ const MissionConceptsPage: React.FC = () => {
   const reminders = lang === "es"
     ? ["No estás solo(a). Muchas personas sienten lo mismo que tú.", "Tus emociones tienen sentido. Son respuestas humanas ante situaciones extraordinarias.", "Pedir ayuda es un acto de valentía, no de debilidad.", "La conexión con otros puede ser una fuente de sanación.", "Pequeñas acciones diarias pueden marcar una gran diferencia."]
     : ["You are not alone. Many people feel the same way.", "Your emotions make sense. They are human responses to extraordinary situations.", "Asking for help is an act of courage, not weakness.", "Connection with others can be a source of healing.", "Small daily actions can make a big difference."];
+  const conceptItems = [
+    {
+      icon: FavoriteBorderRoundedIcon,
+      text: copy(lang, "Vulnerability is a strength, not a weakness.", "La vulnerabilidad es una fortaleza, no una debilidad."),
+    },
+    {
+      icon: ForumOutlinedIcon,
+      text: copy(lang, "What now?", "¿Y ahora qué?"),
+    },
+    {
+      icon: GroupsOutlinedIcon,
+      text: copy(lang, "People indirectly affected by the earthquake; vicarious trauma.", "Afectados indirectos por el terremoto; trauma vicario."),
+    },
+  ];
 
   return <Box data-language-switcher sx={{ minHeight: "100dvh", color: INK, bgcolor: "#f4f0fa", backgroundImage: "radial-gradient(circle at 12% 55%,rgba(136,94,193,.08),transparent 32%),radial-gradient(circle at 88% 70%,rgba(136,94,193,.07),transparent 30%)" }}>
     <Box component="header" sx={{ position: "relative", overflow: "hidden", color: "white", textAlign: "center", background: "radial-gradient(circle at 50% 44%,#292455 0%,#17173d 48%,#10122f 100%)", pb: { xs: 9, md: 10.5 }, "&::after": { content: '""', position: "absolute", left: "-5%", right: "-5%", bottom: -45, height: 80, bgcolor: "#f4f0fa", borderRadius: "50% 50% 0 0 / 100% 100% 0 0" } }}>
       <Container maxWidth="xl" sx={{ pt: 2.25, position: "relative", zIndex: 1 }}>
-        <Box sx={{ maxWidth: 780, mx: "auto", pt: { xs: 6, md: 4.5 } }}><Box sx={{ display: "inline-block", bgcolor: PURPLE, px: 3.2, py: .8, borderRadius: 99, fontSize: 15, fontWeight: 800, letterSpacing: 1.2 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box><Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 46, sm: 61, md: 68 }, fontWeight: 500, lineHeight: .98, mt: 2.25, whiteSpace: { md: "pre-line" } }}>{copy(lang, "Creating safety\nand connection", "Creando seguridad\ny conexión")}</Typography><Box sx={{ width: 42, borderTop: "1px solid rgba(255,255,255,.9)", mx: "auto", my: 2.5 }} /><Typography sx={{ fontSize: 11, letterSpacing: 1.3, color: "#c9b8e6" }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography><Typography sx={{ fontFamily: SERIF, fontSize: { xs: 18, md: 21 }, mt: .8 }}>{copy(lang, "Vulnerability · Vicarious trauma · “What now?”", "Vulnerabilidad · Trauma vicario · “¿Y ahora qué?”")}</Typography></Box>
+        <Box sx={{ maxWidth: 780, mx: "auto", pt: { xs: 6, md: 4.5 } }}><Box sx={{ display: "inline-block", bgcolor: PURPLE, px: 3.2, py: .8, borderRadius: 99, fontSize: 15, fontWeight: 800, letterSpacing: 1.2 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box><Typography component="h1" sx={{ fontFamily: TITLE_FONT, fontSize: { xs: 46, sm: 61, md: 68 }, fontWeight: 500, lineHeight: .98, mt: 2.25, whiteSpace: { md: "pre-line" } }}>{copy(lang, "Creating safety\nand connection", "Creando seguridad\ny conexión")}</Typography><Box sx={{ width: 42, borderTop: "1px solid rgba(255,255,255,.9)", mx: "auto", my: 2.5 }} /><Typography sx={{ fontSize: 11, letterSpacing: 1.3, color: "#c9b8e6" }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography><Typography sx={{ fontFamily: SERIF, fontSize: { xs: 18, md: 21 }, mt: .8 }}>{copy(lang, "Vulnerability · Vicarious trauma · “What now?”", "Vulnerabilidad · Trauma vicario · “¿Y ahora qué?”")}</Typography></Box>
       </Container>
     </Box>
 
-    <Container maxWidth="lg" sx={{ mt: { xs: -3, md: -4 }, pb: 2, position: "relative", zIndex: 2 }}>
+    <Container maxWidth="xl" sx={{ mt: { xs: -3, md: -4 }, pb: 2, position: "relative", zIndex: 2 }}>
       <Box sx={{ mb: 2.5 }}><SessionOneTabs active="concepts" /></Box>
 
-      <Box sx={{ display: "flex", gap: 2, p: { xs: 2, md: 3 }, mb: 1.5, bgcolor: CARD, border: "1px solid rgba(69,45,143,.15)", borderLeft: `4px solid ${PURPLE}`, borderRadius: 3 }}><Box sx={{ width: 52, height: 52, borderRadius: "50%", bgcolor: PURPLE, color: "white", display: "grid", placeItems: "center", flexShrink: 0 }}><LightbulbOutlinedIcon /></Box><Box><Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 23, fontWeight: 600 }}>{copy(lang, "Why is it important?", "¿Por qué es importante?")}</Typography><Typography sx={{ mt: 1, fontSize: 13.5, lineHeight: 1.6 }}>{copy(lang, "When we experience crises through others, our emotions are also affected. Understanding these experiences allows us to respond with compassion and care for our well-being.", "Cuando vivimos crisis a través de otros, nuestras emociones también se ven afectadas. Entender estas experiencias nos permite responder con compasión y cuidar de nuestro bienestar.")}</Typography></Box></Box>
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
+        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 760 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+          <Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>
+          <Typography sx={{ fontFamily: TITLE_FONT, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Creating safety and connection", "Creando seguridad y conexión")}</Typography>
+          <Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} />
+          <Typography sx={{ color: PURPLE, fontSize: 11, fontWeight: 800 }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography>
+          <Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>{copy(lang, "Vulnerability · Vicarious trauma · “What now?”", "Vulnerabilidad · Trauma vicario · “¿Y ahora qué?”")}</Typography>
+          <Box sx={{ position: { md: "absolute" }, bottom: 40, left: 28, right: 28, bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: 5 }}>
+            <FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 38 }} />
+            <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{copy(lang, "This is a space to accompany one another with respect, compassion, and humanity.", "Este es un espacio para acompañarnos con respeto, compasión y humanidad.")}</Typography>
+          </Box>
+        </Box>
 
-      {concepts.map((concept, index) => <Box key={concept.title} sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "100px 1.2fr 1fr" }, gap: { xs: 2, md: 2.5 }, p: { xs: 2.25, md: 3 }, mb: 1.5, bgcolor: CARD, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3 }}><Box sx={{ width: 58, height: 58, mx: "auto", borderRadius: "50%", bgcolor: PURPLE, color: "white", display: "grid", placeItems: "center", fontFamily: SERIF, fontSize: 25, fontWeight: 700, boxShadow: "0 0 0 14px rgba(101,64,178,.07)" }}>{index + 1}</Box><Box><Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 23, fontWeight: 600 }}>{concept.title}</Typography><Typography sx={{ fontWeight: 800, fontSize: 13, mt: 1.4 }}>{concept.lead}</Typography><Typography sx={{ fontSize: 13, lineHeight: 1.6, mt: 1.4 }}>{concept.body}</Typography></Box><Box sx={{ bgcolor: "rgba(239,233,249,.76)", borderRadius: 2.5, p: 2.25, borderLeft: { md: "1px dashed rgba(69,45,143,.22)" } }}><Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 18, fontWeight: 600 }}>“ &nbsp;{copy(lang, "To reflect:", "Para reflexionar:")}</Typography><Box component="ul" sx={{ pl: 3, mb: 0 }}>{concept.prompts.map(prompt => <Typography component="li" key={prompt} sx={{ fontSize: 13, lineHeight: 1.55, mb: 1 }}>{prompt}</Typography>)}</Box></Box></Box>)}
-
-      <Box sx={{ bgcolor: CARD, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: 2.25 }}><Box sx={{ display: "flex", alignItems: "center", gap: 1.4, mb: 2 }}><Box sx={{ width: 40, height: 40, borderRadius: "50%", bgcolor: PURPLE, color: "white", display: "grid", placeItems: "center" }}><StarBorderRoundedIcon /></Box><Typography sx={{ fontFamily: SERIF, fontSize: 22, color: PURPLE }}>{copy(lang, "Key ideas to remember", "Ideas clave para recordar")}</Typography></Box><Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: "repeat(5,1fr)" } }}>{reminders.map((text, index) => <Box key={text} sx={{ textAlign: "center", px: 2, py: 1, borderRight: { md: index < 4 ? "1px solid rgba(69,45,143,.14)" : 0 } }}><Box sx={{ width: 28, height: 28, mx: "auto", borderRadius: "50%", bgcolor: PURPLE, color: "white", display: "grid", placeItems: "center", fontSize: 12, fontWeight: 800 }}>{index + 1}</Box><Typography sx={{ fontSize: 11, lineHeight: 1.45, mt: 1.2 }}>{text}</Typography></Box>)}</Box></Box>
+        <Box component="main" sx={{ bgcolor: CARD, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: { xs: 2.5, md: 4 } }}>
+          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 34, md: 40 }, color: INK }}>{copy(lang, "Concepts", "Conceptos")}</Typography>
+          <Typography sx={{ mt: .5, mb: 4 }}>{copy(lang, "Key ideas for understanding safety, connection, and vicarious trauma.", "Ideas clave para comprender la seguridad, la conexión y el trauma vicario.")}</Typography>
+          <Box sx={{ display: "grid", gap: 2 }}>
+            {conceptItems.map(({ icon: Icon, text }) => (
+              <Box key={text} sx={{ minHeight: 112, display: "flex", alignItems: "center", gap: 2.5, p: 2.5, bgcolor: "rgba(255,255,255,.82)", border: "1px solid rgba(69,45,143,.14)", borderRadius: 3, boxShadow: "0 8px 22px rgba(67,45,126,.03)" }}>
+                <Box sx={{ width: 64, height: 64, flexShrink: 0, borderRadius: "50%", bgcolor: "#eee7fa", color: PURPLE, display: "grid", placeItems: "center" }}><Icon sx={{ fontSize: 34 }} /></Box>
+                <Typography sx={{ fontSize: { xs: 17, md: 20 }, fontWeight: 700 }}>{text}</Typography>
+              </Box>
+            ))}
+          </Box>
+        </Box>
+      </Box>
     </Container>
 
     <Box sx={{ textAlign: "center", bgcolor: "rgba(232,224,247,.82)", py: 1.25 }}><Typography sx={{ fontSize: 12, fontWeight: 800 }}>{copy(lang, "READY TO CONTINUE?", "¿LISTO PARA CONTINUAR?")}</Typography><Typography sx={{ fontSize: 12 }}>{copy(lang, "Each session is one more step toward your well-being and that of those around you.", "Cada sesión es un paso más hacia tu bienestar y el de quienes te rodean.")}</Typography><Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 1.5, mt: 1 }}><Button variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ bgcolor: PURPLE, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CONTINUE TO PSYCHOEDUCATION", "CONTINUAR A PSICOEDUCACIÓN")}</Button><Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ borderColor: PURPLE, color: INK, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button></Box></Box>

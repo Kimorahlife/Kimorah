@@ -19,7 +19,8 @@ import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivism
 import LogoBadge from "../../landing/LogoBadge";
 import SessionOneTabs from "./SessionOneTabs";
 
-const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
+const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
+const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
 const INK = "#211866";
 const PURPLE = "#7650b3";
 const PAPER = "rgba(255,255,255,.72)";
@@ -83,7 +84,7 @@ const MissionSessionOnePage: React.FC = () => {
 
           <Box sx={{ maxWidth: 780, mx: "auto", pt: { xs: 6, md: 4.5 } }}>
             <Box sx={{ display: "inline-block", bgcolor: PURPLE, px: 3.2, py: .8, borderRadius: 99, fontSize: 15, fontWeight: 800, letterSpacing: 1.2 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>
-            <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 46, sm: 61, md: 68 }, fontWeight: 500, lineHeight: .98, mt: 2.25, whiteSpace: { md: "pre-line" } }}>
+            <Typography component="h1" sx={{ fontFamily: TITLE_FONT, fontSize: { xs: 46, sm: 61, md: 68 }, fontWeight: 500, lineHeight: .98, mt: 2.25, whiteSpace: { md: "pre-line" } }}>
               {copy(lang, "Creating safety\nand connection", "Creando seguridad\ny conexión")}
             </Typography>
             <Box sx={{ width: 42, borderTop: "1px solid rgba(255,255,255,.9)", mx: "auto", my: 2.5 }} />
@@ -93,9 +94,46 @@ const MissionSessionOnePage: React.FC = () => {
         </Container>
       </Box>
 
-      <Container maxWidth="lg" sx={{ mt: { xs: -3, md: -4 }, pb: 0, position: "relative", zIndex: 2 }}>
+      <Container maxWidth="xl" sx={{ mt: { xs: -3, md: -4 }, pb: 0, position: "relative", zIndex: 2 }}>
         <Box sx={{ mb: 1.75 }}><SessionOneTabs active="presentation" /></Box>
 
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
+          <Box
+            component="aside"
+            sx={{
+              position: "relative",
+              overflow: "hidden",
+              minHeight: { xs: 390, md: 860 },
+              borderRadius: 3,
+              p: 3,
+              textAlign: "center",
+              backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')",
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
+          >
+            <Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>
+              {copy(lang, "SESSION 1", "SESIÓN 1")}
+            </Box>
+            <Typography sx={{ fontFamily: TITLE_FONT, fontSize: 34, lineHeight: 1.2, mt: 3 }}>
+              {copy(lang, "Creating safety and connection", "Creando seguridad y conexión")}
+            </Typography>
+            <Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} />
+            <Typography sx={{ color: PURPLE, fontSize: 11, fontWeight: 800 }}>
+              {copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}
+            </Typography>
+            <Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>
+              {copy(lang, "Vulnerability · Vicarious trauma · “What now?”", "Vulnerabilidad · Trauma vicario · “¿Y ahora qué?”")}
+            </Typography>
+            <Box sx={{ position: { md: "absolute" }, bottom: 40, left: 28, right: 28, bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: 5 }}>
+              <FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 38 }} />
+              <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>
+                {copy(lang, "This is a space to accompany one another with respect, compassion, and humanity.", "Este es un espacio para acompañarnos con respeto, compasión y humanidad.")}
+              </Typography>
+            </Box>
+          </Box>
+
+          <Box component="main" sx={{ ...sectionCard, p: { xs: 1.25, md: 2 }, minWidth: 0 }}>
         <Section id="presentation" icon={<GroupsOutlinedIcon />} title={copy(lang, "Participant introductions", "Presentación de los participantes")}>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.15fr .85fr" }, gap: { xs: 2.5, md: 4 }, ml: { md: 8.25 } }}>
             <Box>
@@ -120,6 +158,8 @@ const MissionSessionOnePage: React.FC = () => {
             {education.map(({ icon: Icon, text }, index) => <Box key={text} sx={{ textAlign: "center", px: 2, py: 1, borderRight: { md: index < education.length - 1 ? "1px solid rgba(73,50,139,.14)" : 0 } }}><Icon sx={{ color: PURPLE, fontSize: 42, strokeWidth: .75 }} /><Typography sx={{ fontSize: 12, mt: 1, lineHeight: 1.4 }}>{text}</Typography></Box>)}
           </Box>
         </Section>
+          </Box>
+        </Box>
       </Container>
 
       <Box id="session-actions" sx={{ mt: .75, py: 1.4, textAlign: "center", bgcolor: "rgba(232,222,247,.8)", borderTop: "1px solid rgba(73,50,139,.08)" }}>
