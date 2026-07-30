@@ -1,11 +1,19 @@
 import mongoose, { Model, Document, Schema } from "mongoose";
 
+// Why the user is joining Kimorah — captured at signup, drives onboarding.
+enum Intention {
+  Professional = "professional",
+  Client = "client",
+  Explorer = "explorer",
+}
+
 interface IUser {
   _id: mongoose.Types.ObjectId;
   name: string;
   email: string;
   passwordHash?: string;
   roles?: string;
+  intention?: Intention;
   isVerified?: boolean;
   phoneNumber?: string;
   resetToken?: string;
@@ -27,6 +35,7 @@ const userSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     passwordHash: { type: String, required: true, minlength: 6 },
     roles: { type: String, required: false },
+    intention: { type: String, enum: Object.values(Intention), required: false },
     isVerified: { type: Boolean, required: true, default: false },
     phoneNumber: { type: String, required: false },
     resetToken: { type: String, required: false },
@@ -53,4 +62,4 @@ userSchema.statics.updateById = function (id: string, updateData: Record<string,
 };
 
 const Users = mongoose.model<IUser, UserModel>("Users", userSchema);
-export { Users, IUser };
+export { Users, IUser, Intention };

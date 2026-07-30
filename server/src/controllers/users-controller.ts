@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { Users, IUser } from "../models/user-model";
+import { Users, IUser, Intention } from "../models/user-model";
 import { listRoleNamesWithPermission } from "../services/permission-cache";
 import HttpError from "../util/errors/http-error";
 import bcrypt from "bcrypt";
@@ -8,6 +8,9 @@ import { generateJwtToken } from "../util/jwt/jwt";
 interface IUserAuth extends IUser {
   password: string;
 }
+
+const isIntention = (value: unknown): value is Intention =>
+  Object.values(Intention).includes(value as Intention);
 
 export const loginUser = async (
   req: Request<{}, {}, IUserAuth>,
@@ -61,9 +64,18 @@ export const signupUser = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { name, email, password } = req.body;
+  const { name, email, password, intention } = req.body;
 
   try {
+    if (!isIntention(intention)) {
+      return next(
+        new HttpError(
+          `Intention must be one of: ${Object.values(Intention).join(", ")}`,
+          422,
+        ),
+      );
+    }
+
     const user = await Users.findByEmail(email.toLowerCase());
     if (user?.name !== undefined) {
       return next(new HttpError("User already exists, please login", 409));
@@ -78,6 +90,7 @@ export const signupUser = async (
         email: email.toLowerCase(),
         passwordHash,
         roles: "", // no role by default — an admin assigns access via the Users UI
+        intention,
         isVerified: false,
       });
     } catch (err: unknown) {

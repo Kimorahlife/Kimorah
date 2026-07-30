@@ -1,5 +1,13 @@
 import React, { useReducer, ChangeEvent, FocusEvent, FormEvent } from "react";
-import { TextField, Button, Typography, Box, Link, Paper } from "@mui/material";
+import {
+  TextField,
+  Button,
+  Typography,
+  Box,
+  Link,
+  Paper,
+  MenuItem,
+} from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useToken } from "../components/useToken";
 import { AppProvider } from "@toolpad/core/AppProvider";
@@ -8,12 +16,14 @@ import { useTheme } from "@mui/material/styles";
 import { useTranslation } from "react-i18next";
 import LogoBadge from "../../landing/LogoBadge";
 import LandingBackground from "../../landing/LandingBackground";
+import { Intention } from "../../../types/users";
 
 interface State {
   name: string;
   email: string;
   password: string;
   confirmPassword: string;
+  intention: Intention | "";
   error: string;
   loading: boolean;
   touched: { [key: string]: boolean };
@@ -31,6 +41,7 @@ const initialState: State = {
   email: "",
   password: "",
   confirmPassword: "",
+  intention: "",
   error: "",
   loading: false,
   touched: {},
@@ -62,13 +73,17 @@ const reducer = (state: State, action: Action): State => {
 
 const Signup: React.FC = () => {
   const [state, dispatch] = useReducer(reducer, initialState);
-  const { name, email, password, confirmPassword, error, loading, touched } = state;
+  const { name, email, password, confirmPassword, intention, error, loading, touched } =
+    state;
   const [, setToken] = useToken();
   const navigate = useNavigate();
   const theme = useTheme();
   const { t } = useTranslation();
 
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+  // Union type so the same handlers serve the text fields and the Intention select.
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = e.target;
     const sanitizedValue =
       name === "name" || name.includes("password")
@@ -77,14 +92,14 @@ const Signup: React.FC = () => {
     dispatch({ type: "SET_FIELD", field: name, value: sanitizedValue });
   };
 
-  const handleBlur = (e: FocusEvent<HTMLInputElement>) => {
+  const handleBlur = (e: FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     dispatch({ type: "SET_TOUCHED", field: e.target.name });
   };
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
 
-    if (!name || !email || !password || !confirmPassword) {
+    if (!name || !email || !password || !confirmPassword || !intention) {
       dispatch({ type: "SET_ERROR", error: t("auth.signup.errorAllRequired") });
       return;
     }
@@ -107,6 +122,7 @@ const Signup: React.FC = () => {
         name,
         email,
         password,
+        intention,
       });
       setToken(response.data.token);
       navigate("/dashboard");
@@ -264,7 +280,7 @@ const Signup: React.FC = () => {
               </Box>
 
               {/* Password and Confirm Password side by side */}
-              <Box sx={{ display: "flex", gap: 2, mb: 3 }}>
+              <Box sx={{ display: "flex", gap: 2, mb: 2 }}>
                 <Box sx={{ flex: 1 }}>
                   <Typography
                     variant="body2"
@@ -317,6 +333,49 @@ const Signup: React.FC = () => {
                     }
                   />
                 </Box>
+              </Box>
+
+              {/* Intention — why the user is here; drives onboarding downstream */}
+              <Box sx={{ mb: 3 }}>
+                <Typography
+                  variant="body2"
+                  sx={{ mb: 1, fontWeight: 600, color: "text.primary" }}
+                >
+                  {t("auth.signup.intention")}
+                </Typography>
+                <TextField
+                  select
+                  fullWidth
+                  margin="none"
+                  variant="outlined"
+                  name="intention"
+                  value={intention}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  error={touched.intention && !intention}
+                  helperText={
+                    touched.intention && !intention
+                      ? t("auth.signup.intentionError")
+                      : ""
+                  }
+                  SelectProps={{
+                    displayEmpty: true,
+                    renderValue: (value) =>
+                      value ? (
+                        t(`auth.signup.intentionOptions.${String(value)}`)
+                      ) : (
+                        <Typography component="span" color="text.disabled">
+                          {t("auth.signup.intentionPlaceholder")}
+                        </Typography>
+                      ),
+                  }}
+                >
+                  {Object.values(Intention).map((option) => (
+                    <MenuItem key={option} value={option}>
+                      {t(`auth.signup.intentionOptions.${option}`)}
+                    </MenuItem>
+                  ))}
+                </TextField>
               </Box>
 
               <Button
