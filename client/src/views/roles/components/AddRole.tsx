@@ -29,6 +29,7 @@ const AddRole = ({ open, onClose }: Props) => {
   const [name, setName] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [isGlobal, setIsGlobal] = useState(false);
+  const [isDefault, setIsDefault] = useState(false);
   const { list: permissions } = useSelector(getPermission);
   const roleState = useSelector(getRole);
   const prevProcessing = useRef(false);
@@ -49,6 +50,7 @@ const AddRole = ({ open, onClose }: Props) => {
         setName("");
         setSelected([]);
         setIsGlobal(false);
+        setIsDefault(false);
         onClose();
       }
     }
@@ -57,13 +59,14 @@ const AddRole = ({ open, onClose }: Props) => {
 
   const handleSubmit = () => {
     if (!name.trim()) return;
-    dispatch(addRole(token, { name: name.trim(), permissions: selected, isGlobal }));
+    dispatch(addRole(token, { name: name.trim(), permissions: selected, isGlobal, isDefault }));
   };
 
   const handleClose = () => {
     setName("");
     setSelected([]);
     setIsGlobal(false);
+    setIsDefault(false);
     onClose();
   };
 
@@ -88,6 +91,14 @@ const AddRole = ({ open, onClose }: Props) => {
                 />
               }
               label="Global role"
+            />
+          </Tooltip>
+          <Tooltip title="New signups are given this role. Only one role can be the default — turning it on here turns it off elsewhere.">
+            <FormControlLabel
+              control={
+                <Switch checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
+              }
+              label="Default role for new signups"
             />
           </Tooltip>
           <Typography variant="subtitle2">Permissions</Typography>

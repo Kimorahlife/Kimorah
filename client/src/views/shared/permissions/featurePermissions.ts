@@ -6,19 +6,25 @@
  * View / Add / Edit / Delete on that feature.
  *
  * Kimorah's server permission catalog (server/src/config/permissions.ts) has
- * exactly two groups — Users and Roles — each with read/add/write/delete. Each
- * feature row below maps 1:1 to those keys.
+ * four groups — Users, Roles, Research and Curriculums — each with
+ * read/add/write/delete. Each feature row below maps 1:1 to those keys.
  *
  * Permission rule per action: the user has the action if they hold ANY key in
  * the array. The matrix's tri-state UI applies the same OR semantics.
  *
- * To add a Kimorah feature later (e.g. research/Coquí): add a catalog entry in
+ * To add a Kimorah feature later: add a catalog entry in
  * server/src/config/permissions.ts (group + `<group>:read/add/write/delete`),
  * add the feature to the `Feature` union + a row here, and a matching row to
  * PermissionMatrix's DISPLAY_GROUPS. No other code changes — it's all data-driven.
  */
 
-export type Feature = "users" | "roles" | "research";
+export type Feature =
+  | "dashboard"
+  | "professional-dashboard"
+  | "users"
+  | "roles"
+  | "research"
+  | "curriculums";
 
 export type Action = "read" | "add" | "write" | "delete";
 
@@ -49,12 +55,16 @@ export function canDoOn(userPermissions: string[], feature: Feature, action: Act
 
 /**
  * Page-level access. A user has UI access to a feature if they hold ANY of its
- * add/write/delete keys (the "View" column was removed). Granting only Add OR
- * only Edit OR only Delete surfaces the page; individual buttons gate via
+ * read/add/write/delete keys (the "View" column was removed). Granting only Add
+ * OR only Edit OR only Delete surfaces the page; individual buttons gate via
  * <CanAdd> / <CanEdit> / <CanDelete>.
+ *
+ * Delegates to the "read" action, which is exactly the OR across every key of
+ * the feature. It must NOT check "add" alone — that would hide the page from a
+ * role granted only Edit and/or Delete, which is a valid, common grant.
  */
 export function hasUiAccess(userPermissions: string[], feature: Feature, isGlobal = false): boolean {
-  return canDoOn(userPermissions, feature, "add", isGlobal);
+  return canDoOn(userPermissions, feature, "read", isGlobal);
 }
 
 /**
@@ -86,7 +96,15 @@ export function isViewOnly(userPermissions: string[], feature: Feature, isGlobal
 }
 
 export const FEATURE_PERMISSIONS: Record<Feature, FeaturePerms> = {
-  users: { read: ["users:read"], add: ["users:add"], write: ["users:write"], delete: ["users:delete"] },
+  dashboard: { read: ["dashboard:read"], add: ["dashboard:add"], write: ["dashboard:write"], delete: ["dashboard:delete"] },
+  "professional-dashboard": {
+    read: ["professional-dashboard:read"],
+    add: ["professional-dashboard:add"],
+    write: ["professional-dashboard:write"],
+    delete: ["professional-dashboard:delete"],
+  },
+  users:{ read: ["users:read"], add: ["users:add"], write: ["users:write"], delete: ["users:delete"] },
   roles: { read: ["roles:read"], add: ["roles:add"], write: ["roles:write"], delete: ["roles:delete"] },
   research: { read: ["research:read"], add: ["research:add"], write: ["research:write"], delete: ["research:delete"] },
+  curriculums: { read: ["curriculums:read"], add: ["curriculums:add"], write: ["curriculums:write"], delete: ["curriculums:delete"] },
 };

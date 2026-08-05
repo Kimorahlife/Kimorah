@@ -1,7 +1,6 @@
 import { useSelector } from "react-redux";
 import { getRole } from "../store/store";
 import { useUser } from "../views/authentication/components/useUser";
-import { resolveRoleName } from "../utils/roleAliases";
 
 /**
  * Returns true if the current user's role has the given permission key.
@@ -15,7 +14,7 @@ export function usePermission(permission: string): boolean {
 
   if (!user?.roles) return false;
 
-  const role = roles.find((r) => r.name === resolveRoleName(user.roles));
+  const role = roles.find((r) => r.name === user.roles);
   if (!role) return false;
 
   if (role.isGlobal) return true; // global role can do everything

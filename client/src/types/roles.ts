@@ -4,4 +4,6 @@ export interface Role {
   permissions: string[];
   assignable?: boolean;
   isGlobal?: boolean;
+  /** The role new signups are given. At most one role carries this flag. */
+  isDefault?: boolean;
 }

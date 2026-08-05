@@ -14,7 +14,7 @@ import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSetting
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useUser } from "../authentication/components/useUser";
 import { useToken } from "../authentication/components/useToken";
 import { AppDispatch, getUser, getRole, getCoqui } from "../../store/store";
@@ -22,7 +22,6 @@ import { loadUsers } from "../../store/slices/users";
 import { loadCoquiAggregates } from "../../store/slices/coqui";
 import { useCan, useFeatureUiAccess, useCurrentRole } from "../shared/permissions";
 import AccessRestricted from "../shared/AccessRestricted";
-import ProfessionalDashboard from "./ProfessionalDashboard";
 
 /** A single stat tile with a coloured left accent. */
 const StatCard = ({
@@ -87,10 +86,11 @@ export default function Dashboard() {
   const showUsers = useFeatureUiAccess("users");
   const showRoles = useFeatureUiAccess("roles");
   const showResearch = useFeatureUiAccess("research");
+  const showDashboard = useFeatureUiAccess("dashboard");
+  const showProfessionalDashboard = useFeatureUiAccess("professional-dashboard");
   const { isGlobal, permissions } = useCurrentRole();
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
-  const isProfessional = user?.roles === "Professional";
 
   // Coquí participant count comes from the public aggregates endpoint.
   useEffect(() => {
@@ -105,13 +105,14 @@ export default function Dashboard() {
     }
   }, [token, canReadUsers, users.list.length, dispatch]);
 
-  // A user with no role / no permissions (and not global) can't do anything —
-  // show a "contact your administrator" notice instead of an empty dashboard.
-  if (isProfessional) {
-    return <ProfessionalDashboard firstName={firstName} />;
+  // /dashboard is where login lands everyone, so send a user who only holds the
+  // professional dashboard to theirs rather than showing them a wall.
+  if (!showDashboard && showProfessionalDashboard) {
+    return <Navigate to="/dashboard/professional" replace />;
   }
 
-  if (!isGlobal && permissions.length === 0) {
+  // No dashboard permission at all (and not global) — nothing to show here.
+  if (!isGlobal && (!showDashboard || permissions.length === 0)) {
     return <AccessRestricted />;
   }
 

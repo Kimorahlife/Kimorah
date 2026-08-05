@@ -7,6 +7,8 @@ interface IRole {
   isGlobal?: boolean;
   bypassFeatureChecks?: boolean;
   assignable?: boolean;
+  /** The role new signups are given. At most one role carries this flag. */
+  isDefault?: boolean;
 }
 
 export interface RoleModel extends Model<IRole> {}
@@ -18,6 +20,7 @@ const roleSchema = new Schema<IRole>(
     isGlobal: { type: Boolean, default: false },
     bypassFeatureChecks: { type: Boolean, default: false },
     assignable: { type: Boolean, default: true },
+    isDefault: { type: Boolean, default: false },
   },
   { timestamps: true },
 );

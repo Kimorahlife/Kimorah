@@ -34,31 +34,23 @@ export async function syncPermissions(): Promise<void> {
 }
 
 /**
- * Bootstrap: on a brand-new database (no roles at all), seed a SINGLE global
- * role so there is always an admin to start from. A global role (isGlobal:true)
- * bypasses every permission check (see isGlobalRole), so it can do everything
- * and manage all other roles through the UI.
+ * Roles are NEVER created automatically — the Roles collection is the single
+ * source of truth and every role is authored in the Roles UI. Boot only reports
+ * what it finds so an operator can spot a database with no way in.
  *
- * This is the only role ever created automatically. Once any role exists it
- * never runs again — there are no hard-coded system roles; everything else is
- * created and managed in the app. Access is driven by the `isGlobal` flag and
- * the permission matrix, never by role names.
+ * Access is driven by the `isGlobal` flag and the permission matrix, never by
+ * role names, so there is nothing to seed for a role to work.
  */
-export async function seedBootstrapRole(): Promise<void> {
+export async function reportRoleState(): Promise<void> {
   const count = await Roles.estimatedDocumentCount();
-  if (count > 0) {
-    const hasGlobal = await Roles.exists({ isGlobal: true });
-    if (!hasGlobal) {
-      console.warn("⚠️  No global (isGlobal) role exists — flag one role as global to grant admin access.");
-    }
+  if (count === 0) {
+    console.warn("⚠️  No roles exist — create one in the Roles UI and flag it global to grant admin access.");
     return;
   }
-  await Roles.create({
-    name: "Global Admin",
-    isGlobal: true,
-    permissions: ALL_PERMISSION_KEYS,
-  });
-  console.log("✅ Seeded bootstrap role 'Global Admin' (isGlobal) on empty database.");
+  const hasGlobal = await Roles.exists({ isGlobal: true });
+  if (!hasGlobal) {
+    console.warn("⚠️  No global (isGlobal) role exists — flag one role as global to grant admin access.");
+  }
 }
 
 /**
@@ -84,13 +76,13 @@ export async function seedCoquiQuestions(): Promise<void> {
 }
 
 /**
- * Boot sequence. Data is only ever additive here (upsert permissions, seed the
- * bootstrap role on an empty DB, sync survey questions) — deploying never
- * mutates existing role, user, or response data.
+ * Boot sequence. Data is only ever additive here (upsert permissions, sync
+ * survey questions) — deploying never creates roles and never mutates existing
+ * role, user, or response data.
  */
 export async function boot(): Promise<void> {
   await syncPermissions();
-  await seedBootstrapRole();
+  await reportRoleState();
   await seedCoquiQuestions();
   await refreshCache();
 }

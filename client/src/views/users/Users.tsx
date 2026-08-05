@@ -131,6 +131,20 @@ const Users: React.FC = () => {
                         {u.email}
                       </Typography>
                     </Box>
+                    {/* Signup intention — what the person said they're here for.
+                        Informational only: it never grants access, the role does. */}
+                    {u.intention && (
+                      <Tooltip
+                        title={t("users.intentionHint", "Stated at signup — informational only, it grants no access")}
+                      >
+                        <Chip
+                          label={t(`auth.signup.intentionOptions.${u.intention}`, u.intention)}
+                          size="small"
+                          variant="outlined"
+                          sx={{ color: "text.secondary", borderStyle: "dashed" }}
+                        />
+                      </Tooltip>
+                    )}
                     {u.roles && <Chip label={u.roles} size="small" variant="outlined" color="primary" />}
                     <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: "center" }} />
                     <CanEdit feature="users">

@@ -11,29 +11,27 @@ export interface CachedRole {
  * Never access this directly outside this module — use the exported functions.
  */
 const _cache = new Map<string, CachedRole>();
-const resolveRoleName = (roleName: string): string =>
-  roleName === "Professional" ? "User" : roleName;
 
 /** Returns all permissions for a role (empty Set if role not found). */
 export function getPermissions(roleName: string): Set<string> {
-  return _cache.get(resolveRoleName(roleName))?.permissions ?? new Set();
+  return _cache.get(roleName)?.permissions ?? new Set();
 }
 
 /** Returns true if the role has the exact permission. */
 export function hasPermission(roleName: string, permission: string): boolean {
-  return _cache.get(resolveRoleName(roleName))?.permissions.has(permission) ?? false;
+  return _cache.get(roleName)?.permissions.has(permission) ?? false;
 }
 
 /** Returns true if the role has ANY ONE of the listed permissions. */
 export function hasAnyPermission(roleName: string, permissions: string[]): boolean {
-  const entry = _cache.get(resolveRoleName(roleName));
+  const entry = _cache.get(roleName);
   if (!entry) return false;
   return permissions.some((p) => entry.permissions.has(p));
 }
 
 /** Returns true if the role is global (bypasses all permission checks). */
 export function isGlobalRole(roleName: string): boolean {
-  return _cache.get(resolveRoleName(roleName))?.isGlobal ?? false;
+  return _cache.get(roleName)?.isGlobal ?? false;
 }
 
 /** Returns role names whose permission Set contains the requested permission.
@@ -45,13 +43,12 @@ export function listRoleNamesWithPermission(permission: string): string[] {
   for (const [roleName, entry] of _cache.entries()) {
     if (entry.permissions.has(permission)) names.push(roleName);
   }
-  if (names.includes("User")) names.push("Professional");
   return names;
 }
 
 /** Returns the full cached role entry (permissions + bypassFeatureChecks), or undefined if not found. */
 export function getCachedRole(roleName: string): CachedRole | undefined {
-  return _cache.get(resolveRoleName(roleName));
+  return _cache.get(roleName);
 }
 
 /**

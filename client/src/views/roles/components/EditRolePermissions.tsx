@@ -32,6 +32,7 @@ const EditRolePermissions = ({ role: currentRole, onClose }: Props) => {
   const [name, setName] = useState("");
   const [selected, setSelected] = useState<string[]>([]);
   const [isGlobal, setIsGlobal] = useState(false);
+  const [isDefault, setIsDefault] = useState(false);
   const [saveError, setSaveError] = useState<string | null>(null);
   const prevProcessing = useRef(false);
 
@@ -48,6 +49,7 @@ const EditRolePermissions = ({ role: currentRole, onClose }: Props) => {
       setName(currentRole.name ?? "");
       setSelected(currentRole.permissions ?? []);
       setIsGlobal(currentRole.isGlobal ?? false);
+      setIsDefault(currentRole.isDefault ?? false);
     }
   }, [currentRole]);
 
@@ -77,6 +79,7 @@ const EditRolePermissions = ({ role: currentRole, onClose }: Props) => {
         name: name.trim() || currentRole.name,
         permissions: selected,
         isGlobal,
+        isDefault,
       })
     );
   };
@@ -109,6 +112,14 @@ const EditRolePermissions = ({ role: currentRole, onClose }: Props) => {
                 />
               }
               label="Global role"
+            />
+          </Tooltip>
+          <Tooltip title="New signups are given this role. Only one role can be the default — turning it on here turns it off elsewhere.">
+            <FormControlLabel
+              control={
+                <Switch checked={isDefault} onChange={(e) => setIsDefault(e.target.checked)} />
+              }
+              label="Default role for new signups"
             />
           </Tooltip>
           <Divider />

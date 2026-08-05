@@ -23,11 +23,15 @@ const ACTIONS = [
 type DisplayGroup = { label: string; members: string[] };
 
 // Each `members` entry is a catalog `group` value from
-// server/src/config/permissions.ts. Kimorah's catalog has exactly two groups.
+// server/src/config/permissions.ts. Rows render only when the DB actually holds
+// permissions for the group, so this list can lead the catalog safely.
 const DISPLAY_GROUPS: DisplayGroup[] = [
+  { label: "Dashboard", members: ["Dashboard"] },
+  { label: "Professional Dashboard", members: ["Professional Dashboard"] },
   { label: "Users", members: ["Users"] },
   { label: "Roles", members: ["Roles"] },
   { label: "Research", members: ["Research"] },
+  { label: "Curriculums", members: ["Curriculums"] },
 ];
 
 type Props = {

@@ -8,6 +8,15 @@ interface RoleBody {
   name: string;
   permissions: string[];
   isGlobal?: boolean;
+  isDefault?: boolean;
+}
+
+/**
+ * Enforces the "at most one default role" invariant by clearing the flag from
+ * every other role. Call whenever a role is saved with isDefault true.
+ */
+async function clearOtherDefaults(keepId: string): Promise<void> {
+  await Roles.updateMany({ _id: { $ne: keepId }, isDefault: true }, { $set: { isDefault: false } });
 }
 
 export const getAllRoles = async (
@@ -44,14 +53,16 @@ export const createRole = async (
   res: Response,
   next: NextFunction,
 ): Promise<void> => {
-  const { name, permissions, isGlobal } = req.body;
+  const { name, permissions, isGlobal, isDefault } = req.body;
 
   try {
     const role = await Roles.create({
       name,
       permissions: permissions ?? [],
       isGlobal: isGlobal ?? false,
+      isDefault: isDefault ?? false,
     });
+    if (role.isDefault) await clearOtherDefaults(role.id);
     await refreshCache(); // Must refresh cache after role change
     res.status(201).json({ message: role });
   } catch (error: any) {
@@ -68,7 +79,7 @@ export const updateRole = async (
   next: NextFunction,
 ): Promise<void> => {
   const { id } = req.params;
-  const { name, permissions, isGlobal } = req.body;
+  const { name, permissions, isGlobal, isDefault } = req.body;
 
   try {
     const role = await Roles.findById(id);
@@ -79,8 +90,10 @@ export const updateRole = async (
     if (name !== undefined) role.name = name;
     if (permissions !== undefined) role.permissions = permissions;
     if (isGlobal !== undefined) role.isGlobal = isGlobal;
+    if (isDefault !== undefined) role.isDefault = isDefault;
 
     await role.save();
+    if (role.isDefault) await clearOtherDefaults(role.id);
     await refreshCache(); // Must refresh cache after role change
     res.status(200).json({ message: role });
   } catch (error: any) {

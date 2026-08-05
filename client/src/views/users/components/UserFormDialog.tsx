@@ -139,9 +139,6 @@ const UserFormDialog = ({ open, onClose, user, roles }: Props) => {
                     {r.name}
                   </MenuItem>
                 ))}
-              {!roles.some((r) => r.name === "Professional") && (
-                <MenuItem value="Professional">Professional</MenuItem>
-              )}
             </Select>
           </FormControl>
 

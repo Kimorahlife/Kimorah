@@ -2,7 +2,6 @@ import { useSelector } from "react-redux";
 import { getRole } from "../../../store/store";
 import { useUser } from "../../authentication/components/useUser";
 import { canDoOn, type Action, type Feature } from "./featurePermissions";
-import { resolveRoleName } from "../../../utils/roleAliases";
 
 interface CurrentRole {
   permissions: string[];
@@ -22,7 +21,7 @@ export function useCurrentRole(): CurrentRole {
     | undefined;
   const roles = roleSlice?.list ?? [];
   if (!user?.roles) return { permissions: [], isGlobal: false };
-  const role = roles.find((r) => r.name === resolveRoleName(user.roles));
+  const role = roles.find((r) => r.name === user.roles);
   return { permissions: role?.permissions ?? [], isGlobal: role?.isGlobal ?? false };
 }
 

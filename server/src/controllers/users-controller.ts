@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { Users, IUser, Intention } from "../models/user-model";
+import { Roles } from "../models/roles-model";
 import { listRoleNamesWithPermission } from "../services/permission-cache";
 import HttpError from "../util/errors/http-error";
 import bcrypt from "bcrypt";
@@ -83,13 +84,20 @@ export const signupUser = async (
 
     const passwordHash = await bcrypt.hash(password, 10);
 
+    const defaultRole = await Roles.findOne({ isDefault: true });
+    const defaultRoleName = defaultRole?.name ?? "";
+
     let result;
     try {
       result = await Users.create({
         name,
         email: email.toLowerCase(),
         passwordHash,
-        roles: "", // no role by default — an admin assigns access via the Users UI
+        // New signups get whichever role is flagged as the signup default in the
+        // Roles UI (there is at most one). No role name is hard-coded here — if
+        // nothing is flagged, the user lands with no role and an admin assigns
+        // one via the Users UI, exactly as before.
+        roles: defaultRoleName,
         intention,
         isVerified: false,
       });

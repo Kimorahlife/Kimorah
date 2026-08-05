@@ -11,6 +11,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import StarOutlineRoundedIcon from "@mui/icons-material/StarOutlineRounded";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useUser } from "../authentication/components/useUser";
 
 const PURPLE = "#6f3fc1";
 const INK = "#12142f";
@@ -31,9 +32,16 @@ const StatCard = ({ icon, value, label, action }: { icon: ReactNode; value: numb
   </Panel>
 );
 
-export default function ProfessionalDashboard({ firstName }: { firstName: string }) {
+/**
+ * The practitioner dashboard. Routed directly at /dashboard/professional and
+ * gated by the `professional-dashboard` permission, so it stands alone rather
+ * than being swapped in by the admin dashboard.
+ */
+export default function ProfessionalDashboard({ firstName }: { firstName?: string }) {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const user = useUser();
+  const displayName = firstName ?? user?.name?.split(" ")[0] ?? "there";
   const spanish = (i18n.resolvedLanguage || i18n.language).startsWith("es");
   const copy = (en: string, es: string) => spanish ? es : en;
 
@@ -52,7 +60,7 @@ export default function ProfessionalDashboard({ firstName }: { firstName: string
     <Box sx={{ bgcolor: "#fdfcff", minHeight: "100%", color: INK, p: { xs: 2, md: 3 } }}>
       <Box sx={{ maxWidth: 1320, mx: "auto" }}>
         <Typography variant="h3" fontWeight={800}>
-          {copy(`Welcome back, ${firstName} ✨`, `Bienvenida de nuevo, ${firstName} ✨`)}
+          {copy(`Welcome back, ${displayName} ✨`, `Bienvenida de nuevo, ${displayName} ✨`)}
         </Typography>
         <Typography sx={{ mt: .5 }}>{copy("Here’s your space to reflect, grow, and make an impact.", "Este es tu espacio para reflexionar, crecer y generar impacto.")}</Typography>
 
