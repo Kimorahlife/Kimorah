@@ -11,14 +11,23 @@ import { loadRoles } from "../../store/slices/roles";
 import { loadUserIds, resetPresence } from "../../store/slices/presence";
 import { useUser } from "../authentication/components/useUser";
 import { useToken } from "../authentication/components/useToken";
-import { canDoOn } from "./permissions";
+import { canDoOn, hasUiAccess } from "./permissions";
+import type { Feature } from "./permissions/featurePermissions";
 import { getVisibleNavigation } from "./navigation";
 import { getSession, SidebarFooter } from "./appProviderHelper";
 import ToolbarActions from "./theme/ToolbarActions";
 import AppTitle from "./theme/AppTitle";
+import AccessRestricted from "./AccessRestricted";
+import Spinner from "./buttons/Spinner";
 
 interface PrivateRouteProps {
   element: ReactNode;
+  /**
+   * Feature the viewer must hold to open this page. Omit for pages that only
+   * require a login, or that gate themselves (e.g. Dashboard, which redirects
+   * to the professional dashboard rather than refusing).
+   */
+  requireFeature?: Feature;
 }
 
 interface Authentication {
@@ -33,8 +42,13 @@ interface Authentication {
  * element inside a ReactRouterAppProvider + DashboardLayout: the sidebar nav is
  * built from the user's permissions, and the header carries the language picker
  * and the Account control (avatar + sign-out).
+ *
+ * With `requireFeature`, the page also enforces the permission the sidebar
+ * already uses to decide visibility — so reaching it by typing the URL is
+ * refused, not just unlinked. The refusal renders inside the shell, leaving the
+ * nav intact so the user can go somewhere they do have access to.
  */
-export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
+export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element, requireFeature }) => {
   const { t } = useTranslation();
   const user = useUser();
   const location = useLocation();
@@ -93,6 +107,23 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
     return <Navigate to="/login" replace />;
   }
 
+  // Roles load asynchronously, and until they arrive `userPermissions` is empty
+  // — indistinguishable from "no access". Hold on a spinner until the list
+  // resolves, so a permitted user never sees a false refusal and a forbidden one
+  // never glimpses the page. If the fetch fails we stop waiting and fall through
+  // to the check, which denies: unverifiable permission is not permission.
+  // (A database with genuinely zero roles would spin, but nobody can hold a
+  // permission in that state anyway — boot logs a warning for it.)
+  const rolesPending =
+    Boolean(requireFeature) && roleState.list.length === 0 && !roleState.error;
+
+  const denied =
+    Boolean(requireFeature) &&
+    !rolesPending &&
+    !hasUiAccess(userPermissions, requireFeature as Feature, isGlobal);
+
+  const content = rolesPending ? <Spinner /> : denied ? <AccessRestricted /> : element;
+
   return (
     <ReactRouterAppProvider
       session={getSession(user)}
@@ -126,7 +157,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element }) => {
             p: 3,
           }}
         >
-          {element}
+          {content}
         </Box>
       </DashboardLayout>
     </ReactRouterAppProvider>

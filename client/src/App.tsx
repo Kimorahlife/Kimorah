@@ -64,10 +64,10 @@ const App: React.FC = () => {
 
       {/* Protected routes */}
       <Route path="/dashboard" element={<PrivateRoute element={<Dashboard />} />} />
-      <Route path="/dashboard/professional" element={<PrivateRoute element={<ProfessionalDashboard />} />} />
-      <Route path="/roles" element={<PrivateRoute element={<Roles />} />} />
-      <Route path="/users" element={<PrivateRoute element={<Users />} />} />
-      <Route path="/coqui-questions" element={<PrivateRoute element={<CoquiQuestions />} />} />
+      <Route path="/dashboard/professional" element={<PrivateRoute requireFeature="professional-dashboard" element={<ProfessionalDashboard />} />} />
+      <Route path="/roles" element={<PrivateRoute requireFeature="roles" element={<Roles />} />} />
+      <Route path="/users" element={<PrivateRoute requireFeature="users" element={<Users />} />} />
+      <Route path="/coqui-questions" element={<PrivateRoute requireFeature="research" element={<CoquiQuestions />} />} />
       {/* Public env/connectivity self-check */}
       <Route path="/diagnostics" element={<Diagnostics />} />
 
