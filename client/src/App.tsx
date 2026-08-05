@@ -14,6 +14,7 @@ import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
+import MissionSessionTwoPage from "./views/pillars/mission/MissionSessionTwoPage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
 import MissionPsychoeducationPage from "./views/pillars/mission/MissionPsychoeducationPage";
@@ -79,6 +80,8 @@ const App: React.FC = () => {
       <Route path="/mission/sessions/1/processing" element={<MissionProcessingPage />} />
       <Route path="/mission/sessions/1/closing" element={<MissionClosingPage />} />
       <Route path="/mission/sessions/1/:section" element={<SessionOneComingSoonPage />} />
+      <Route path="/mission/sessions/2" element={<MissionSessionTwoPage />} />
+      <Route path="/mission/sessions/2/:section" element={<MissionSessionTwoPage />} />
       <Route path="/mission/grief/session/1/:section" element={<GriefCurriculumPage />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}
       <Route path="/mission/coqui" element={<KindnessPage />} />
