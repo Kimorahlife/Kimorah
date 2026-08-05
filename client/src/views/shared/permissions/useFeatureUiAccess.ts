@@ -1,5 +1,5 @@
 import { useCurrentRole } from "./useCan";
-import { hasUiAccess, isViewOnly, type Feature } from "./featurePermissions";
+import { hasUiAccess, hasFullUiAccess, isViewOnly, type Feature } from "./featurePermissions";
 
 /**
  * The universal UI visibility rule. Renders the nav entry / page when the user
@@ -11,6 +11,18 @@ import { hasUiAccess, isViewOnly, type Feature } from "./featurePermissions";
 export function useFeatureUiAccess(feature: Feature): boolean {
   const { permissions, isGlobal } = useCurrentRole();
   return hasUiAccess(permissions, feature, isGlobal);
+}
+
+/**
+ * The stricter tier: Add AND (Edit OR Delete). Use for surfaces that should
+ * open only to someone who can genuinely work in the feature, not merely reach
+ * it — a partial grant leaves them out. A global role always passes.
+ *
+ *   const canOpenCurriculum = useFeatureFullAccess("curriculums");
+ */
+export function useFeatureFullAccess(feature: Feature): boolean {
+  const { permissions, isGlobal } = useCurrentRole();
+  return hasFullUiAccess(permissions, feature, isGlobal);
 }
 
 /**

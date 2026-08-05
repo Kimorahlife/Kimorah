@@ -1,14 +1,17 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Box, Button, ButtonBase, Typography } from "@mui/material";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import { useTranslation } from "react-i18next";
+import { useDispatch } from "react-redux";
 import { useToken } from "../authentication/components/useToken";
+import { AppDispatch } from "../../store/store";
+import { loadRoles } from "../../store/slices/roles";
 import { useNavigate } from "react-router-dom";
 import LanguageMenu from "../shared/LanguageMenu";
 import LogoBadge from "./LogoBadge";
 import LandingBackground from "./LandingBackground";
 import { PILLARS, Pillar } from "./pillars";
-import { PILLAR_CONTENT } from "../pillars/pillar-content";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 
@@ -18,13 +21,21 @@ const HALO = "0 1px 3px rgba(0,0,0,0.45)";
 // Warm sun-gold from the KIMORAH LIFE logo.
 const SUN = "#e8b53f";
 
-const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> = ({
-  pillar,
-  onSelect,
-}) => (
+const PillarButton: React.FC<{
+  pillar: Pillar;
+  onSelect: (p: Pillar) => void;
+  /** Locked: the viewer is signed out, so nothing here is open to them yet. */
+  locked?: boolean;
+  spanish?: boolean;
+}> = ({ pillar, onSelect, locked = false, spanish = false }) => (
   <ButtonBase
     focusRipple
-    aria-label={pillar.label}
+    disabled={locked}
+    aria-label={
+      locked
+        ? `${pillar.label} — ${spanish ? "próximamente" : "coming soon"}`
+        : pillar.label
+    }
     onClick={() => onSelect(pillar)}
     sx={{
       flexDirection: "column",
@@ -34,52 +45,59 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
       width: "100%",
       minWidth: 0,
       verticalAlign: "top",
-      "&:hover .kimorah-circle": {
-        transform: "translateY(-4px)",
-        boxShadow: "0 12px 22px rgba(40,40,70,0.28)",
-      },
+      cursor: locked ? "default" : "pointer",
+      ...(!locked && {
+        "&:hover .kimorah-circle": {
+          transform: "translateY(-4px)",
+          boxShadow: "0 12px 22px rgba(40,40,70,0.28)",
+        },
+      }),
     }}
   >
     <Box
       className="kimorah-circle"
       sx={{
-        width: { xs: 80, sm: 124, md: 140 },
-        height: { xs: 80, sm: 124, md: 140 },
+        "--tile": "clamp(36px, min(15vh, 11.5vw), 180px)",
+        width: "var(--tile)",
+        height: "var(--tile)",
         flexShrink: 0,
         mx: "auto",
         borderRadius: "50%",
         bgcolor: pillar.color,
         color: "#fff",
+        // Signed out: every pillar reads as unavailable — desaturated and faded
+        // — so the brand colours are something signing in reveals.
+        ...(locked && { filter: "grayscale(0.9)", opacity: 0.5 }),
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         boxShadow: "0 6px 16px rgba(40,40,70,0.18)",
         transition: "transform .18s ease, box-shadow .18s ease",
-        "& svg": { fontSize: { xs: 19, sm: 29 } },
-        "& .mi-glyph": { fontSize: { xs: 26, sm: 42 } },
+        "& svg": { fontSize: "calc(var(--tile) * 0.21)" },
+        "& .mi-glyph": { fontSize: "calc(var(--tile) * 0.30)" },
         "& .mission-glyph": { position: "relative", display: "inline-flex", flexDirection: "column", alignItems: "center" },
         "& .mission-glyph::after": { content: '\"\"', position: "absolute", top: "8%", bottom: "-36%", left: "50%", width: 2, bgcolor: "currentColor", transform: "translateX(-50%)" },
         "& .mission-staff": { position: "absolute", top: "64%", left: "50%", zIndex: 1, fontFamily: SERIF, fontSize: ".72em", lineHeight: 1, transform: "translateX(-50%)" },
-        "& .oneness-glyph": { position: "relative", display: "block", width: { xs: 27, sm: 42 }, height: { xs: 27, sm: 42 } },
+        "& .oneness-glyph": { position: "relative", display: "block", width: "calc(var(--tile) * 0.30)", height: "calc(var(--tile) * 0.30)" },
         "& .oneness-glyph i": { position: "absolute", width: "58%", height: "58%", border: "1.5px solid currentColor", borderRadius: "50%" },
         "& .oneness-glyph i:nth-of-type(1)": { top: 0, left: "21%" },
         "& .oneness-glyph i:nth-of-type(2)": { top: "21%", right: 0 },
         "& .oneness-glyph i:nth-of-type(3)": { right: "8%", bottom: 0 },
         "& .oneness-glyph i:nth-of-type(4)": { left: "8%", bottom: 0 },
         "& .oneness-glyph i:nth-of-type(5)": { top: "21%", left: 0 },
-        "& .papyrus-glyph": { width: { xs: 27, sm: 42 }, height: { xs: 27, sm: 42 }, overflow: "visible" },
+        "& .papyrus-glyph": { width: "calc(var(--tile) * 0.30)", height: "calc(var(--tile) * 0.30)", overflow: "visible" },
       }}
     >
       <Typography
         component="span"
         sx={{
           width: "100%",
-          height: { xs: 27, sm: 44 },
+          height: "calc(var(--tile) * 0.31)",
           display: "grid",
           placeItems: "center",
           fontFamily: SERIF,
-          fontSize: { xs: 24, sm: 40 },
+          fontSize: "calc(var(--tile) * 0.29)",
           lineHeight: 1,
           fontWeight: 600,
         }}
@@ -90,14 +108,14 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
         className="pillar-icon-slot"
         sx={{
           position: "relative",
-          width: { xs: 34, sm: 50 },
-          height: { xs: 32, sm: 48 },
-          mt: { xs: 0.15, sm: 0.35 },
+          width: "calc(var(--tile) * 0.36)",
+          height: "calc(var(--tile) * 0.34)",
+          mt: "calc(var(--tile) * 0.025)",
           display: "flex",
           alignItems: "center",
           justifyContent: "center",
           lineHeight: 0,
-          "& > svg": { width: { xs: 27, sm: 42 }, height: { xs: 27, sm: 42 }, fontSize: { xs: 27, sm: 42 } },
+          "& > svg": { width: "calc(var(--tile) * 0.30)", height: "calc(var(--tile) * 0.30)", fontSize: "calc(var(--tile) * 0.30)" },
           ...(pillar.letter === "I" && {
             pb: { xs: 0.5, sm: 0.8 },
             "&::after": {
@@ -120,7 +138,7 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
     <Typography
       component="span"
       sx={{
-        fontSize: { xs: 10, sm: 13 },
+        fontSize: "clamp(9px, 1.7vh, 17px)",
         fontWeight: 700,
         color: "#ffffff",
         textShadow: "0 1px 4px rgba(0,0,0,0.55)",
@@ -133,6 +151,29 @@ const PillarButton: React.FC<{ pillar: Pillar; onSelect: (p: Pillar) => void }> 
     >
       {pillar.label}
     </Typography>
+    {locked && (
+      <Box
+        component="span"
+        sx={{
+          mt: "clamp(1px, 0.5vh, 5px)",
+          px: "clamp(4px, 0.8vw, 11px)",
+          py: "clamp(1px, 0.25vh, 3px)",
+          borderRadius: 99,
+          border: "1px solid rgba(255,255,255,.45)",
+          bgcolor: "rgba(255,255,255,.14)",
+          backdropFilter: "blur(4px)",
+          color: "#fff",
+          fontSize: "clamp(6.5px, 1.15vh, 12px)",
+          fontWeight: 800,
+          letterSpacing: 0.6,
+          lineHeight: 1.4,
+          textTransform: "uppercase",
+          whiteSpace: "nowrap",
+        }}
+      >
+        Coming soon
+      </Box>
+    )}
   </ButtonBase>
 );
 
@@ -156,26 +197,27 @@ const Divider: React.FC = () => (
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
-  const [, , isTokenValid] = useToken();
+  const dispatch = useDispatch<AppDispatch>();
+  const [token, , isTokenValid] = useToken();
   const signedIn = isTokenValid;
   const spanish = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es");
 
-  // Open full component pages or image-based pillar pages. Pillars without
-  // either kind of page continue to the signup flow.
+  // The landing sits outside PrivateRoute, so nothing has fetched the roles
+  // list yet — without this the viewer's permissions read as empty and every
+  // tile would look locked.
+  useEffect(() => {
+    if (token) dispatch(loadRoles(token));
+  }, [token, dispatch]);
+
+
+  /**
+   * Locked while signed out, except the one launched pillar which is open to
+   * everyone. Signing in unlocks the rest — a member has full access.
+   */
+  const isLocked = (pillar: Pillar) => !signedIn && !pillar.alwaysAvailable;
+
   const handleSelect = (pillar: Pillar) => {
-    const slug = pillar.path.replace("/", "");
-    const componentPages = new Set(["acceptance", "harmony"]);
-    if (!signedIn) {
-      navigate("/login");
-      return;
-    }
-    const hasPage = componentPages.has(slug) || Boolean(PILLAR_CONTENT[slug]);
-    // Unbuilt pillars invite a visitor to sign up; a member is already in, so
-    // leave them where they are rather than bouncing them to /signup.
-    if (!hasPage) {
-      if (!signedIn) navigate("/signup");
-      return;
-    }
+    if (isLocked(pillar)) return;
     navigate(pillar.path);
   };
 
@@ -183,11 +225,10 @@ const Landing: React.FC = () => {
     <Box
       sx={{
         position: "relative",
-        // Signed-in members get SiteHeader above this splash, so give back the
-        // space it occupies — otherwise the page scrolls by exactly the header.
-        height: signedIn
-          ? { xs: "calc(100dvh - 76px)", md: "calc(100dvh - 98px)" }
-          : "100dvh",
+        // The splash must fit the viewport exactly — never scroll, never clip.
+        // Everything inside is sized in vh-based clamp()s so the whole stack
+        // shrinks with the screen instead of overflowing it.
+        height: "100dvh",
         width: "100%",
         display: "flex",
         justifyContent: "center",
@@ -221,9 +262,8 @@ const Landing: React.FC = () => {
         }}
       />
 
-      {/* Top-right: language dropdown + ghost Members button (white text).
-          Hidden for signed-in members — SiteHeader already carries both. */}
-      {!signedIn && (
+      {/* Top-right: language dropdown + ghost Members/Dashboard button. The
+          landing shows no site banner, so these are its only chrome. */}
       <Box
         data-language-switcher
         sx={{
@@ -237,7 +277,7 @@ const Landing: React.FC = () => {
         }}
       >
         <Button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate(signedIn ? "/dashboard" : "/login")}
           variant="outlined"
           sx={{
             color: "#fff",
@@ -255,11 +295,10 @@ const Landing: React.FC = () => {
             "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,.22)" },
           }}
         >
-          {spanish ? "Miembros" : "Members"}
+          {signedIn ? (spanish ? "Panel" : "Dashboard") : spanish ? "Miembros" : "Members"}
         </Button>
         <LanguageMenu variant="ghost" />
       </Box>
-      )}
 
       <Box
         sx={{
@@ -267,25 +306,25 @@ const Landing: React.FC = () => {
           zIndex: 1,
           width: "100%",
           maxWidth: 1280,
-          px: 3,
-          py: { xs: 2, sm: 3 },
+          px: { xs: 1.25, sm: 3 },
+          py: "clamp(8px, 2vh, 28px)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
         }}
       >
-        <LogoBadge />
+        <LogoBadge size="clamp(88px, 20vh, 260px)" />
 
         <Typography
           component="h1"
           sx={{
             fontFamily: SERIF,
             fontWeight: 600,
-            fontSize: { xs: 50, sm: 64 },
+            fontSize: "clamp(34px, 8vh, 82px)",
             color: "#ffffff",
             textShadow: HALO,
-            mt: 1.25,
+            mt: "clamp(3px, 1.1vh, 13px)",
             lineHeight: 1.1,
           }}
         >
@@ -294,9 +333,9 @@ const Landing: React.FC = () => {
 
         <Typography
           sx={{
-            mt: 1,
+            mt: "clamp(3px, 1vh, 11px)",
             fontWeight: 700,
-            fontSize: { xs: 18, sm: 21 },
+            fontSize: "clamp(15px, 2.7vh, 27px)",
             color: "#ffffff",
             textShadow: HALO,
           }}
@@ -305,8 +344,8 @@ const Landing: React.FC = () => {
         </Typography>
         <Typography
           sx={{
-            mt: 0.5,
-            fontSize: { xs: 15, sm: 17 },
+            mt: "clamp(2px, 0.6vh, 6px)",
+            fontSize: "clamp(13px, 2.2vh, 22px)",
             color: "#ffffff",
             textShadow: HALO,
           }}
@@ -314,7 +353,7 @@ const Landing: React.FC = () => {
           Choose what you want to nurture today.
         </Typography>
 
-        <Box sx={{ mt: 1.5, mb: 1.25 }}>
+        <Box sx={{ mt: "clamp(4px, 1.5vh, 15px)", mb: "clamp(3px, 1.2vh, 12px)" }}>
           <Divider />
         </Box>
 
@@ -322,18 +361,18 @@ const Landing: React.FC = () => {
           sx={{
             fontFamily: SERIF,
             fontStyle: "italic",
-            fontSize: { xs: 16, sm: 18.5 },
+            fontSize: "clamp(13.5px, 2.4vh, 24px)",
             color: "#ffffff",
             textShadow: HALO,
             maxWidth: 360,
-            lineHeight: 1.5,
+            lineHeight: 1.4,
           }}
         >
           Every choice is a step toward your well-being.
         </Typography>
 
         <FavoriteRoundedIcon
-          sx={{ color: SUN, fontSize: { xs: 34, sm: 40 }, mt: 1, mb: 1.5, filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.35))" }}
+          sx={{ color: SUN, fontSize: "clamp(20px, 4.2vh, 50px)", mt: "clamp(3px, 1vh, 10px)", mb: "clamp(4px, 1.5vh, 15px)", filter: "drop-shadow(0 2px 6px rgba(0,0,0,0.35))" }}
         />
 
         {/* All seven pillars on one row — the letters read K-I-M-O-R-A-H */}
@@ -342,16 +381,23 @@ const Landing: React.FC = () => {
             width: "100%",
             display: "grid",
             gridTemplateColumns: "repeat(7, minmax(0, 1fr))",
-            columnGap: { xs: 0.75, sm: 2 },
-            mt: 0.5,
+            columnGap: "clamp(2px, 1vw, 16px)",
+            mt: "clamp(2px, 0.6vh, 6px)",
             alignItems: "start",
             justifyItems: "center",
           }}
         >
           {PILLARS.map((p) => (
-            <PillarButton key={p.letter} pillar={p} onSelect={handleSelect} />
+            <PillarButton
+              key={p.letter}
+              pillar={p}
+              onSelect={handleSelect}
+              locked={isLocked(p)}
+              spanish={spanish}
+            />
           ))}
         </Box>
+
       </Box>
     </Box>
   );

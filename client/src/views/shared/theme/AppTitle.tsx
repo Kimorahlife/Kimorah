@@ -3,18 +3,17 @@ import { useNavigate } from "react-router-dom";
 
 /**
  * Header brand for the dashboard shell: a large logo + "Kimorah" title.
- * Clicking it returns the (already-authenticated) user to the dashboard —
- * replaces Toolpad's default brand link, which points at "/".
+ * Clicking it returns the user to the main landing page.
  */
 const AppTitle = () => {
   const navigate = useNavigate();
   return (
     <Box
-      onClick={() => navigate("/dashboard")}
+      onClick={() => navigate("/")}
       role="button"
       tabIndex={0}
       onKeyDown={(e) => {
-        if (e.key === "Enter") navigate("/dashboard");
+        if (e.key === "Enter") navigate("/");
       }}
       sx={{ display: "flex", alignItems: "center", gap: 1.25, cursor: "pointer", maxHeight: 60, overflow: "hidden" }}
     >

@@ -38,7 +38,6 @@ import HarmonyPage from "./views/pillars/harmony/HarmonyPage";
 import LanguageSwitcher from "./views/shared/LanguageSwitcher";
 import SiteHeader from "./views/shared/SiteHeader";
 import { useAutoTranslate } from "./views/shared/useAutoTranslate";
-import { useToken } from "./views/authentication/components/useToken";
 
 // Pages that manage their own top-of-page chrome (no global SiteHeader).
 const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/dashboard/professional", "/roles", "/users", "/coqui-questions", "/diagnostics"]);
@@ -48,11 +47,9 @@ const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password", "/reset-pas
 const App: React.FC = () => {
   useAutoTranslate();
   const { pathname } = useLocation();
-  const [, , isTokenValid] = useToken();
-  // The landing is a full-bleed splash for visitors, but a signed-in member is
-  // "inside" the product — give them the real site chrome (brand + pillar nav +
-  // Dashboard) there, same as every other page.
-  const showHeader = !NO_HEADER.has(pathname) || (pathname === "/" && isTokenValid);
+  // The landing carries its own corner controls (Dashboard + language), so the
+  // site banner is for inner pages only — signed in or not.
+  const showHeader = !NO_HEADER.has(pathname);
   const showFloatingLang = AUTH_PAGES.has(pathname);
   return (
     <>

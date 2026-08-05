@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   Dialog,
   DialogActions,
@@ -82,7 +83,7 @@ const AddRole = ({ open, onClose }: Props) => {
             value={name}
             onChange={(e) => setName(e.target.value)}
           />
-          <Tooltip title="Global roles apply everywhere and are not scoped.">
+          <Tooltip title="Bypasses all permission checks — the role can reach every feature.">
             <FormControlLabel
               control={
                 <Switch
@@ -93,6 +94,11 @@ const AddRole = ({ open, onClose }: Props) => {
               label="Global role"
             />
           </Tooltip>
+          <Typography variant="caption" sx={{ display: "block", mt: -1, ml: 5.5, color: "text.secondary", lineHeight: 1.45 }}>
+            A global role bypasses every permission check — the matrix below is
+            ignored and the role can reach everything. To see permissions
+            actually take effect, test with a non-global role.
+          </Typography>
           <Tooltip title="New signups are given this role. Only one role can be the default — turning it on here turns it off elsewhere.">
             <FormControlLabel
               control={
@@ -102,6 +108,11 @@ const AddRole = ({ open, onClose }: Props) => {
             />
           </Tooltip>
           <Typography variant="subtitle2">Permissions</Typography>
+          {isGlobal && (
+            <Alert severity="info" sx={{ py: 0.5 }}>
+              Global is on, so these checkboxes have no effect for this role.
+            </Alert>
+          )}
           {/* Toggling global pre-selects all as a convenience; you can then
               disable specific ones — "global" is scope, not which actions. */}
           <PermissionMatrix selected={selected} onChange={setSelected} />

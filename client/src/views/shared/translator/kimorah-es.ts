@@ -7,6 +7,9 @@ export const KIMORAH_ES: Record<string, string> = {
   "Kindness": "Bondad", "Immersive": "Inmersivo", "Mission": "Misión", "MISSION": "MISIÓN",
   "Oneness": "Unidad", "Revitalization": "Revitalización", "Acceptance": "Aceptación", "Harmony": "Armonía",
   "Back": "Volver", "Back to Home": "Volver al inicio", "Coming soon.": "Próximamente.",
+  // Landing: locked pillar tiles + the note explaining them.
+  "Coming soon": "Próximamente",
+  "All experiences will be available soon.": "Todas las experiencias estarán disponibles próximamente.",
   "Learn More": "Conoce más", "Explore": "Explorar", "Journal": "Diario", "View Groups": "Ver grupos",
   "Renew your energy. Reclaim your truth.": "Renueva tu energía. Recupera tu verdad.",
   "Rise into your fullest self.": "Álzate hacia tu ser más pleno.",

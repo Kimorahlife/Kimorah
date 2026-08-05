@@ -88,7 +88,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element, requireFeat
         removeToken();                    // clear localStorage + hook state
         dispatch(resetPresence());        // clear in-memory presence ids
         persistor.purge();                // drop persisted presence/coqui
-        window.location.href = "/login";  // full reload → non-persisted slices reinit
+        window.location.href = "/";       // full reload → non-persisted slices reinit
       },
     }),
     [navigate, removeToken, dispatch]
