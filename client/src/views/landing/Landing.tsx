@@ -169,14 +169,25 @@ const Landing: React.FC = () => {
       navigate("/login");
       return;
     }
-    navigate(componentPages.has(slug) || PILLAR_CONTENT[slug] ? pillar.path : "/signup");
+    const hasPage = componentPages.has(slug) || Boolean(PILLAR_CONTENT[slug]);
+    // Unbuilt pillars invite a visitor to sign up; a member is already in, so
+    // leave them where they are rather than bouncing them to /signup.
+    if (!hasPage) {
+      if (!signedIn) navigate("/signup");
+      return;
+    }
+    navigate(pillar.path);
   };
 
   return (
     <Box
       sx={{
         position: "relative",
-        height: "100dvh",
+        // Signed-in members get SiteHeader above this splash, so give back the
+        // space it occupies — otherwise the page scrolls by exactly the header.
+        height: signedIn
+          ? { xs: "calc(100dvh - 76px)", md: "calc(100dvh - 98px)" }
+          : "100dvh",
         width: "100%",
         display: "flex",
         justifyContent: "center",
@@ -210,7 +221,9 @@ const Landing: React.FC = () => {
         }}
       />
 
-      {/* Top-right: language dropdown + ghost Members button (white text) */}
+      {/* Top-right: language dropdown + ghost Members button (white text).
+          Hidden for signed-in members — SiteHeader already carries both. */}
+      {!signedIn && (
       <Box
         data-language-switcher
         sx={{
@@ -224,7 +237,7 @@ const Landing: React.FC = () => {
         }}
       >
         <Button
-          onClick={() => navigate(signedIn ? "/dashboard" : "/login")}
+          onClick={() => navigate("/login")}
           variant="outlined"
           sx={{
             color: "#fff",
@@ -242,10 +255,11 @@ const Landing: React.FC = () => {
             "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,.22)" },
           }}
         >
-          {signedIn ? (spanish ? "Panel" : "Dashboard") : spanish ? "Miembros" : "Members"}
+          {spanish ? "Miembros" : "Members"}
         </Button>
         <LanguageMenu variant="ghost" />
       </Box>
+      )}
 
       <Box
         sx={{
