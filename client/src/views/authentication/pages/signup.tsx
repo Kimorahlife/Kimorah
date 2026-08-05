@@ -125,7 +125,7 @@ const Signup: React.FC = () => {
         intention,
       });
       setToken(response.data.token);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error: any) {
       dispatch({
         type: "SET_ERROR",

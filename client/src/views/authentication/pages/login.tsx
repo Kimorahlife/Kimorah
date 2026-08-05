@@ -55,7 +55,7 @@ const Login: React.FC = () => {
 
       const jwt = response.data.token;
       setToken(jwt);
-      navigate("/dashboard");
+      navigate("/");
     } catch (error: any) {
       setError(error.response?.data?.message || t("auth.login.errorInvalidCredentials"));
     }

@@ -5,6 +5,7 @@ import Signup from "./views/authentication/pages/signup";
 import ForgotPassword from "./views/authentication/pages/forgot-password";
 import ResetPassword from "./views/authentication/pages/reset-password";
 import { PrivateRoute } from "./views/shared/private-routes";
+import { RequireAuth } from "./views/shared/require-auth";
 import Dashboard from "./views/dashboard/Dashboard";
 import ProfessionalDashboard from "./views/dashboard/ProfessionalDashboard";
 import Roles from "./views/roles/Roles";
@@ -71,32 +72,32 @@ const App: React.FC = () => {
       <Route path="/diagnostics" element={<Diagnostics />} />
 
       {/* Full data-driven component pages */}
-      <Route path="/mission" element={<MissionPage />} />
+      <Route path="/mission" element={<RequireAuth element={<MissionPage />} />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
-      <Route path="/mission/sessions/1" element={<MissionSessionOnePage />} />
-      <Route path="/mission/sessions/1/concepts" element={<MissionConceptsPage />} />
-      <Route path="/mission/sessions/1/objectives" element={<MissionObjectivesPage />} />
-      <Route path="/mission/sessions/1/psychoeducation" element={<MissionPsychoeducationPage />} />
-      <Route path="/mission/sessions/1/intervention" element={<MissionInterventionPage />} />
-      <Route path="/mission/sessions/1/processing" element={<MissionProcessingPage />} />
-      <Route path="/mission/sessions/1/closing" element={<MissionClosingPage />} />
-      <Route path="/mission/sessions/1/:section" element={<SessionOneComingSoonPage />} />
-      <Route path="/mission/grief/session/1/:section" element={<GriefCurriculumPage />} />
+      <Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
+      <Route path="/mission/sessions/1/concepts" element={<RequireAuth element={<MissionConceptsPage />} />} />
+      <Route path="/mission/sessions/1/objectives" element={<RequireAuth element={<MissionObjectivesPage />} />} />
+      <Route path="/mission/sessions/1/psychoeducation" element={<RequireAuth element={<MissionPsychoeducationPage />} />} />
+      <Route path="/mission/sessions/1/intervention" element={<RequireAuth element={<MissionInterventionPage />} />} />
+      <Route path="/mission/sessions/1/processing" element={<RequireAuth element={<MissionProcessingPage />} />} />
+      <Route path="/mission/sessions/1/closing" element={<RequireAuth element={<MissionClosingPage />} />} />
+      <Route path="/mission/sessions/1/:section" element={<RequireAuth element={<SessionOneComingSoonPage />} />} />
+      <Route path="/mission/grief/session/1/:section" element={<RequireAuth element={<GriefCurriculumPage />} />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}
-      <Route path="/mission/coqui" element={<KindnessPage />} />
-      <Route path="/mission/coqui/survey" element={<SurveyPage />} />
-      <Route path="/immersive" element={<ImmersivePage />} />
-      <Route path="/oneness" element={<OnenessPage />} />
-      <Route path="/revitalization" element={<RevitalizationPage />} />
-      <Route path="/acceptance" element={<AcceptancePage />} />
+      <Route path="/mission/coqui" element={<RequireAuth element={<KindnessPage />} />} />
+      <Route path="/mission/coqui/survey" element={<RequireAuth element={<SurveyPage />} />} />
+      <Route path="/immersive" element={<RequireAuth element={<ImmersivePage />} />} />
+      <Route path="/oneness" element={<RequireAuth element={<OnenessPage />} />} />
+      <Route path="/revitalization" element={<RequireAuth element={<RevitalizationPage />} />} />
+      <Route path="/acceptance" element={<RequireAuth element={<AcceptancePage />} />} />
 
-      <Route path="/kindness" element={<KindnessPillarPage />} />
-      <Route path="/kindness/words" element={<WordsOfKindnessPage />} />
-      <Route path="/kindness/lend-a-hand" element={<LendAHandPage />} />
-      <Route path="/harmony" element={<HarmonyPage />} />
+      <Route path="/kindness" element={<RequireAuth element={<KindnessPillarPage />} />} />
+      <Route path="/kindness/words" element={<RequireAuth element={<WordsOfKindnessPage />} />} />
+      <Route path="/kindness/lend-a-hand" element={<RequireAuth element={<LendAHandPage />} />} />
+      <Route path="/harmony" element={<RequireAuth element={<HarmonyPage />} />} />
 
       {/* Other pillar detail pages (image-based for now) */}
-      <Route path="/:slug" element={<PillarDetail />} />
+      <Route path="/:slug" element={<RequireAuth element={<PillarDetail />} />} />
 
       {/* Fallback */}
       <Route path="*" element={<Navigate to="/" replace />} />

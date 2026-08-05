@@ -2,6 +2,7 @@ import React from "react";
 import { Box, Button, ButtonBase, Typography } from "@mui/material";
 import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
 import { useTranslation } from "react-i18next";
+import { useToken } from "../authentication/components/useToken";
 import { useNavigate } from "react-router-dom";
 import LanguageMenu from "../shared/LanguageMenu";
 import LogoBadge from "./LogoBadge";
@@ -155,6 +156,8 @@ const Divider: React.FC = () => (
 const Landing: React.FC = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
+  const [, , isTokenValid] = useToken();
+  const signedIn = isTokenValid;
   const spanish = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es");
 
   // Open full component pages or image-based pillar pages. Pillars without
@@ -162,6 +165,10 @@ const Landing: React.FC = () => {
   const handleSelect = (pillar: Pillar) => {
     const slug = pillar.path.replace("/", "");
     const componentPages = new Set(["acceptance", "harmony"]);
+    if (!signedIn) {
+      navigate("/login");
+      return;
+    }
     navigate(componentPages.has(slug) || PILLAR_CONTENT[slug] ? pillar.path : "/signup");
   };
 
@@ -217,7 +224,7 @@ const Landing: React.FC = () => {
         }}
       >
         <Button
-          onClick={() => navigate("/login")}
+          onClick={() => navigate(signedIn ? "/dashboard" : "/login")}
           variant="outlined"
           sx={{
             color: "#fff",
@@ -235,7 +242,7 @@ const Landing: React.FC = () => {
             "&:hover": { borderColor: "#fff", bgcolor: "rgba(255,255,255,.22)" },
           }}
         >
-          {spanish ? "Miembros" : "Members"}
+          {signedIn ? (spanish ? "Panel" : "Dashboard") : spanish ? "Miembros" : "Members"}
         </Button>
         <LanguageMenu variant="ghost" />
       </Box>

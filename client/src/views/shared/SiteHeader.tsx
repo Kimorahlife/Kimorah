@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import LogoBadge from "../landing/LogoBadge";
 import { PILLARS } from "../landing/pillars";
 import LanguageMenu from "./LanguageMenu";
+import { useToken } from "../authentication/components/useToken";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 const PURPLE = "#6540b2";
@@ -23,6 +24,8 @@ const NAV_ITEMS: { label: string; es: string; path: string }[] = [
  */
 const SiteHeader: React.FC = () => {
   const navigate = useNavigate();
+  const [, , isTokenValid] = useToken();
+  const signedIn = isTokenValid;
   const { pathname } = useLocation();
   const { i18n } = useTranslation();
   const spanish = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es");
@@ -55,7 +58,7 @@ const SiteHeader: React.FC = () => {
 
           {/* Actions */}
           <Box sx={{ justifySelf: "end", display: "flex", alignItems: "center", gap: { xs: 1.25, sm: 2 }, flexShrink: 0 }}>
-            <Button onClick={() => navigate("/login")} variant="contained" sx={{ bgcolor: PURPLE, color: "#fff", borderRadius: 99, px: { xs: 2.5, sm: 3.25 }, py: 1.4, fontSize: { xs: 12, sm: 13.5 }, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "none", "&:hover": { bgcolor: "#553599", color: "#fff", boxShadow: "none" } }}>{spanish ? "MIEMBROS" : "MEMBERS"}</Button>
+            <Button onClick={() => navigate(signedIn ? "/dashboard" : "/login")} variant="contained" sx={{ bgcolor: PURPLE, color: "#fff", borderRadius: 99, px: { xs: 2.5, sm: 3.25 }, py: 1.4, fontSize: { xs: 12, sm: 13.5 }, fontWeight: 800, whiteSpace: "nowrap", boxShadow: "none", "&:hover": { bgcolor: "#553599", color: "#fff", boxShadow: "none" } }}>{signedIn ? (spanish ? "PANEL" : "DASHBOARD") : spanish ? "MIEMBROS" : "MEMBERS"}</Button>
             <LanguageMenu variant="onDark" sx={{ fontSize: { xs: 12.5, sm: 14 }, px: { xs: 1.9, sm: 2.3 }, py: { xs: 0.8, sm: 0.95 } }} />
           </Box>
         </Box>
