@@ -162,15 +162,12 @@ const MissionSessionOnePage: React.FC = () => {
         </Box>
       </Container>
 
-      <Box id="session-actions" sx={{ mt: .75, py: 1.4, textAlign: "center", bgcolor: "rgba(232,222,247,.8)", borderTop: "1px solid rgba(73,50,139,.08)" }}>
-        <Typography sx={{ fontWeight: 800, fontSize: 12, letterSpacing: .7 }}>{copy(lang, "READY TO BEGIN?", "¿LISTO PARA COMENZAR?")}</Typography>
-        <Typography sx={{ fontSize: 12, mt: .25 }}>{copy(lang, "Take the first step toward your well-being and that of those you support.", "Da el primer paso hacia tu bienestar y el de quienes acompañas.")}</Typography>
-        <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 2, mt: 1 }}>
-          <Button variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ bgcolor: PURPLE, borderRadius: 99, px: 3.5, py: .7, fontSize: 11, fontWeight: 800, boxShadow: "none", "&:hover": { bgcolor: "#6742a7" } }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button>
-          <Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ color: INK, borderColor: PURPLE, borderRadius: 99, px: 3.5, py: .7, fontSize: 11, fontWeight: 800 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button>
+      <Box id="session-actions" sx={{ mt: .75, py: 2.5, textAlign: "center", bgcolor: "rgba(232,222,247,.8)", borderTop: "1px solid rgba(73,50,139,.08)" }}>
+        <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 1.5 }}>
+          <Button onClick={() => navigate("/mission/sessions/2")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ minWidth: 300, minHeight: 54, px: 3.5, bgcolor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500, boxShadow: "0 5px 12px rgba(57,36,118,.28)", "&:hover": { bgcolor: "#6742a7" } }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button>
+          <Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ minWidth: 300, minHeight: 54, px: 3.5, borderWidth: 1.5, color: INK, borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button>
         </Box>
       </Box>
-      <Box component="footer" sx={{ py: .75, display: "flex", justifyContent: "center", alignItems: "center", gap: 1, bgcolor: "white" }}><InfoOutlinedIcon sx={{ fontSize: 18 }} /><Typography sx={{ fontSize: 12 }}>{copy(lang, "Therapeutic approach: Trauma-Informed Care (TIC), Mindfulness and ACT", "Enfoque terapéutico: Atención Informada por Trauma (TIC), Mindfulness y ACT")}</Typography></Box>
     </Box>
   );
 };

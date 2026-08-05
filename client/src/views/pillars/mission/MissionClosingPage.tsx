@@ -78,13 +78,14 @@ const MissionClosingPage: React.FC = () => {
               <Typography sx={{ mt: 1.5, lineHeight: 1.65, fontStyle: "italic" }}>{copy(lang, "This session uses Trauma-Informed Care principles to establish psychological safety, together with ACT and mindfulness strategies to help participants distinguish what they can control from what they need to accept, promoting presence in the current moment.", "Esta sesión utiliza principios de la Atención Informada por Trauma para establecer seguridad psicológica, junto con estrategias de ACT y mindfulness para ayudar a los participantes a diferenciar aquello que pueden controlar de aquello que necesitan aceptar, promoviendo la presencia en el momento actual.")}</Typography>
             </Box>
           </Box>
-
-          <Button onClick={() => navigate("/mission/sessions/2")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ justifySelf: "center", bgcolor: PURPLE, borderRadius: 99, px: { xs: 5, md: 10 }, py: 1.6, fontWeight: 800 }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button>
         </Box>
       </Box>
     </Container>
 
-    <Box sx={{ textAlign: "center", bgcolor: "rgba(232,224,247,.82)", py: 2 }}><Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ borderColor: PURPLE, color: INK, borderRadius: 99, px: 3 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button></Box>
+    <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 1.5, bgcolor: "rgba(232,224,247,.82)", py: 2.5 }}>
+      <Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ minWidth: 300, minHeight: 54, px: 3.5, borderWidth: 1.5, borderColor: PURPLE, color: INK, borderRadius: 99, fontSize: 16, fontWeight: 500 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button>
+      <Button onClick={() => navigate("/mission/sessions/2")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ minWidth: 300, minHeight: 54, px: 3.5, bgcolor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500, boxShadow: "0 5px 12px rgba(57,36,118,.28)", "&:hover": { bgcolor: "#6742a7" } }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button>
+    </Box>
   </Box>;
 };
 

@@ -16,6 +16,7 @@ import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
+import MissionSessionTwoPage from "./views/pillars/mission/MissionSessionTwoPage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
 import MissionPsychoeducationPage from "./views/pillars/mission/MissionPsychoeducationPage";
@@ -74,7 +75,7 @@ const App: React.FC = () => {
       {/* Full data-driven component pages */}
       <Route path="/mission" element={<RequireAuth element={<MissionPage />} />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
-      <Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
+<Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
       <Route path="/mission/sessions/1/concepts" element={<RequireAuth element={<MissionConceptsPage />} />} />
       <Route path="/mission/sessions/1/objectives" element={<RequireAuth element={<MissionObjectivesPage />} />} />
       <Route path="/mission/sessions/1/psychoeducation" element={<RequireAuth element={<MissionPsychoeducationPage />} />} />
@@ -82,6 +83,8 @@ const App: React.FC = () => {
       <Route path="/mission/sessions/1/processing" element={<RequireAuth element={<MissionProcessingPage />} />} />
       <Route path="/mission/sessions/1/closing" element={<RequireAuth element={<MissionClosingPage />} />} />
       <Route path="/mission/sessions/1/:section" element={<RequireAuth element={<SessionOneComingSoonPage />} />} />
+      <Route path="/mission/sessions/2" element={<RequireAuth element={<MissionSessionTwoPage />} />} />
+      <Route path="/mission/sessions/2/:section" element={<RequireAuth element={<MissionSessionTwoPage />} />} />
       <Route path="/mission/grief/session/1/:section" element={<RequireAuth element={<GriefCurriculumPage />} />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}
       <Route path="/mission/coqui" element={<RequireAuth element={<KindnessPage />} />} />
