@@ -10,7 +10,8 @@ import SpaOutlinedIcon from "@mui/icons-material/SpaOutlined";
 import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 import CurriculumStepNavigation from "./CurriculumStepNavigation";
 
-export type SessionTwoTab = "introduction" | "concepts" | "objectives" | "psychoeducation" | "intervention" | "processing" | "closing";
+export type SessionThreeTab = "introduction" | "concepts" | "objectives" | "psychoeducation" | "intervention" | "processing" | "closing";
+
 const tabs = [
   ["introduction", SpaOutlinedIcon, "Introduction", "Introducción"],
   ["concepts", LightbulbOutlinedIcon, "Concepts", "Conceptos"],
@@ -21,15 +22,23 @@ const tabs = [
   ["closing", FavoriteBorderRoundedIcon, "Closing", "Cierre"],
 ] as const;
 
-const SessionTwoTabs: React.FC<{ active: SessionTwoTab }> = ({ active }) => {
+const SessionThreeTabs: React.FC<{ active: SessionThreeTab }> = ({ active }) => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const es = (i18n.resolvedLanguage || i18n.language).startsWith("es");
-  return <>
-    <Box component="nav" sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(4,1fr)", md: "repeat(7,1fr)" }, overflow: "hidden", bgcolor: "white", borderRadius: 3, boxShadow: "0 8px 22px rgba(55,35,115,.08)" }}>
-      {tabs.map(([id, Icon, en, spanish]) => <Box component="button" type="button" key={id} onClick={() => navigate(id === "introduction" ? "/mission/sessions/2" : `/mission/sessions/2/${id}`)} sx={{ border: 0, borderBottom: id === active ? "4px solid #7650b3" : "4px solid transparent", bgcolor: "transparent", color: id === active ? "#7650b3" : "#211866", py: 1.5, cursor: "pointer" }}><Icon sx={{ fontSize: 29 }} /><Typography sx={{ fontSize: 10, fontWeight: 800 }}>{(es ? spanish : en).toUpperCase()}</Typography></Box>)}
-    </Box>
-    <CurriculumStepNavigation session={2} active={active} />
-  </>;
+  return (
+    <>
+      <Box component="nav" sx={{ display: "grid", gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(4,1fr)", md: "repeat(7,1fr)" }, overflow: "hidden", bgcolor: "white", borderRadius: 3, boxShadow: "0 8px 22px rgba(55,35,115,.08)" }}>
+        {tabs.map(([id, Icon, en, spanish]) => (
+          <Box component="button" type="button" key={id} onClick={() => navigate(id === "introduction" ? "/mission/sessions/3" : `/mission/sessions/3/${id}`)} sx={{ border: 0, borderBottom: id === active ? "4px solid #7650b3" : "4px solid transparent", bgcolor: "transparent", color: id === active ? "#7650b3" : "#211866", py: 1.5, cursor: "pointer" }}>
+            <Icon sx={{ fontSize: 29 }} />
+            <Typography sx={{ fontSize: 10, fontWeight: 800 }}>{(es ? spanish : en).toUpperCase()}</Typography>
+          </Box>
+        ))}
+      </Box>
+      <CurriculumStepNavigation session={3} active={active} />
+    </>
+  );
 };
-export default SessionTwoTabs;
+
+export default SessionThreeTabs;

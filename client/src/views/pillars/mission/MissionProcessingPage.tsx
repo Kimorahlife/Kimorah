@@ -8,6 +8,7 @@ import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded
 import FormatQuoteRoundedIcon from "@mui/icons-material/FormatQuoteRounded";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SessionOneTabs from "./SessionOneTabs";
+import CurriculumStepNavigation from "./CurriculumStepNavigation";
 
 const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
 const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
@@ -58,7 +59,7 @@ const MissionProcessingPage: React.FC = () => {
     </Box>
 
     <Container maxWidth="xl" sx={{ mt: { xs: -3, md: -4 }, pb: 2, position: "relative", zIndex: 2 }}>
-      <Box sx={{ mb: 2.5 }}><SessionOneTabs active="processing" /></Box>
+      <Box sx={{ mb: 2.5 }}><SessionOneTabs active="processing" /><CurriculumStepNavigation session={1} active="processing" /></Box>
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
         <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 850 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>

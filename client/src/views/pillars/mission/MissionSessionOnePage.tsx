@@ -18,6 +18,7 @@ import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import LogoBadge from "../../landing/LogoBadge";
 import SessionOneTabs from "./SessionOneTabs";
+import CurriculumStepNavigation from "./CurriculumStepNavigation";
 
 const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
 const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
@@ -95,7 +96,7 @@ const MissionSessionOnePage: React.FC = () => {
       </Box>
 
       <Container maxWidth="xl" sx={{ mt: { xs: -3, md: -4 }, pb: 0, position: "relative", zIndex: 2 }}>
-        <Box sx={{ mb: 1.75 }}><SessionOneTabs active="presentation" /></Box>
+        <Box sx={{ mb: 1.75 }}><SessionOneTabs active="presentation" /><CurriculumStepNavigation session={1} active="presentation" /></Box>
 
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
           <Box

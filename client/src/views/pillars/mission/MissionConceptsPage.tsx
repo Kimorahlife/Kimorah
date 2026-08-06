@@ -16,6 +16,7 @@ import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
 import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 import LogoBadge from "../../landing/LogoBadge";
 import SessionOneTabs from "./SessionOneTabs";
+import CurriculumStepNavigation from "./CurriculumStepNavigation";
 
 const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
 const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
@@ -69,7 +70,7 @@ const MissionConceptsPage: React.FC = () => {
     </Box>
 
     <Container maxWidth="xl" sx={{ mt: { xs: -3, md: -4 }, pb: 2, position: "relative", zIndex: 2 }}>
-      <Box sx={{ mb: 2.5 }}><SessionOneTabs active="concepts" /></Box>
+      <Box sx={{ mb: 2.5 }}><SessionOneTabs active="concepts" /><CurriculumStepNavigation session={1} active="concepts" /></Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
         <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 760 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
