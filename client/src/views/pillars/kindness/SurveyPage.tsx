@@ -7,6 +7,7 @@ import LockRoundedIcon from "@mui/icons-material/LockRounded";
 import CheckCircleRoundedIcon from "@mui/icons-material/CheckCircleRounded";
 import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafRounded";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { api } from "../../../api";
 import CoquiShell from "./CoquiShell";
 import { Lang, L, SurveyQuestion, surveyStrings } from "./survey-data";
@@ -71,7 +72,10 @@ const textFieldSx = {
 
 const SurveyPage: React.FC = () => {
   const navigate = useNavigate();
-  const [lang, setLang] = useState<Lang>("en");
+  const { i18n } = useTranslation();
+  // Follow the site-wide language switcher. The survey used to hold its own
+  // "en"/"es" state, so flipping the header control left this page in English.
+  const lang: Lang = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es") ? "es" : "en";
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
   const [describes, setDescribes] = useState<Record<string, string>>({});
@@ -91,7 +95,7 @@ const SurveyPage: React.FC = () => {
 
   if (!total) {
     return (
-      <CoquiShell activeId="survey" heroTitle="COQUÍ RESEARCH SURVEY">
+      <CoquiShell activeId="survey" heroTitle={lang === "es" ? "ENCUESTA DE INVESTIGACIÓN COQUÍ" : "COQUÍ RESEARCH SURVEY"}>
         <Box sx={{ p: { xs: 2, sm: 3 } }}>
           <Box sx={{ maxWidth: 940, mx: "auto", bgcolor: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 4, p: { xs: 2.5, sm: 4 }, textAlign: "center", py: { xs: 6, sm: 8 } }}>
             <Typography sx={{ color: SUB }}>
@@ -166,7 +170,7 @@ const SurveyPage: React.FC = () => {
 
   if (submitted) {
     return (
-      <CoquiShell activeId="survey" heroTitle="COQUÍ RESEARCH SURVEY">
+      <CoquiShell activeId="survey" heroTitle={lang === "es" ? "ENCUESTA DE INVESTIGACIÓN COQUÍ" : "COQUÍ RESEARCH SURVEY"}>
         <Box sx={{ p: { xs: 2, sm: 3 } }}>
           <Box sx={{ ...card, textAlign: "center", py: { xs: 6, sm: 8 } }}>
             <CheckCircleRoundedIcon sx={{ color: "#7fc98f", fontSize: 56 }} />
@@ -191,24 +195,9 @@ const SurveyPage: React.FC = () => {
   }
 
   return (
-    <CoquiShell activeId="survey" heroTitle="COQUÍ RESEARCH SURVEY">
+    <CoquiShell activeId="survey" heroTitle={lang === "es" ? "ENCUESTA DE INVESTIGACIÓN COQUÍ" : "COQUÍ RESEARCH SURVEY"}>
       <Box sx={{ p: { xs: 2, sm: 3 } }}>
         <Box sx={card}>
-          {/* Language toggle */}
-          <Box sx={{ display: "flex", justifyContent: "flex-end", mb: 1.5 }}>
-            <Box sx={{ display: "inline-flex", bgcolor: "rgba(255,255,255,0.08)", borderRadius: 999, p: 0.4 }}>
-              {(["en", "es"] as Lang[]).map((l) => (
-                <Box
-                  key={l}
-                  onClick={() => setLang(l)}
-                  sx={{ px: 1.75, py: 0.4, borderRadius: 999, cursor: "pointer", fontSize: 12.5, fontWeight: 700, bgcolor: lang === l ? PURPLE : "transparent", color: lang === l ? "#fff" : SUB }}
-                >
-                  {l.toUpperCase()}
-                </Box>
-              ))}
-            </Box>
-          </Box>
-
           {/* Progress */}
           <Typography sx={{ color: SUB, fontWeight: 700, letterSpacing: 0.8, fontSize: 13 }}>{t(surveyStrings.progress)}</Typography>
           <Box sx={{ display: "flex", alignItems: "center", gap: 2, mt: 1.5 }}>

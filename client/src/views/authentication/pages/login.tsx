@@ -267,6 +267,17 @@ const Login: React.FC = () => {
                   </Link>
                 </Typography>
               </Box>
+              <Box sx={{ textAlign: "center", mt: 1.5 }}>
+                <Link
+                  component="button"
+                  type="button"
+                  onClick={() => navigate("/")}
+                  variant="body2"
+                  sx={{ color: "text.secondary", textDecoration: "none", "&:hover": { textDecoration: "underline" } }}
+                >
+                  ← Back to Home
+                </Link>
+              </Box>
             </form>
 
             <Typography

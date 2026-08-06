@@ -75,7 +75,10 @@ const App: React.FC = () => {
       <Route path="/diagnostics" element={<Diagnostics />} />
 
       {/* Full data-driven component pages */}
-      <Route path="/mission" element={<RequireAuth element={<MissionPage />} />} />
+      {/* Public: the landing offers Mission to everyone, so it must open
+          without a login. Its curriculum sub-pages below stay gated, and the
+          "Explore curriculum" buttons gate on the curriculums permission. */}
+      <Route path="/mission" element={<MissionPage />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
 <Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
       <Route path="/mission/sessions/1/concepts" element={<RequireAuth element={<MissionConceptsPage />} />} />

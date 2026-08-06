@@ -211,10 +211,12 @@ const Landing: React.FC = () => {
 
 
   /**
-   * Locked while signed out, except the one launched pillar which is open to
-   * everyone. Signing in unlocks the rest — a member has full access.
+   * Only launched pillars are open, and Mission is the only one so far. Signing
+   * in does not unlock the rest: a plain "User" holds no permissions and should
+   * see exactly what a visitor sees. What a role grants is enforced inside the
+   * pillar (e.g. the curriculum buttons), not by unlocking tiles here.
    */
-  const isLocked = (pillar: Pillar) => !signedIn && !pillar.alwaysAvailable;
+  const isLocked = (pillar: Pillar) => !pillar.alwaysAvailable;
 
   const handleSelect = (pillar: Pillar) => {
     if (isLocked(pillar)) return;

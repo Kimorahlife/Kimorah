@@ -1,6 +1,9 @@
 import React from "react";
 import { Box, Button, Typography } from "@mui/material";
+import { useState } from "react";
 import { useFeatureFullAccess } from "../../shared/permissions";
+import { useToken } from "../../authentication/components/useToken";
+import AccessGateDialog from "../../shared/AccessGateDialog";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
@@ -9,10 +12,13 @@ import { PriorityProgramItem } from "./mission-data";
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 
 /**
- * Priority programme card. The two "Explore curriculum" buttons open only for
- * someone who can genuinely work in the curriculum: Add AND (Edit OR Delete)
- * on `curriculums`. A partial grant — say Add alone — is not enough, so the
- * buttons render greyed and inert rather than failing after the click.
+ * Priority programme card.
+ *
+ * The two "Explore curriculum" buttons stay enabled for everyone — a greyed
+ * button tells a prospective member nothing and gives them nowhere to go.
+ * Opening one without Add AND (Edit OR Delete) on `curriculums` raises an
+ * interstitial instead: a sign-up prompt for visitors, a "contact your
+ * administrator" note for members who are simply missing the grant.
  */
 const PriorityProgramCard: React.FC<{
   item: PriorityProgramItem;
@@ -21,6 +27,17 @@ const PriorityProgramCard: React.FC<{
   onWatchVideo?: () => void;
 }> = ({ item, onExplore, onExploreSecondary, onWatchVideo }) => {
   const canOpenCurriculum = useFeatureFullAccess("curriculums");
+  const [, , isTokenValid] = useToken();
+  const [gateOpen, setGateOpen] = useState(false);
+
+  const openCurriculum = (go?: () => void) => {
+    if (!canOpenCurriculum) {
+      setGateOpen(true);
+      return;
+    }
+    go?.();
+  };
+
   return (
   <Box
     sx={{
@@ -118,8 +135,7 @@ const PriorityProgramCard: React.FC<{
             <Button
               fullWidth
               variant="contained"
-              disabled={!canOpenCurriculum}
-              onClick={index === 0 ? onExplore : onExploreSecondary}
+              onClick={() => openCurriculum(index === 0 ? onExplore : onExploreSecondary)}
               endIcon={<ArrowForwardRoundedIcon />}
               sx={{
                 mt: 2,
@@ -131,10 +147,6 @@ const PriorityProgramCard: React.FC<{
                 letterSpacing: 1.1,
                 boxShadow: "none",
                 "&:hover": { bgcolor: curriculum.accent, filter: "brightness(1.1)", boxShadow: "none" },
-                "&.Mui-disabled": {
-                  bgcolor: "rgba(255,255,255,.14)",
-                  color: "rgba(255,255,255,.45)",
-                },
               }}
             >
               {curriculum.action}
@@ -160,6 +172,7 @@ const PriorityProgramCard: React.FC<{
         {item.secondaryAction}
       </Button>
     </Box>
+      <AccessGateDialog open={gateOpen} onClose={() => setGateOpen(false)} signedIn={isTokenValid} />
     </Box>
   );
 };
