@@ -81,7 +81,7 @@ const App: React.FC = () => {
           "Explore curriculum" buttons gate on the curriculums permission. */}
       <Route path="/mission" element={<MissionPage />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
-<Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
+      <Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
       <Route path="/mission/sessions/1/concepts" element={<RequireAuth element={<MissionConceptsPage />} />} />
       <Route path="/mission/sessions/1/objectives" element={<RequireAuth element={<MissionObjectivesPage />} />} />
       <Route path="/mission/sessions/1/psychoeducation" element={<RequireAuth element={<MissionPsychoeducationPage />} />} />
