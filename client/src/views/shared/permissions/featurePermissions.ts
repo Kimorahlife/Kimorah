@@ -24,7 +24,16 @@ export type Feature =
   | "users"
   | "roles"
   | "research"
-  | "curriculums";
+  | "curriculums"
+  // Member workspace. The pages behind these are not built yet — granting one
+  // reveals its sidebar entry and opens a "coming soon" placeholder. They are
+  // real permissions today so roles can be composed ahead of the pages.
+  | "profile"
+  | "bookmarks"
+  | "forum"
+  | "messages"
+  | "settings"
+  | "help-center";
 
 export type Action = "read" | "add" | "write" | "delete";
 
@@ -107,4 +116,10 @@ export const FEATURE_PERMISSIONS: Record<Feature, FeaturePerms> = {
   roles: { read: ["roles:read"], add: ["roles:add"], write: ["roles:write"], delete: ["roles:delete"] },
   research: { read: ["research:read"], add: ["research:add"], write: ["research:write"], delete: ["research:delete"] },
   curriculums: { read: ["curriculums:read"], add: ["curriculums:add"], write: ["curriculums:write"], delete: ["curriculums:delete"] },
+  profile: { read: ["profile:read"], add: ["profile:add"], write: ["profile:write"], delete: ["profile:delete"] },
+  bookmarks: { read: ["bookmarks:read"], add: ["bookmarks:add"], write: ["bookmarks:write"], delete: ["bookmarks:delete"] },
+  forum: { read: ["forum:read"], add: ["forum:add"], write: ["forum:write"], delete: ["forum:delete"] },
+  messages: { read: ["messages:read"], add: ["messages:add"], write: ["messages:write"], delete: ["messages:delete"] },
+  settings: { read: ["settings:read"], add: ["settings:add"], write: ["settings:write"], delete: ["settings:delete"] },
+  "help-center": { read: ["help-center:read"], add: ["help-center:add"], write: ["help-center:write"], delete: ["help-center:delete"] },
 };

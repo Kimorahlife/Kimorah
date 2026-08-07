@@ -1,6 +1,12 @@
 import mongoose, { Model, Document, Schema } from "mongoose";
 
-// Why the user is joining Kimorah — captured at signup, drives onboarding.
+// Why the user is joining Kimorah — captured at signup and STORED ONLY.
+//
+// It is NOT a role and grants nothing. Authorization is driven entirely by the
+// user's `roles` value and the permission matrix behind it; this field is kept
+// solely as a segmentation variable for future email campaigns. Do not
+// authorize on it, and do not render it anywhere it could be mistaken for a
+// role.
 enum Intention {
   Professional = "professional",
   Client = "client",

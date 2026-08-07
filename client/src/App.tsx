@@ -12,6 +12,7 @@ import Roles from "./views/roles/Roles";
 import Users from "./views/users/Users";
 import CoquiQuestions from "./views/coqui/CoquiQuestions";
 import Diagnostics from "./views/shared/Diagnostics";
+import ComingSoon from "./views/shared/ComingSoon";
 import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
@@ -41,7 +42,7 @@ import SiteHeader from "./views/shared/SiteHeader";
 import { useAutoTranslate } from "./views/shared/useAutoTranslate";
 
 // Pages that manage their own top-of-page chrome (no global SiteHeader).
-const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/dashboard/professional", "/roles", "/users", "/coqui-questions", "/diagnostics"]);
+const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/dashboard/professional", "/roles", "/users", "/coqui-questions", "/diagnostics", "/profile", "/bookmarks", "/forum", "/messages", "/settings", "/help"]);
 // Auth screens keep a floating language switcher; the landing page has its own.
 const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
 
@@ -72,6 +73,16 @@ const App: React.FC = () => {
       <Route path="/roles" element={<PrivateRoute requireFeature="roles" element={<Roles />} />} />
       <Route path="/users" element={<PrivateRoute requireFeature="users" element={<Users />} />} />
       <Route path="/coqui-questions" element={<PrivateRoute requireFeature="research" element={<CoquiQuestions />} />} />
+
+      {/* Member workspace — permissions and sidebar entries exist, the pages
+          don't yet. Each is gated like a finished page, so building the real
+          view later means swapping the element and nothing else. */}
+      <Route path="/profile" element={<PrivateRoute requireFeature="profile" element={<ComingSoon titleKey="nav.profile" fallback="My Profile" />} />} />
+      <Route path="/bookmarks" element={<PrivateRoute requireFeature="bookmarks" element={<ComingSoon titleKey="nav.bookmarks" fallback="Bookmarks" />} />} />
+      <Route path="/forum" element={<PrivateRoute requireFeature="forum" element={<ComingSoon titleKey="nav.forum" fallback="Community Forum" />} />} />
+      <Route path="/messages" element={<PrivateRoute requireFeature="messages" element={<ComingSoon titleKey="nav.messages" fallback="Messages" />} />} />
+      <Route path="/settings" element={<PrivateRoute requireFeature="settings" element={<ComingSoon titleKey="nav.settings" fallback="Settings" />} />} />
+      <Route path="/help" element={<PrivateRoute requireFeature="help-center" element={<ComingSoon titleKey="nav.helpCenter" fallback="Help Center" />} />} />
       {/* Public env/connectivity self-check */}
       <Route path="/diagnostics" element={<Diagnostics />} />
 

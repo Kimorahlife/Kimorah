@@ -32,6 +32,13 @@ const DISPLAY_GROUPS: DisplayGroup[] = [
   { label: "Roles", members: ["Roles"] },
   { label: "Research", members: ["Research"] },
   { label: "Curriculums", members: ["Curriculums"] },
+  // Member workspace — assignable now, pages land later.
+  { label: "My Profile", members: ["My Profile"] },
+  { label: "Bookmarks", members: ["Bookmarks"] },
+  { label: "Community Forum", members: ["Community Forum"] },
+  { label: "Messages", members: ["Messages"] },
+  { label: "Settings", members: ["Settings"] },
+  { label: "Help Center", members: ["Help Center"] },
 ];
 
 type Props = {

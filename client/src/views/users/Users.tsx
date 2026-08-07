@@ -131,20 +131,10 @@ const Users: React.FC = () => {
                         {u.email}
                       </Typography>
                     </Box>
-                    {/* Signup intention — what the person said they're here for.
-                        Informational only: it never grants access, the role does. */}
-                    {u.intention && (
-                      <Tooltip
-                        title={t("users.intentionHint", "Stated at signup — informational only, it grants no access")}
-                      >
-                        <Chip
-                          label={t(`auth.signup.intentionOptions.${u.intention}`, u.intention)}
-                          size="small"
-                          variant="outlined"
-                          sx={{ color: "text.secondary", borderStyle: "dashed" }}
-                        />
-                      </Tooltip>
-                    )}
+                    {/* The role is the only thing shown here, because it is the
+                        only thing that grants access. Signup intention is not
+                        rendered: it looked like a second role and read as a
+                        duplicate whenever the two shared a label. */}
                     {u.roles && <Chip label={u.roles} size="small" variant="outlined" color="primary" />}
                     <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: "center" }} />
                     <CanEdit feature="users">
