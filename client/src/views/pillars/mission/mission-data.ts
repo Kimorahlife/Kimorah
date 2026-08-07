@@ -71,7 +71,7 @@ export const missionData: MissionContent = {
   title: "MISSION",
   tagline: "Healing People. Revitalizing Communities. Protecting Our Earth.",
   description:
-    "We believe healing is the foundation of a thriving world. Through compassionate mental health care, transformative education, meaningful research, creativity, humanitarian service, and environmental stewardship, KIMORAH LIFE empowers individuals to overcome adversity, strengthens communities through connection and purpose, and fosters a healthier relationship with our planet. Together, we are building a future where every act of healing creates lasting change for people, communities, and the Earth.",
+    "We believe healing is the foundation of a thriving world. Through compassionate mental health care, transformative education, meaningful research, creativity, humanitarian service, and environmental stewardship, KIMORAH LIFE empowers individuals to overcome adversity, strengthens communities through connection and purpose, and fosters a healthier relationship with our planet. Together, we are building a future where every act of healing creates lasting change in our communities and the people of Earth.",
   causes: [
     { id: "earth",    title: "Earth & Climate",    subtitle: "Protect our home",              icon: "globe",   color: "#5f8c48" },
     { id: "children", title: "Children Education", subtitle: "Invest in their future",        icon: "book",    color: "#3f6fb0" },
@@ -135,7 +135,7 @@ export const missionDataEs: MissionContent = {
   title: "MISIÓN",
   tagline: "Sanando personas. Revitalizando comunidades. Protegiendo nuestra Tierra.",
   description:
-    "Creemos que la sanación es la base de un mundo próspero. A través de una atención compasiva de la salud mental, educación transformadora, investigación significativa, creatividad, servicio humanitario y responsabilidad ambiental, KIMORAH LIFE empodera a las personas para superar la adversidad, fortalece las comunidades mediante la conexión y el propósito, y fomenta una relación más saludable con nuestro planeta. Juntos, estamos construyendo un futuro donde cada acto de sanación genera un cambio duradero para las personas, las comunidades y la Tierra.",
+    "Creemos que la sanación es la base de un mundo próspero. A través de una atención compasiva de la salud mental, educación transformadora, investigación significativa, creatividad, servicio humanitario y responsabilidad ambiental, KIMORAH LIFE empodera a las personas para superar la adversidad, fortalece las comunidades mediante la conexión y el propósito, y fomenta una relación más saludable con nuestro planeta. Juntos, estamos construyendo un futuro donde cada acto de sanación genera un cambio duradero en nuestras comunidades y en las personas de la Tierra.",
   causes: [
     { id: "earth", title: "Tierra y clima", subtitle: "Protege nuestro hogar", icon: "globe", color: "#5f8c48" },
     { id: "children", title: "Educación infantil", subtitle: "Invierte en su futuro", icon: "book", color: "#3f6fb0" },
