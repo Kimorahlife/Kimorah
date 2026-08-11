@@ -8,6 +8,7 @@ import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlin
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
+import HearingOutlinedIcon from "@mui/icons-material/HearingOutlined";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
@@ -76,6 +77,13 @@ const MissionSessionOnePage: React.FC = () => {
     { icon: VolunteerActivismOutlinedIcon, text: copy(lang, "Expressing emotions and asking for help is strength", "Expresar emociones y pedir ayuda es fortaleza") },
   ];
 
+  const applications = [
+    { icon: SpaOutlinedIcon, text: copy(lang, "Creating a safe and respectful space.", "Creando un espacio seguro y de respeto.") },
+    { icon: HearingOutlinedIcon, text: copy(lang, "Listening actively and without judgment.", "Escuchando activamente y sin juicios.") },
+    { icon: FavoriteBorderRoundedIcon, text: copy(lang, "Validating our emotions and those of others.", "Validando nuestras emociones y las de los demás.") },
+    { icon: TrackChangesOutlinedIcon, text: copy(lang, "Opening the door to reflection, learning, and healing.", "Abriendo la puerta a la reflexión, el aprendizaje y la sanación.") },
+  ];
+
   const scrollTo = (id: string) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
@@ -104,7 +112,8 @@ const MissionSessionOnePage: React.FC = () => {
             sx={{
               position: "relative",
               overflow: "hidden",
-              minHeight: { xs: 390, md: 860 },
+              minHeight: { xs: 390, md: 0 },
+              height: "100%",
               borderRadius: 3,
               p: 3,
               textAlign: "center",
@@ -126,6 +135,17 @@ const MissionSessionOnePage: React.FC = () => {
             <Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>
               {copy(lang, "Vulnerability · Vicarious trauma · “What now?”", "Vulnerabilidad · Trauma vicario · “¿Y ahora qué?”")}
             </Typography>
+            <Box sx={{ bgcolor: "rgba(255,255,255,.72)", borderRadius: 3, p: 2, mt: 3, textAlign: "left" }}>
+              <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600, mb: 1.25 }}>
+                {copy(lang, "How will we apply them?", "¿Cómo los aplicaremos?")}
+              </Typography>
+              {applications.map(({ icon: Icon, text }) => (
+                <Box key={text} sx={{ display: "flex", alignItems: "center", gap: 1, py: .75 }}>
+                  <Icon sx={{ color: PURPLE, fontSize: 22, flexShrink: 0 }} />
+                  <Typography sx={{ fontSize: 11.5, lineHeight: 1.35 }}>{text}</Typography>
+                </Box>
+              ))}
+            </Box>
             <Box sx={{ position: { md: "absolute" }, bottom: 40, left: 28, right: 28, bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: 5 }}>
               <FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 38 }} />
               <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>
@@ -141,7 +161,7 @@ const MissionSessionOnePage: React.FC = () => {
               <Typography sx={{ lineHeight: 1.65, fontSize: 14 }}>{copy(lang, "Each participant will have the opportunity to introduce themselves, sharing only what feels comfortable. This is a space where vulnerability is welcome and sharing is an invitation, not an obligation.", "Cada participante tendrá la oportunidad de presentarse compartiendo únicamente aquello con lo que se sienta cómodo(a). Se enfatizará que este es un espacio donde la vulnerabilidad es bienvenida y que compartir es una invitación, no una obligación.")}</Typography>
               <Box sx={{ mt: 3, p: 1.7, bgcolor: "#eee9f8", border: "1px solid rgba(118,80,179,.14)", borderRadius: 2, display: "flex", gap: 1.4, alignItems: "center" }}><ShieldOutlinedIcon sx={{ color: PURPLE }} /><Typography sx={{ fontSize: 12.5 }}><b>{copy(lang, "Reminder:", "Recordatorio:")}</b> {copy(lang, "Everyone has the right to say “Pass” if they prefer not to answer a question.", "Todas las personas tienen el derecho de decir “Paso” si prefieren no responder alguna pregunta.")}</Typography></Box>
             </Box>
-            <Box sx={{ bgcolor: "#f0ebf7", borderRadius: 2.5, p: 2.25 }}>
+            <Box sx={{ bgcolor: "#f0ebf7", borderRadius: 2.5, p: 2.25, mt: { md: -8.25 }, alignSelf: "start" }}>
               <Typography sx={{ fontFamily: SERIF, fontSize: 20, mb: 1.75 }}>{copy(lang, "Suggested group questions", "Preguntas sugeridas para el grupo")}</Typography>
               {[copy(lang, "How would you like us to address you during the group?", "¿Cómo te gustaría que te llamáramos durante el grupo?"), copy(lang, "Is there anything you want the group to know to better support you? (Optional)", "¿Hay algo que quisieras que el grupo supiera sobre ti para apoyarte mejor? (Opcional)")].map((question) => <Box key={question} sx={{ display: "flex", gap: 1, bgcolor: "rgba(255,255,255,.78)", borderRadius: 2, p: 1.75, mb: 1.1 }}><Typography sx={{ color: PURPLE, fontFamily: SERIF, fontWeight: 800, fontSize: 30, lineHeight: .8 }}>“</Typography><Typography sx={{ fontFamily: SERIF, fontSize: 16, lineHeight: 1.45 }}>{question}</Typography></Box>)}
             </Box>

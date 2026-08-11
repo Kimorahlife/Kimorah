@@ -2,16 +2,11 @@ import React from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import AppsRoundedIcon from "@mui/icons-material/AppsRounded";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import ChatBubbleOutlineRoundedIcon from "@mui/icons-material/ChatBubbleOutlineRounded";
-import HearingOutlinedIcon from "@mui/icons-material/HearingOutlined";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import PeopleOutlineRoundedIcon from "@mui/icons-material/PeopleOutlineRounded";
 import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
-import SpaOutlinedIcon from "@mui/icons-material/SpaOutlined";
 import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
 import TrackChangesOutlinedIcon from "@mui/icons-material/TrackChangesOutlined";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
@@ -46,27 +41,11 @@ const objectiveCopy = {
   ],
 };
 
-const applyCopy = {
-  es: [
-    { icon: SpaOutlinedIcon, text: "Creando un espacio seguro y de respeto." },
-    { icon: HearingOutlinedIcon, text: "Escuchando activamente y sin juicios." },
-    { icon: FavoriteBorderRoundedIcon, text: "Validando nuestras emociones y las de los demás." },
-    { icon: TrackChangesOutlinedIcon, text: "Abriendo la puerta a la reflexión, el aprendizaje y la sanación." },
-  ],
-  en: [
-    { icon: SpaOutlinedIcon, text: "Creating a safe and respectful space." },
-    { icon: HearingOutlinedIcon, text: "Listening actively and without judgment." },
-    { icon: FavoriteBorderRoundedIcon, text: "Validating our emotions and those of others." },
-    { icon: TrackChangesOutlinedIcon, text: "Opening the door to reflection, learning, and healing." },
-  ],
-};
-
 const MissionObjectivesPage: React.FC = () => {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const lang: Lang = (i18n.resolvedLanguage || i18n.language).startsWith("es") ? "es" : "en";
   const objectives = objectiveCopy[lang];
-  const apply = applyCopy[lang];
 
   return <Box data-language-switcher sx={{ minHeight: "100dvh", color: INK, bgcolor: "#f4f0fa", backgroundImage: "radial-gradient(circle at 12% 55%,rgba(136,94,193,.08),transparent 32%),radial-gradient(circle at 88% 70%,rgba(136,94,193,.07),transparent 30%)" }}>
     <Box component="header" sx={{ position: "relative", overflow: "hidden", color: "white", textAlign: "center", background: "radial-gradient(circle at 50% 44%,#292455 0%,#17173d 48%,#10122f 100%)", pb: { xs: 9, md: 10.5 }, "&::after": { content: '""', position: "absolute", left: "-5%", right: "-5%", bottom: -45, height: 80, bgcolor: "#f4f0fa", borderRadius: "50% 50% 0 0 / 100% 100% 0 0" } }}>
@@ -79,7 +58,7 @@ const MissionObjectivesPage: React.FC = () => {
       <Box sx={{ mb: 2.5 }}><SessionOneTabs active="objectives" /><CurriculumStepNavigation session={1} active="objectives" /></Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
-        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 1080 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 0 }, height: "100%", borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>
           <Typography sx={{ fontFamily: TITLE_FONT, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Creating safety and connection", "Creando seguridad y conexión")}</Typography>
           <Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} />
@@ -90,10 +69,6 @@ const MissionObjectivesPage: React.FC = () => {
             <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600, mt: .5 }}>{copy(lang, "Why have clear objectives?", "¿Por qué tener objetivos claros?")}</Typography>
             <Typography sx={{ mt: .7, fontSize: 12, lineHeight: 1.5 }}>{copy(lang, "They give direction to our group work, help us focus on what matters, and give each step a meaningful purpose.", "Dan dirección al trabajo grupal, nos ayudan a enfocarnos en lo importante y dan a cada paso un propósito significativo.")}</Typography>
           </Box>
-          <Box sx={{ bgcolor: "rgba(255,255,255,.72)", borderRadius: 3, p: 2, mt: 2, textAlign: "left" }}>
-            <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600, mb: 1.25 }}>{copy(lang, "How will we apply them?", "¿Cómo los aplicaremos?")}</Typography>
-            {apply.map(({ icon: Icon, text }) => <Box key={text} sx={{ display: "flex", alignItems: "center", gap: 1, py: .75 }}><Icon sx={{ color: PURPLE, fontSize: 22, flexShrink: 0 }} /><Typography sx={{ fontSize: 11.5, lineHeight: 1.35 }}>{text}</Typography></Box>)}
-          </Box>
           <Box sx={{ bgcolor: "rgba(244,239,251,.9)", borderLeft: `4px solid ${PURPLE}`, borderRadius: 3, p: 2, mt: 2, textAlign: "left" }}>
             <StarBorderRoundedIcon sx={{ color: PURPLE, fontSize: 30 }} />
             <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600 }}>{copy(lang, "Important reminder", "Recordatorio importante")}</Typography>
@@ -102,7 +77,7 @@ const MissionObjectivesPage: React.FC = () => {
         </Box>
 
         <Box component="main" sx={{ bgcolor: CARD, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: { xs: 2.5, md: 4 }, minWidth: 0 }}>
-          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 34, md: 40 }, color: INK }}>{copy(lang, "Objectives", "Objetivos")}</Typography>
+          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK }}>{copy(lang, "Objectives", "Objetivos")}</Typography>
           <Typography sx={{ mt: .5, mb: 3 }}>{copy(lang, "What we hope to accomplish in this session.", "Lo que buscamos lograr en esta sesión.")}</Typography>
 
           <Box sx={{ display: "grid", gap: 1.5 }}>
@@ -113,8 +88,6 @@ const MissionObjectivesPage: React.FC = () => {
       </Box>
     </Container>
 
-    <Box sx={{ textAlign: "center", bgcolor: "rgba(232,224,247,.82)", py: 1.25 }}><Typography sx={{ fontSize: 12, fontWeight: 800 }}>{copy(lang, "READY TO CONTINUE?", "¿LISTO PARA CONTINUAR?")}</Typography><Typography sx={{ fontSize: 12 }}>{copy(lang, "Each session is one more step toward your well-being and that of those around you.", "Cada sesión es un paso más hacia tu bienestar y el de quienes te rodean.")}</Typography><Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 1.5, mt: 1 }}><Button onClick={() => navigate("/mission/sessions/1/psychoeducation")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ bgcolor: PURPLE, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CONTINUE TO PSYCHOEDUCATION", "CONTINUAR A PSICOEDUCACIÓN")}</Button><Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ borderColor: PURPLE, color: INK, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button></Box></Box>
-    <Box component="footer" sx={{ bgcolor: "white", display: "flex", justifyContent: "center", alignItems: "center", gap: 1, py: .7 }}><InfoOutlinedIcon sx={{ fontSize: 17 }} /><Typography sx={{ fontSize: 11 }}>{copy(lang, "Therapeutic approach: Trauma-Informed Care (TIC), Mindfulness and ACT", "Enfoque terapéutico: Atención Informada por Trauma (TIC), Mindfulness y ACT")}</Typography></Box>
   </Box>;
 };
 

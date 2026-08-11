@@ -2,10 +2,7 @@ import React from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import AppsRoundedIcon from "@mui/icons-material/AppsRounded";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import SessionOneTabs from "./SessionOneTabs";
 import CurriculumStepNavigation from "./CurriculumStepNavigation";
 
@@ -53,7 +50,7 @@ const MissionInterventionPage: React.FC = () => {
     <Container maxWidth="xl" sx={{ mt: { xs: -3, md: -4 }, pb: 2, position: "relative", zIndex: 2 }}>
       <Box sx={{ mb: 2.5 }}><SessionOneTabs active="intervention" /><CurriculumStepNavigation session={1} active="intervention" /></Box>
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
-        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 760 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 0 }, height: "100%", borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>
           <Typography sx={{ fontFamily: TITLE_FONT, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Creating safety and connection", "Creando seguridad y conexión")}</Typography>
           <Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} />
@@ -66,7 +63,7 @@ const MissionInterventionPage: React.FC = () => {
         </Box>
 
         <Box component="main" sx={{ bgcolor: "rgba(255,255,255,.72)", border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: { xs: 2.5, md: 4 }, minWidth: 0 }}>
-          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 34, md: 40 } }}>{copy(lang, "Intervention", "Intervención")}</Typography>
+          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK }}>{copy(lang, "Intervention", "Intervención")}</Typography>
           <Typography sx={{ mt: .5, mb: 3, fontSize: 18, fontWeight: 700, color: PURPLE }}>{copy(lang, "Focused on:", "Enfocada en:")}</Typography>
           <Box sx={{ display: "grid", gap: 1.8 }}>
             {items.map((text, index) => <Box key={text} sx={{ minHeight: 112, display: "flex", alignItems: "center", gap: 2.5, p: 2.5, bgcolor: "rgba(255,255,255,.88)", border: "1px solid rgba(69,45,143,.14)", borderRadius: 3 }}>
@@ -74,15 +71,24 @@ const MissionInterventionPage: React.FC = () => {
               <Typography sx={{ fontSize: { xs: 15, md: 17 }, lineHeight: 1.55, fontWeight: 600 }}>{text}</Typography>
             </Box>)}
           </Box>
+          <Box sx={{ p: { xs: 2.5, md: 3 }, mt: 1.8, bgcolor: "rgba(255,255,255,.88)", border: "1px solid rgba(69,45,143,.14)", borderRadius: 3 }}>
+            <Typography sx={{ fontSize: { xs: 15, md: 17 }, lineHeight: 1.7 }}>
+              {copy(lang, "You may choose any ", "Puede elegir cualquier ")}
+              <Box component="strong">{copy(lang, "evidence-based intervention", "intervención basada en evidencia")}</Box>
+              {copy(lang, " that aligns with the therapeutic focus and objectives of this session. ", " que se alinee con el enfoque terapéutico y los objetivos de esta sesión. ")}
+              <Box component="strong">
+                {copy(
+                  lang,
+                  "Expressive and creative approaches—including art, music, poetry, writing, movement, or other evidence-informed activities—are encouraged when clinically appropriate and supportive of the group’s needs and therapeutic process.",
+                  "Se fomentan los enfoques expresivos y creativos—incluidos el arte, la música, la poesía, la escritura, el movimiento u otras actividades basadas en evidencia—cuando sean clínicamente apropiados y apoyen las necesidades del grupo y el proceso terapéutico."
+                )}
+              </Box>
+            </Typography>
+          </Box>
         </Box>
       </Box>
     </Container>
 
-    <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 1.5, bgcolor: "rgba(232,224,247,.82)", py: 2 }}>
-      <Button onClick={() => navigate("/mission/sessions/1/processing")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ bgcolor: PURPLE, borderRadius: 99, px: 3 }}>{copy(lang, "CONTINUE TO PROCESSING", "CONTINUAR A PROCESAMIENTO")}</Button>
-      <Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ borderColor: PURPLE, color: INK, borderRadius: 99, px: 3 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button>
-    </Box>
-    <Box component="footer" sx={{ bgcolor: "white", display: "flex", justifyContent: "center", alignItems: "center", gap: 1, py: .7 }}><InfoOutlinedIcon sx={{ fontSize: 17 }} /><Typography sx={{ fontSize: 11 }}>{copy(lang, "Therapeutic approach: Trauma-Informed Care (TIC), Mindfulness and ACT", "Enfoque terapéutico: Atención Informada por Trauma (TIC), Mindfulness y ACT")}</Typography></Box>
   </Box>;
 };
 

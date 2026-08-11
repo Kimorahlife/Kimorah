@@ -2,14 +2,11 @@ import React from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import AppsRoundedIcon from "@mui/icons-material/AppsRounded";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import BalanceOutlinedIcon from "@mui/icons-material/BalanceOutlined";
 import BedtimeOutlinedIcon from "@mui/icons-material/BedtimeOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import FormatQuoteRoundedIcon from "@mui/icons-material/FormatQuoteRounded";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import LoopRoundedIcon from "@mui/icons-material/LoopRounded";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
@@ -82,7 +79,7 @@ const MissionPsychoeducationPage: React.FC = () => {
       <Box sx={{ mb: 2.5 }}><SessionOneTabs active="psychoeducation" /><CurriculumStepNavigation session={1} active="psychoeducation" /></Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
-        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 980 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 0 }, height: "100%", borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>
           <Typography sx={{ fontFamily: TITLE_FONT, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Creating safety and connection", "Creando seguridad y conexión")}</Typography>
           <Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} />
@@ -95,10 +92,10 @@ const MissionPsychoeducationPage: React.FC = () => {
         </Box>
 
         <Box component="main" sx={{ bgcolor: CARD, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: { xs: 2.5, md: 4 }, minWidth: 0 }}>
-          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 34, md: 40 }, color: INK }}>{copy(lang, "Psychoeducation", "Psicoeducación")}</Typography>
+          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK }}>{copy(lang, "Psychoeducation", "Psicoeducación")}</Typography>
           <Typography sx={{ mt: .5, mb: 3 }}>{copy(lang, "What I can and cannot control after a disaster.", "Lo que puedo controlar y lo que no puedo controlar después de un desastre.")}</Typography>
 
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1.1fr .9fr" }, gap: 2.5 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1.1fr .9fr" }, gap: 2.5, alignItems: "start" }}>
             <Box sx={{ border: "1px solid rgba(69,45,143,.14)", borderRadius: 3, p: 2.5 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}><Box sx={{ width: 42, height: 42, borderRadius: "50%", bgcolor: PURPLE, color: "white", display: "grid", placeItems: "center" }}><LightbulbOutlinedIcon /></Box><Typography sx={{ fontFamily: SERIF, fontSize: 25, color: PURPLE }}>{copy(lang, "Explain:", "Explicar:")}</Typography></Box>
               <Box sx={{ display: "grid", gap: 1.2 }}>
@@ -109,7 +106,7 @@ const MissionPsychoeducationPage: React.FC = () => {
             <Box sx={{ bgcolor: "#f4effb", border: "1px solid rgba(69,45,143,.12)", borderRadius: 3, p: 2.5 }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}><Diversity3OutlinedIcon sx={{ color: PURPLE, fontSize: 34 }} /><Typography sx={{ fontFamily: SERIF, fontSize: 23, color: PURPLE }}>{copy(lang, "Normalize frequent responses such as:", "Normalizar respuestas frecuentes como:")}</Typography></Box>
               <Box sx={{ display: "grid", gap: 1.2 }}>
-                {normalize.map(({ icon: Icon, text }, index) => <Box key={text} sx={{ minHeight: 68, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "rgba(255,255,255,.9)", borderRadius: 2.5, p: 1.5 }}><Box sx={{ width: 38, height: 38, flexShrink: 0, borderRadius: "50%", bgcolor: PURPLE, color: "white", display: "grid", placeItems: "center", fontWeight: 800 }}>{index + 1}</Box><Icon sx={{ color: PURPLE }} /><Typography sx={{ fontSize: 14, fontWeight: 700 }}>{text}</Typography></Box>)}
+                {normalize.map(({ icon: Icon, text }) => <Box key={text} sx={{ minHeight: 68, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "rgba(255,255,255,.9)", borderRadius: 2.5, p: 1.5 }}><Icon sx={{ color: PURPLE }} /><Typography sx={{ fontSize: 14, fontWeight: 700 }}>{text}</Typography></Box>)}
               </Box>
             </Box>
           </Box>
@@ -117,8 +114,6 @@ const MissionPsychoeducationPage: React.FC = () => {
       </Box>
     </Container>
 
-    <Box sx={{ textAlign: "center", bgcolor: "rgba(232,224,247,.82)", py: 1.25 }}><Typography sx={{ fontSize: 12, fontWeight: 800 }}>{copy(lang, "READY TO CONTINUE?", "¿LISTO PARA CONTINUAR?")}</Typography><Typography sx={{ fontSize: 12 }}>{copy(lang, "Each session is one more step toward your well-being and that of those around you.", "Cada sesión es un paso más hacia tu bienestar y el de quienes te rodean.")}</Typography><Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 1.5, mt: 1 }}><Button onClick={() => navigate("/mission/sessions/1/intervention")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ bgcolor: PURPLE, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CONTINUE TO INTERVENTION", "CONTINUAR A INTERVENCIÓN")}</Button><Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ borderColor: PURPLE, color: INK, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button></Box></Box>
-    <Box component="footer" sx={{ bgcolor: "white", display: "flex", justifyContent: "center", alignItems: "center", gap: 1, py: .7 }}><InfoOutlinedIcon sx={{ fontSize: 17 }} /><Typography sx={{ fontSize: 11 }}>{copy(lang, "Therapeutic approach: Trauma-Informed Care (TIC), Mindfulness and ACT", "Enfoque terapéutico: Atención Informada por Trauma (TIC), Mindfulness y ACT")}</Typography></Box>
   </Box>;
 };
 

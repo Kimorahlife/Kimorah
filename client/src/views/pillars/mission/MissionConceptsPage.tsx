@@ -1,13 +1,9 @@
 import React from "react";
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Container, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import AppsRoundedIcon from "@mui/icons-material/AppsRounded";
-import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import FavoriteBorderRoundedIcon from "@mui/icons-material/FavoriteBorderRounded";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import LightbulbOutlinedIcon from "@mui/icons-material/LightbulbOutlined";
 import MenuBookOutlinedIcon from "@mui/icons-material/MenuBookOutlined";
 import PersonOutlineRoundedIcon from "@mui/icons-material/PersonOutlineRounded";
@@ -40,7 +36,6 @@ const conceptCopy = {
 };
 
 const MissionConceptsPage: React.FC = () => {
-  const navigate = useNavigate();
   const { i18n } = useTranslation();
   const lang: Lang = (i18n.resolvedLanguage || i18n.language).startsWith("es") ? "es" : "en";
   const concepts = conceptCopy[lang];
@@ -73,26 +68,26 @@ const MissionConceptsPage: React.FC = () => {
       <Box sx={{ mb: 2.5 }}><SessionOneTabs active="concepts" /><CurriculumStepNavigation session={1} active="concepts" /></Box>
 
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
-        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 760 }, borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
+        <Box component="aside" sx={{ position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 0 }, height: "100%", borderRadius: 3, p: 3, textAlign: "center", backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')", backgroundSize: "cover", backgroundPosition: "center" }}>
           <Box sx={{ bgcolor: PURPLE, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>{copy(lang, "SESSION 1", "SESIÓN 1")}</Box>
           <Typography sx={{ fontFamily: TITLE_FONT, fontSize: 34, lineHeight: 1.2, mt: 3 }}>{copy(lang, "Creating safety and connection", "Creando seguridad y conexión")}</Typography>
           <Box sx={{ borderTop: "1px solid rgba(80,54,150,.2)", my: 3 }} />
           <Typography sx={{ color: PURPLE, fontSize: 11, fontWeight: 800 }}>{copy(lang, "MAIN TOPIC", "TEMA PRINCIPAL")}</Typography>
           <Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>{copy(lang, "Vulnerability · Vicarious trauma · “What now?”", "Vulnerabilidad · Trauma vicario · “¿Y ahora qué?”")}</Typography>
-          <Box sx={{ position: { md: "absolute" }, bottom: 40, left: 28, right: 28, bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: 5 }}>
+          <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: 4 }}>
             <FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 38 }} />
             <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{copy(lang, "This is a space to accompany one another with respect, compassion, and humanity.", "Este es un espacio para acompañarnos con respeto, compasión y humanidad.")}</Typography>
           </Box>
         </Box>
 
         <Box component="main" sx={{ bgcolor: CARD, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: { xs: 2.5, md: 4 } }}>
-          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 34, md: 40 }, color: INK }}>{copy(lang, "Concepts", "Conceptos")}</Typography>
+          <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK }}>{copy(lang, "Concepts", "Conceptos")}</Typography>
           <Typography sx={{ mt: .5, mb: 4 }}>{copy(lang, "Key ideas for understanding safety, connection, and vicarious trauma.", "Ideas clave para comprender la seguridad, la conexión y el trauma vicario.")}</Typography>
           <Box sx={{ display: "grid", gap: 2 }}>
             {conceptItems.map(({ icon: Icon, text }) => (
               <Box key={text} sx={{ minHeight: 112, display: "flex", alignItems: "center", gap: 2.5, p: 2.5, bgcolor: "rgba(255,255,255,.82)", border: "1px solid rgba(69,45,143,.14)", borderRadius: 3, boxShadow: "0 8px 22px rgba(67,45,126,.03)" }}>
-                <Box sx={{ width: 64, height: 64, flexShrink: 0, borderRadius: "50%", bgcolor: "#eee7fa", color: PURPLE, display: "grid", placeItems: "center" }}><Icon sx={{ fontSize: 34 }} /></Box>
-                <Typography sx={{ fontSize: { xs: 17, md: 20 }, fontWeight: 700 }}>{text}</Typography>
+                <Box sx={{ width: 58, height: 58, flexShrink: 0, borderRadius: "50%", bgcolor: "#eee7fa", color: PURPLE, display: "grid", placeItems: "center" }}><Icon sx={{ fontSize: 34 }} /></Box>
+                <Typography sx={{ fontSize: { xs: 15, md: 17 }, lineHeight: 1.55, fontWeight: 600 }}>{text}</Typography>
               </Box>
             ))}
           </Box>
@@ -100,8 +95,6 @@ const MissionConceptsPage: React.FC = () => {
       </Box>
     </Container>
 
-    <Box sx={{ textAlign: "center", bgcolor: "rgba(232,224,247,.82)", py: 1.25 }}><Typography sx={{ fontSize: 12, fontWeight: 800 }}>{copy(lang, "READY TO CONTINUE?", "¿LISTO PARA CONTINUAR?")}</Typography><Typography sx={{ fontSize: 12 }}>{copy(lang, "Each session is one more step toward your well-being and that of those around you.", "Cada sesión es un paso más hacia tu bienestar y el de quienes te rodean.")}</Typography><Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 1.5, mt: 1 }}><Button variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ bgcolor: PURPLE, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CONTINUE TO PSYCHOEDUCATION", "CONTINUAR A PSICOEDUCACIÓN")}</Button><Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ borderColor: PURPLE, color: INK, borderRadius: 99, px: 3, fontSize: 11 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button></Box></Box>
-    <Box component="footer" sx={{ bgcolor: "white", display: "flex", justifyContent: "center", alignItems: "center", gap: 1, py: .7 }}><InfoOutlinedIcon sx={{ fontSize: 17 }} /><Typography sx={{ fontSize: 11 }}>{copy(lang, "Therapeutic approach: Trauma-Informed Care (TIC), Mindfulness and ACT", "Enfoque terapéutico: Atención Informada por Trauma (TIC), Mindfulness y ACT")}</Typography></Box>
   </Box>;
 };
 
