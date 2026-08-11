@@ -56,6 +56,45 @@ const arr = (doc: any, qid: string): string[] => {
   const v = val(doc, qid);
   return Array.isArray(v) ? v : [];
 };
+/** Free-text follow-up ("If yes, describe…") stored alongside the value. */
+const desc = (doc: any, qid: string): string =>
+  Array.isArray(doc.answers) ? String(doc.answers.find((a: any) => a.questionId === qid)?.describe ?? "").trim() : "";
+
+/**
+ * Words ignored when building the open-ended word cloud. Both languages, since
+ * responses are stored in whichever language the participant answered in.
+ */
+const STOPWORDS = new Set([
+  "the","and","for","that","this","with","was","were","are","you","your","but","not","have","had","has","its","it's",
+  "from","they","them","their","when","what","who","how","why","all","can","could","would","will","just","like","very",
+  "more","most","some","any","then","than","there","here","been","being","because","about","into","out","also","over",
+  "just","get","got","one","two","때","así","que","los","las","una","uno","del","con","por","para","como","más","muy",
+  "pero","este","esta","esto","eso","esa","ese","mis","mi","me","te","se","lo","la","el","en","de","un","y","o","a",
+  "es","son","era","eran","ser","estar","he","ha","han","hay","cuando","donde","porque","sobre","todo","toda","todos",
+  "siempre","nunca","también","desde","hasta","entre","sin","ya","al","su","sus","yo","tu","nos","les","le","mucho",
+]);
+
+/**
+ * Word-frequency cloud across every open-ended answer. The survey's free-text
+ * questions are the only place these themes exist, so the cloud is computed
+ * here rather than asking participants to pick from a fixed list.
+ */
+const wordCloudFrom = (texts: string[], limit = 18): Array<{ label: string; value: number }> => {
+  const counts = new Map<string, number>();
+  for (const text of texts) {
+    const tokens = String(text ?? "")
+      .toLowerCase()
+      .replace(/[^\p{L}\s]/gu, " ")
+      .split(/\s+/)
+      .filter((w) => w.length > 3 && !STOPWORDS.has(w));
+    for (const w of tokens) counts.set(w, (counts.get(w) ?? 0) + 1);
+  }
+  return [...counts.entries()]
+    .filter(([, c]) => c > 1) // a word one person used once is not a theme
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, limit)
+    .map(([label, value]) => ({ label, value }));
+};
 
 /** GET /api/research/coqui/survey — the question bank (from DB, config fallback). */
 export const getSurvey = async (_req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -140,8 +179,8 @@ export const getAggregates = async (req: Request, res: Response, next: NextFunct
     };
     const years = subs.map((s) => parseYears(val(s, "time_since"))).filter((y): y is number => y !== null);
     const avgTimeSinceYears = years.length ? years.reduce((a, b) => a + b, 0) / years.length : 0;
-    const tsLabels = ["< 1 year", "1 – 3 years", "4 – 10 years", "11 – 20 years", "> 20 years"];
-    const tsOf = (y: number): string => (y < 1 ? tsLabels[0] : y <= 3 ? tsLabels[1] : y <= 10 ? tsLabels[2] : y <= 20 ? tsLabels[3] : tsLabels[4]);
+    const tsLabels = ["< 1 year", "1 – 5 years", "6 – 10 years", "11 – 20 years", "> 20 years"];
+    const tsOf = (y: number): string => (y < 1 ? tsLabels[0] : y <= 5 ? tsLabels[1] : y <= 10 ? tsLabels[2] : y <= 20 ? tsLabels[3] : tsLabels[4]);
     const tsCount = new Map<string, number>(tsLabels.map((b) => [b, 0]));
     for (const y of years) tsCount.set(tsOf(y), (tsCount.get(tsOf(y)) ?? 0) + 1);
     const timeSinceBuckets = tsLabels.map((label) => ({ label, value: years.length ? Math.round((100 * (tsCount.get(label) ?? 0)) / years.length) : 0 }));
@@ -152,6 +191,21 @@ export const getAggregates = async (req: Request, res: Response, next: NextFunct
     const actCount = new Map<string, number>(actLabels.map((b) => [b, 0]));
     for (const a of activations) actCount.set(actOf(a), (actCount.get(actOf(a)) ?? 0) + 1);
     const activationBands = actLabels.map((label) => ({ label, value: activations.length ? Math.round((100 * (actCount.get(label) ?? 0)) / activations.length) : 0 }));
+
+    // Same raw 0–10 answers, bucketed as a histogram for the "nervous system
+    // rate" panel. Kept alongside activationBands rather than replacing it —
+    // the donut and the histogram want different groupings of one question.
+    const histDefs: Array<[string, (a: number) => boolean]> = [
+      ["0-1", (a) => a <= 1],
+      ["2-3", (a) => a >= 2 && a <= 3],
+      ["4-5", (a) => a >= 4 && a <= 5],
+      ["6-7", (a) => a >= 6 && a <= 7],
+      ["8-10", (a) => a >= 8],
+    ];
+    const activationBuckets = histDefs.map(([label, test]) => ({
+      label,
+      value: activations.length ? Math.round((100 * activations.filter(test).length) / activations.length) : 0,
+    }));
 
     // "Do you feel this sound lives inside you?" → yes / unsure / no.
     const insideVals = subs.map((s) => String(val(s, "inside") ?? "").trim()).filter(Boolean);
@@ -166,6 +220,30 @@ export const getAggregates = async (req: Request, res: Response, next: NextFunct
 
     // "Did the sound feel…" (multi-select)
     const soundFelt = topCounts(subs.flatMap((s) => arr(s, "sound_felt").map((id) => labelOf("sound_felt", id))), n);
+
+    // Agree / disagree distribution. Built from whatever options the question
+    // bank actually holds, so adding a "Neither agree nor disagree" option in
+    // the Coquí Questions admin surfaces a third slice with no code change.
+    const agreeOptions: Array<{ id: string; label: string }> = (() => {
+      const q = (qdocs as any[]).find((x) => x.questionId === "agree");
+      return Array.isArray(q?.options) ? q.options.map((o: any) => ({ id: o.id, label: o.label?.en ?? o.id })) : [];
+    })();
+    const agreeDistribution = agreeOptions.map(({ id, label }) => ({
+      label,
+      value: agrees.length ? Math.round((100 * agrees.filter((a) => a === id).length) / agrees.length) : 0,
+    }));
+
+    // Free-text follow-ups that the dashboard quotes directly.
+    const insideQuotes = subs.map((s) => desc(s, "inside")).filter(Boolean).slice(0, 4);
+    const agreeHow = subs.filter((s) => val(s, "agree") === "agree").map((s) => desc(s, "agree")).filter(Boolean).slice(0, 6);
+    const wishHearNotes = subs.map((s) => String(val(s, "wish_hear") ?? "").trim()).filter(Boolean).slice(0, 6);
+
+    // Open-ended themes across every free-text question.
+    const openEndedWordCloud = wordCloudFrom(
+      subs.flatMap((s) =>
+        ["meaning", "wish_hear", "absence", "belonging", "anything_else"].map((qid) => String(val(s, qid) ?? "")),
+      ),
+    );
 
     // Key-finding yes-rates
     const rate = (qid: string, yes = "yes"): number => (n ? Math.round((100 * subs.filter((s) => val(s, qid) === yes).length) / n) : 0);
@@ -182,7 +260,13 @@ export const getAggregates = async (req: Request, res: Response, next: NextFunct
       avgTimeSinceYears: Number(avgTimeSinceYears.toFixed(1)),
       timeSinceBuckets,
       activationBands,
+      activationBuckets,
       insideDistribution,
+      insideQuotes,
+      agreeDistribution,
+      agreeHow,
+      wishHearNotes,
+      openEndedWordCloud,
       agreeRate,
       identityBelongingRate: n ? Math.round((100 * identityYes) / n) : 0,
       avgAge: Number(avgAge.toFixed(1)),
