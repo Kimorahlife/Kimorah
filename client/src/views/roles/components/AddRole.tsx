@@ -17,7 +17,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, getPermission, getRole } from "../../../store/store";
 import { useToken } from "../../authentication/components/useToken";
 import { addRole } from "../../../store/slices/roles";
-import PermissionMatrix from "./PermissionMatrix";
+import PermissionMatrix, { reconcileReadKeys } from "./PermissionMatrix";
 
 type Props = {
   open: boolean;
@@ -60,7 +60,12 @@ const AddRole = ({ open, onClose }: Props) => {
 
   const handleSubmit = () => {
     if (!name.trim()) return;
-    dispatch(addRole(token, { name: name.trim(), permissions: selected, isGlobal, isDefault }));
+    dispatch(addRole(token, {
+      name: name.trim(),
+      permissions: reconcileReadKeys(selected, permissions),
+      isGlobal,
+      isDefault,
+    }));
   };
 
   const handleClose = () => {

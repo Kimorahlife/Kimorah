@@ -12,13 +12,18 @@ import { getPermission } from "../../../store/store";
 
 // 3-column matrix per the "pages always render" agreement. View column
 // dropped: page visibility + nav gating now derived from holding any of
-// Add / Edit / Delete. The `:read` keys still exist in the catalog (server
-// may still authorize on them), but admins no longer manage them here.
+// Add / Edit / Delete.
+//
+// The `:read` keys still exist in the catalog and both client and server still
+// authorize on them, so they cannot simply be left alone — see
+// reconcileReadKeys below for how they are kept in step with these three.
 const ACTIONS = [
   { action: "add", label: "Add" },
   { action: "write", label: "Edit" },
   { action: "delete", label: "Delete" },
 ] as const;
+
+export { reconcileReadKeys } from "../permissions/reconcileReadKeys";
 
 type DisplayGroup = { label: string; members: string[] };
 

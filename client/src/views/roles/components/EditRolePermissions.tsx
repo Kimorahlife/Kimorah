@@ -19,7 +19,7 @@ import { AppDispatch, getPermission, getRole } from "../../../store/store";
 import { useToken } from "../../authentication/components/useToken";
 import { closeRoleError, updateRole } from "../../../store/slices/roles";
 import { Role } from "../../../types/roles";
-import PermissionMatrix from "./PermissionMatrix";
+import PermissionMatrix, { reconcileReadKeys } from "./PermissionMatrix";
 
 type Props = {
   role: Role | null;
@@ -77,7 +77,7 @@ const EditRolePermissions = ({ role: currentRole, onClose }: Props) => {
       updateRole(token, {
         ...currentRole,
         name: name.trim() || currentRole.name,
-        permissions: selected,
+        permissions: reconcileReadKeys(selected, permissions),
         isGlobal,
         isDefault,
       })
