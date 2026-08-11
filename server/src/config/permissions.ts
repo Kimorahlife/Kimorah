@@ -42,10 +42,10 @@ export const KNOWN_PERMISSIONS: KnownPermission[] = [
   { key: "roles:delete", label: "Roles – Delete", group: "Roles", action: "delete" },
 
   // Research (Coquí survey questions)
-  { key: "research:read",   label: "Research – View",   group: "Research", action: "read"   },
-  { key: "research:add",    label: "Research – Add",    group: "Research", action: "add"    },
-  { key: "research:write",  label: "Research – Edit",   group: "Research", action: "write"  },
-  { key: "research:delete", label: "Research – Delete", group: "Research", action: "delete" },
+  { key: "research:read",   label: "Research (Coquí) – View",   group: "Research", action: "read"   },
+  { key: "research:add",    label: "Research (Coquí) – Add",    group: "Research", action: "add"    },
+  { key: "research:write",  label: "Research (Coquí) – Edit",   group: "Research", action: "write"  },
+  { key: "research:delete", label: "Research (Coquí) – Delete", group: "Research", action: "delete" },
 
   // Curriculums (Mission session curricula)
   { key: "curriculums:read",   label: "Curriculums – View",   group: "Curriculums", action: "read"   },

@@ -105,7 +105,7 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
     if (showResearch) {
       nav.push({
         segment: "mission/coqui",
-        title: t("nav.research", "Research"),
+        title: t("nav.research", "Research (Coquí)"),
         icon: <SearchRoundedIcon />,
       });
     }

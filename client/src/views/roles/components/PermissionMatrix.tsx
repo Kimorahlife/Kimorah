@@ -35,7 +35,7 @@ const DISPLAY_GROUPS: DisplayGroup[] = [
   { label: "Professional Dashboard", members: ["Professional Dashboard"] },
   { label: "Users", members: ["Users"] },
   { label: "Roles", members: ["Roles"] },
-  { label: "Research", members: ["Research"] },
+  { label: "Research (Coquí)", members: ["Research"] },
   { label: "Curriculums", members: ["Curriculums"] },
   // Member workspace — assignable now, pages land later.
   { label: "My Profile", members: ["My Profile"] },
