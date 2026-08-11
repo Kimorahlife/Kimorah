@@ -190,23 +190,36 @@ const KindnessPage: React.FC = () => {
         </Panel>
 
         {/* ── Key findings + time since exposure ───────────────────────── */}
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1.5fr 1fr" }, gap: { xs: 1.5, sm: 2 }, alignItems: "start" }}>
+        <Box
+          sx={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            // Key Findings sits beside Time Since only once there is room for
+            // all five tiles in one row; below that it takes the full width and
+            // Time Since drops underneath.
+            "@media (min-width:1500px)": { gridTemplateColumns: "1.9fr 1fr" },
+            gap: { xs: 1.5, sm: 2 },
+            alignItems: "start",
+          }}
+        >
           <Panel id="k-findings">
             <SectionLabel>
               Key Findings <Box component="span" sx={{ color: MUTED, fontWeight: 400, textTransform: "none" }}>(Share of Participants)</Box>
             </SectionLabel>
-            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(3, 1fr)", xl: "repeat(5, 1fr)" }, gap: 1.5, alignItems: "stretch" }}>
-              <UnlinkedStat
-                label="Heard a coquí (sounds, landscapes, recordings)"
-                needs="Needs a Yes/No screening question — nothing records whether a participant heard the sound."
-              />
-              {findings.map((f, i) => (
-                <FindingCard key={i} pct={f.pct} label={f.label} />
-              ))}
-              <UnlinkedStat
-                label="Wish to hear the sound again more often"
-                needs="Needs `wish_hear` to become Yes/No, keeping the current textarea as its describe field."
-              />
+            <Box sx={{ overflowX: "auto", mx: -0.5, px: 0.5, pb: 0.5 }}>
+              <Box sx={{ display: "grid", gridTemplateColumns: "repeat(5, minmax(132px, 1fr))", gap: 1.5, alignItems: "stretch" }}>
+                <UnlinkedStat
+                  label="Heard a coquí (sounds, landscapes, recordings)"
+                  needs="Needs a Yes/No screening question — nothing records whether a participant heard the sound."
+                />
+                {findings.map((f, i) => (
+                  <FindingCard key={i} pct={f.pct} label={f.label} />
+                ))}
+                <UnlinkedStat
+                  label="Wish to hear the sound again more often"
+                  needs="Needs `wish_hear` to become Yes/No, keeping the current textarea as its describe field."
+                />
+              </Box>
             </Box>
           </Panel>
 
