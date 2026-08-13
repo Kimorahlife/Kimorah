@@ -37,6 +37,14 @@ export const healthCheck = (req: Request, res: Response): void => {
       ORIGIN_URL: process.env.ORIGIN_URL || "MISSING", // public URL — safe to show
       PORT: process.env.PORT || "(default 3001)",
       NODE_ENV: process.env.NODE_ENV || "(unset → development)",
+      ANTHROPIC_API_KEY: process.env.ANTHROPIC_API_KEY ? "set" : "MISSING",
+    },
+    // Whether the optional features that need their own configuration can
+    // actually run, so a 503 in the UI can be explained without a redeploy.
+    features: {
+      translation: process.env.ANTHROPIC_API_KEY
+        ? "ready"
+        : "unavailable — ANTHROPIC_API_KEY is not set, /api/translate will return 503",
     },
     cors: {
       requestOrigin: requestOrigin ?? null,
