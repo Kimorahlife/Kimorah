@@ -519,7 +519,7 @@ const CurriculumSessionPage: React.FC = () => {
         {/* Page furniture: identical on every curriculum, so it is not stored. */}
         {active === "intervention" && (
           <Box sx={{ p: { xs: 2.5, md: 3 }, mt: 1.8, bgcolor: "rgba(255,255,255,.88)", border: "1px solid rgba(69,45,143,.14)", borderRadius: 3 }}>
-            <Typography sx={{ lineHeight: 1.7 }}>
+            <Typography sx={{ fontSize: 17, lineHeight: 1.7 }}>
               {FIXED.interventionNote[lang].map((run, i) =>
                 i % 2 ? <Box component="strong" key={i}>{run}</Box> : <React.Fragment key={i}>{run}</React.Fragment>,
               )}
