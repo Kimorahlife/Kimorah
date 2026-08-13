@@ -3,7 +3,6 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
-import AppsRoundedIcon from "@mui/icons-material/AppsRounded";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import BalanceOutlinedIcon from "@mui/icons-material/BalanceOutlined";
@@ -803,23 +802,53 @@ const CurriculumSessionPage: React.FC = () => {
           })}
         </Box>
 
-        <Box sx={{ bgcolor: "#fff", borderRadius: 3, py: 1.25, px: 2, mb: 2.5, display: "flex", alignItems: "center", justifyContent: "center", position: "relative", boxShadow: "0 8px 22px rgba(55,35,115,.06)" }}>
-          {step > 1 && (
+        <Box sx={{ bgcolor: "#fff", borderRadius: 3, py: 1.25, px: 2, mb: 2.5, display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 1, boxShadow: "0 8px 22px rgba(55,35,115,.06)" }}>
+          {/* Opposite Continue: the way out of the curriculum, then the step
+              back. A grid rather than absolute positioning, so the two can sit
+              together on the left without overlapping the step label. */}
+          <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifySelf: "start", minWidth: 0 }}>
             <Box
               component="button"
               type="button"
-              onClick={() => navigate(`${base}/session/${session.number}/${TABS[step - 2].id}`)}
+              onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
               sx={{
-                position: { md: "absolute" }, left: { md: 16 }, mr: { xs: 2, md: 0 },
-                appearance: "none", border: 0, cursor: "pointer", bgcolor: "transparent",
-                color: accent, fontSize: 13, fontWeight: 700,
-                display: "flex", alignItems: "center", gap: 0.75,
+                appearance: "none", cursor: "pointer", flexShrink: 0,
+                display: "flex", alignItems: "center", gap: 0.6,
+                px: 1.6, py: 0.7, borderRadius: 99,
+                border: `1px solid ${accent}`, bgcolor: "transparent", color: accent,
+                fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
+                "&:hover": { bgcolor: "#f4efff" },
               }}
             >
-              <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
-              {lang === "es" ? "Anterior" : "Previous"}
+              <ArrowBackRoundedIcon sx={{ fontSize: 17 }} />
+              <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
+                {groupId
+                  ? lang === "es"
+                    ? "Volver al grupo"
+                    : "Back to group"
+                  : lang === "es"
+                    ? "Currículos"
+                    : "Curriculums"}
+              </Box>
             </Box>
-          )}
+
+            {step > 1 && (
+              <Box
+                component="button"
+                type="button"
+                onClick={() => navigate(`${base}/session/${session.number}/${TABS[step - 2].id}`)}
+                sx={{
+                  appearance: "none", border: 0, cursor: "pointer", bgcolor: "transparent",
+                  color: accent, fontSize: 13, fontWeight: 700, fontFamily: "inherit",
+                  display: { xs: "none", md: "flex" }, alignItems: "center", gap: 0.75,
+                }}
+              >
+                <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
+                {lang === "es" ? "Anterior" : "Previous"}
+              </Box>
+            )}
+          </Box>
+
           <Box sx={{ textAlign: "center" }}>
             <Typography sx={{ fontSize: 11, fontWeight: 800, color: accent, letterSpacing: 1.1 }}>
               {(lang === "es" ? `PASO ${step} DE 7` : `STEP ${step} OF 7`)}
@@ -828,23 +857,25 @@ const CurriculumSessionPage: React.FC = () => {
               {lang === "es" ? TABS[step - 1].es : TABS[step - 1].en}
             </Typography>
           </Box>
-          {step < TABS.length && (
-            <Box
-              component="button"
-              type="button"
-              onClick={() => navigate(`${base}/session/${session.number}/${TABS[step].id}`)}
-              sx={{
-                position: { md: "absolute" }, right: { md: 16 }, ml: { xs: 2, md: 0 },
-                appearance: "none", border: 0, cursor: "pointer",
-                bgcolor: accent, color: "white", borderRadius: 99, px: 2.5, py: 1,
-                fontSize: 13, fontWeight: 700, display: "flex", alignItems: "center", gap: 0.75,
-                "&:hover": { filter: "brightness(1.1)" },
-              }}
-            >
-              {lang === "es" ? "Continuar" : "Continue"}
-              <ArrowForwardRoundedIcon sx={{ fontSize: 18 }} />
-            </Box>
-          )}
+          <Box sx={{ justifySelf: "end" }}>
+            {step < TABS.length && (
+              <Box
+                component="button"
+                type="button"
+                onClick={() => navigate(`${base}/session/${session.number}/${TABS[step].id}`)}
+                sx={{
+                  appearance: "none", border: 0, cursor: "pointer",
+                  bgcolor: accent, color: "white", borderRadius: 99, px: 2.5, py: 1,
+                  fontSize: 13, fontWeight: 700, fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 0.75,
+                  "&:hover": { filter: "brightness(1.1)" },
+                }}
+              >
+                {lang === "es" ? "Continuar" : "Continue"}
+                <ArrowForwardRoundedIcon sx={{ fontSize: 18 }} />
+              </Box>
+            )}
+          </Box>
         </Box>
 
         <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)", lg: "505px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
@@ -1048,7 +1079,7 @@ const CurriculumSessionPage: React.FC = () => {
           <Button
             onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
             variant="outlined"
-            startIcon={<AppsRoundedIcon />}
+            startIcon={<ArrowBackRoundedIcon />}
             sx={{
               minWidth: 300, minHeight: 54, px: 3.5, borderWidth: 1.5, color: INK,
               borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500,
@@ -1059,8 +1090,8 @@ const CurriculumSessionPage: React.FC = () => {
                 ? "VOLVER AL GRUPO"
                 : "BACK TO GROUP"
               : lang === "es"
-                ? "IR AL ÍNDICE DEL CURRÍCULO"
-                : "CURRICULUM INDEX"}
+                ? "VOLVER A CURRÍCULOS"
+                : "BACK TO CURRICULUMS"}
           </Button>
         </Box>
       </Box>
