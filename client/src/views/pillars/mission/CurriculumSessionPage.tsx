@@ -827,16 +827,88 @@ const CurriculumSessionPage: React.FC = () => {
           )}
         </Box>
 
-        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
-          <Box
-            component="aside"
-            sx={{
-              position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 0 }, height: "100%",
-              borderRadius: 3, p: 3, textAlign: "center",
-              backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')",
-              backgroundSize: "cover", backgroundPosition: "center",
-            }}
-          >
+        <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "275px minmax(0,1fr)", lg: "505px minmax(0,1fr)" }, gap: 2, alignItems: "stretch" }}>
+          {/* The session rail and the session card share one grid column, so
+              they sit side by side on a wide screen and stack on a narrow one
+              without the main panel ever wrapping under them. */}
+          <Box sx={{ display: "flex", flexDirection: { xs: "column", lg: "row" }, gap: 2, alignItems: "stretch" }}>
+            <Box
+              component="nav"
+              aria-label={lang === "es" ? "Sesiones del currículo" : "Curriculum sessions"}
+              sx={{
+                width: { xs: "100%", lg: 214 }, flexShrink: 0,
+                bgcolor: "#fff", borderRadius: 3, p: 1.25,
+                boxShadow: "0 8px 22px rgba(55,35,115,.07)",
+                alignSelf: "flex-start",
+                // Follows the reader down a long session.
+                position: { lg: "sticky" }, top: { lg: 16 },
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: 10.5, fontWeight: 800, letterSpacing: 1.1, color: "#7d7899",
+                  px: 1.25, pt: 0.75, pb: 1,
+                }}
+              >
+                {lang === "es" ? "SESIONES" : "SESSIONS"}
+              </Typography>
+
+              <Box sx={{ display: "flex", flexDirection: "column", gap: 0.5 }}>
+                {ordered.map((s) => {
+                  const current = s.number === session.number;
+                  return (
+                    <Box
+                      key={s.number}
+                      component="button"
+                      type="button"
+                      onClick={() => navigate(`${base}/session/${s.number}/${active}`)}
+                      sx={{
+                        appearance: "none", border: 0, cursor: "pointer", textAlign: "left",
+                        display: "flex", alignItems: "center", gap: 1.25,
+                        p: 1, borderRadius: 2.5,
+                        bgcolor: current ? "#efe8fb" : "transparent",
+                        transition: "background-color .15s",
+                        "&:hover": { bgcolor: current ? "#efe8fb" : "#f6f2fd" },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 28, height: 28, flexShrink: 0, borderRadius: "50%",
+                          display: "grid", placeItems: "center",
+                          fontFamily: TITLE_FONT, fontSize: 15, fontWeight: 700,
+                          bgcolor: current ? accent : "#f0ebf8",
+                          color: current ? "#fff" : accent,
+                        }}
+                      >
+                        {s.number}
+                      </Box>
+                      <Typography
+                        sx={{
+                          fontSize: 12.5, lineHeight: 1.3,
+                          fontWeight: current ? 800 : 600,
+                          color: current ? INK : "#4a4570",
+                          display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical",
+                          overflow: "hidden",
+                        }}
+                      >
+                        {pick(s.title)}
+                      </Typography>
+                    </Box>
+                  );
+                })}
+              </Box>
+            </Box>
+
+            <Box
+              component="aside"
+              sx={{
+                position: "relative", overflow: "hidden", minHeight: { xs: 390, md: 0 }, height: "100%",
+                flex: 1, minWidth: 0,
+                borderRadius: 3, p: 3, textAlign: "center",
+                backgroundImage: "linear-gradient(rgba(255,246,250,.77),rgba(231,222,248,.72)),url('/pillars/mission-bg.jpg')",
+                backgroundSize: "cover", backgroundPosition: "center",
+              }}
+            >
             <Box sx={{ bgcolor: accent, color: "white", borderRadius: 2, py: 1, fontWeight: 800, fontSize: 20 }}>
               {sessionLabel}
             </Box>
@@ -895,6 +967,7 @@ const CurriculumSessionPage: React.FC = () => {
                 <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{FIXED.aside[lang]}</Typography>
               </Box>
             )}
+            </Box>
           </Box>
 
           <Box component="main" sx={{ bgcolor: PAPER, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: { xs: 2.5, md: 4 } }}>

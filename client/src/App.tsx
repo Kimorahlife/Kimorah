@@ -20,7 +20,7 @@ import MissionPage from "./views/pillars/mission/MissionPage";
 import CurriculumSessionPage from "./views/pillars/mission/CurriculumSessionPage";
 import GroupsPage from "./views/groups/GroupsPage";
 import GroupDetailPage from "./views/groups/GroupDetailPage";
-import GroupCurriculumPage from "./views/groups/GroupCurriculumPage";
+import GroupCurriculumEntry from "./views/groups/GroupCurriculumEntry";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
@@ -89,9 +89,10 @@ const App: React.FC = () => {
       {/* The curriculum read as a group's own. Same page as /mission/c/... —
           it just carries the group through, so every tab and step keeps the
           context and the way out leads back to the group. */}
-      {/* The whole curriculum as this group's own — every session in one
-          place, each with the participants recorded against it. */}
-      <Route path="/groups/:groupId/c/:slug" element={<RequireAuth element={<GroupCurriculumPage />} />} />
+      {/* A group's curriculum opens on its first session, so it reads exactly
+          like the Mission template — the session rail inside the page is what
+          navigates between sessions. */}
+      <Route path="/groups/:groupId/c/:slug" element={<RequireAuth element={<GroupCurriculumEntry />} />} />
       <Route path="/groups/:groupId/c/:slug/session/:number" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/groups/:groupId/c/:slug/session/:number/:section" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/coqui-questions" element={<PrivateRoute requireFeature="research" element={<CoquiQuestions />} />} />
