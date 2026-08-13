@@ -68,11 +68,18 @@ const MissionPage: React.FC = () => {
   const spanish = (i18n.resolvedLanguage || i18n.language).startsWith("es");
   const d = spanish ? missionDataEs : missionData;
 
-  // The same card, built from the stored curricula, shown beneath the hardcoded
-  // one so the two can be compared before the hardcoded copy is retired.
-  // Development only — a visitor should never see the page twice.
   const stored = useDatabaseCurricula(d.priorityProgram);
-  const comparing = import.meta.env.DEV;
+
+  /**
+   * Show the hardcoded card and the database card side by side, labelled, so
+   * the two can be checked against each other — on the deployed site as well
+   * as locally, while that checking is still going on.
+   *
+   * When the comparison is finished: set this to `import.meta.env.DEV` to hide
+   * it from visitors again, or delete the hardcoded card and `mission-data`'s
+   * `curricula` entries outright and render `stored.program` alone.
+   */
+  const comparing = true;
 
   const explore = (
     curriculum: (typeof d.priorityProgram)["curricula"][number],
