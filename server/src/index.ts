@@ -13,6 +13,7 @@ import roleRoutes from "./routes/role-routes";
 import permissionRoutes from "./routes/permission-routes";
 import researchRoutes from "./routes/research-routes";
 import curriculumRoutes from "./routes/curriculum-routes";
+import groupRoutes from "./routes/group-routes";
 import translationRoutes from "./routes/translation-routes";
 
 /**
@@ -56,6 +57,7 @@ app.use("/api/roles", roleRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/research", researchRoutes);
 app.use("/api/curriculums", curriculumRoutes);
+app.use("/api/groups", groupRoutes);
 app.use("/api/translate", translationRoutes);
 
 // 404 + global error handler

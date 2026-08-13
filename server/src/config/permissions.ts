@@ -53,6 +53,15 @@ export const KNOWN_PERMISSIONS: KnownPermission[] = [
   { key: "curriculums:write",  label: "Curriculums – Edit",   group: "Curriculums", action: "write"  },
   { key: "curriculums:delete", label: "Curriculums – Delete", group: "Curriculums", action: "delete" },
 
+  // Groups — a professional running a curriculum with a set of people.
+  // Read/add/write belong to professionals and admins; delete is meant for
+  // admins only, which is expressed by granting it to that role alone rather
+  // than by naming a role here.
+  { key: "groups:read",   label: "Groups – View",   group: "Groups", action: "read"   },
+  { key: "groups:add",    label: "Groups – Add",    group: "Groups", action: "add"    },
+  { key: "groups:write",  label: "Groups – Edit",   group: "Groups", action: "write"  },
+  { key: "groups:delete", label: "Groups – Delete", group: "Groups", action: "delete" },
+
   // Member workspace — the practitioner-facing surfaces that live alongside the
   // dashboards. The pages themselves are not built yet: granting one of these
   // reveals the sidebar entry and opens a "coming soon" placeholder. The

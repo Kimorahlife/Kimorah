@@ -1,4 +1,5 @@
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 import QuizRoundedIcon from "@mui/icons-material/QuizRounded";
 import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
@@ -58,6 +59,7 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
   const showRoles = hasUiAccess(userPermissions, "roles", isGlobal);
   const showResearch = hasUiAccess(userPermissions, "research", isGlobal);
   const showCurriculums = hasUiAccess(userPermissions, "curriculums", isGlobal);
+  const showGroups = hasUiAccess(userPermissions, "groups", isGlobal);
   const showDashboard = hasUiAccess(userPermissions, "dashboard", isGlobal);
   const showProfessionalDashboard = hasUiAccess(userPermissions, "professional-dashboard", isGlobal);
 
@@ -94,13 +96,22 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
   }
 
   // Professional Access — the practitioner-facing surfaces.
-  if (showCurriculums || showResearch) {
+  if (showCurriculums || showResearch || showGroups) {
     nav.push({ kind: "header", title: t("nav.professionalResources", "Professional Access") });
     if (showCurriculums) {
       nav.push({
         segment: "mission",
         title: t("nav.curriculums", "Curriculums"),
         icon: <AutoStoriesOutlinedIcon />,
+      });
+    }
+    // Running a curriculum with a set of people. Sits beside the read-only
+    // Curriculums entry because it is the practitioner's side of the same work.
+    if (showGroups) {
+      nav.push({
+        segment: "groups",
+        title: t("nav.groups", "Groups"),
+        icon: <GroupsRoundedIcon />,
       });
     }
     if (showResearch) {

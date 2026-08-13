@@ -13,7 +13,10 @@ import Delete from "../shared/buttons/Delete";
 import { CanAdd, CanDelete, CanEdit, ReadOnlyBanner } from "../shared/permissions";
 import MainCard from "../../Berry/ui-component/cards/MainCard";
 import CurriculumDialog from "./components/CurriculumDialog";
+import CurriculumInUseDialog from "./components/CurriculumInUseDialog";
 import { Curriculum, sessionItemCount } from "./curriculum-types";
+import { api } from "../../api";
+import type { CurriculumUsage } from "../../types/groups";
 
 /** Total authored items across every group of every section of every session. */
 const itemCount = (c: Curriculum): number =>
@@ -34,6 +37,9 @@ const CurriculumBuilder: React.FC = () => {
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editing, setEditing] = useState<Curriculum | null>(null);
+  const [inUse, setInUse] = useState<{ curriculum: Curriculum; usage: CurriculumUsage } | null>(
+    null,
+  );
 
   const fetch = useCallback(async () => {
     await dispatch(loadCurriculums(token));
@@ -51,6 +57,28 @@ const CurriculumBuilder: React.FC = () => {
   const openEdit = (c: Curriculum) => {
     setEditing(c);
     setDialogOpen(true);
+  };
+
+  /**
+   * Ask the server who depends on this curriculum before deleting it.
+   *
+   * The delete endpoint refuses with a 409 either way — this check exists so an
+   * admin sees *which* groups are blocking it and can archive instead, rather
+   * than a bare error after the fact. If the check itself fails we fall through
+   * to the delete and let the server have the final word.
+   */
+  const requestDelete = async (c: Curriculum) => {
+    try {
+      const response = await api.get(`/api/curriculums/${c._id}/usage`);
+      const usage: CurriculumUsage = response.data?.message;
+      if (usage?.inUse) {
+        setInUse({ curriculum: c, usage });
+        return;
+      }
+    } catch {
+      // Fall through — the server still guards the delete.
+    }
+    dispatch(deleteCurriculum(token, c._id as string));
   };
 
   const list = state.list ?? [];
@@ -146,7 +174,7 @@ const CurriculumBuilder: React.FC = () => {
               <CanDelete feature="curriculums">
                 <Delete
                   title={t("curriculum.deleteTitle", "Delete curriculum")}
-                  onConfirm={() => dispatch(deleteCurriculum(token, c._id as string))}
+                  onConfirm={() => requestDelete(c)}
                 />
               </CanDelete>
             </Paper>
@@ -155,6 +183,22 @@ const CurriculumBuilder: React.FC = () => {
       )}
 
       <CurriculumDialog open={dialogOpen} current={editing} onClose={() => setDialogOpen(false)} />
+
+      {inUse && (
+        <CurriculumInUseDialog
+          open
+          onClose={() => setInUse(null)}
+          curriculumId={inUse.curriculum._id as string}
+          curriculumTitle={
+            inUse.curriculum.title?.en || inUse.curriculum.title?.es || inUse.curriculum.slug
+          }
+          usage={inUse.usage}
+          onArchived={() => {
+            setInUse(null);
+            fetch();
+          }}
+        />
+      )}
 
       <Snackbar
         open={Boolean(state.error)}

@@ -18,6 +18,8 @@ import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import CurriculumSessionPage from "./views/pillars/mission/CurriculumSessionPage";
+import GroupsPage from "./views/groups/GroupsPage";
+import GroupDetailPage from "./views/groups/GroupDetailPage";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
@@ -97,6 +99,12 @@ const App: React.FC = () => {
           stay as they are so the two can be compared. */}
       <Route path="/mission/c/:slug/session/:number" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/mission/c/:slug/session/:number/:section" element={<RequireAuth element={<CurriculumSessionPage />} />} />
+
+      {/* Groups — a professional's record of running a curriculum with a set
+          of people. The pages render whatever the server returns; which groups
+          a caller may see is narrowed there, not here. */}
+      <Route path="/groups" element={<RequireAuth element={<GroupsPage />} />} />
+      <Route path="/groups/:id" element={<RequireAuth element={<GroupDetailPage />} />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
       {/* Session 1 is the only hardcoded session — the design the database
           template is measured against. Every later session is data, so any

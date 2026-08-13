@@ -37,6 +37,7 @@ const DISPLAY_GROUPS: DisplayGroup[] = [
   { label: "Roles", members: ["Roles"] },
   { label: "Research (Coquí)", members: ["Research"] },
   { label: "Curriculums", members: ["Curriculums"] },
+  { label: "Groups", members: ["Groups"] },
   // Member workspace — assignable now, pages land later.
   { label: "My Profile", members: ["My Profile"] },
   { label: "Bookmarks", members: ["Bookmarks"] },
