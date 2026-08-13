@@ -132,6 +132,22 @@ const APPLICATIONS: Array<{ icon: typeof SpaOutlinedIcon; en: string; es: string
   { icon: TrackChangesOutlinedIcon, en: "Opening the door to reflection, learning, and healing.", es: "Abriendo la puerta a la reflexión, el aprendizaje y la sanación." },
 ];
 
+/**
+ * Each section draws its rows slightly differently on the hardcoded pages —
+ * Concepts leads with the item's icon, Objectives numbers them in serif and
+ * puts the title in purple above a body line. These are those measurements.
+ */
+const ROW: Record<string, {
+  bgcolor: string; p: number; minHeight: number; disc: number; discFont: number;
+  numbered: boolean; serifTitle: boolean; showBody: boolean;
+}> = {
+  concepts:        { bgcolor: "rgba(255,255,255,.82)", p: 2.5,  minHeight: 112, disc: 58, discFont: 14, numbered: false, serifTitle: false, showBody: false },
+  objectives:      { bgcolor: "rgba(255,255,255,.86)", p: 2.25, minHeight: 105, disc: 56, discFont: 25, numbered: true,  serifTitle: true,  showBody: true },
+  psychoeducation: { bgcolor: "rgba(255,255,255,.88)", p: 2.5,  minHeight: 112, disc: 58, discFont: 26, numbered: true,  serifTitle: false, showBody: true },
+  intervention:    { bgcolor: "rgba(255,255,255,.88)", p: 2.5,  minHeight: 112, disc: 58, discFont: 26, numbered: true,  serifTitle: false, showBody: false },
+  processing:      { bgcolor: "rgba(255,255,255,.88)", p: 2.5,  minHeight: 112, disc: 58, discFont: 26, numbered: true,  serifTitle: false, showBody: false },
+};
+
 /** Copy that is the same on every curriculum, so it belongs to the page. */
 const FIXED = {
   aside: {
@@ -247,12 +263,12 @@ const CurriculumSessionPage: React.FC = () => {
                 <Box
                   key={ii}
                   sx={{
-                    minHeight: 112,
+                    minHeight: ROW[key].minHeight,
                     display: "flex",
                     alignItems: "center",
                     gap: 2.5,
-                    p: 2.5,
-                    bgcolor: "rgba(255,255,255,.88)",
+                    p: ROW[key].p,
+                    bgcolor: ROW[key].bgcolor,
                     border: "1px solid rgba(69,45,143,.14)",
                     borderRadius: 3,
                     boxShadow: "0 8px 22px rgba(67,45,126,.03)",
@@ -260,28 +276,26 @@ const CurriculumSessionPage: React.FC = () => {
                 >
                   <Box
                     sx={{
-                      width: 58, height: 58, flexShrink: 0, borderRadius: "50%",
+                      width: ROW[key].disc, height: ROW[key].disc, flexShrink: 0, borderRadius: "50%",
                       bgcolor: "#eee7fa", color: accent, display: "grid", placeItems: "center",
-                      fontFamily: SERIF, fontSize: 26,
+                      fontFamily: SERIF, fontSize: ROW[key].discFont,
                     }}
                   >
-                    {iconFor(item.icon, ii)}
+                    {ROW[key].numbered ? ii + 1 : iconFor(item.icon, ii)}
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
-                    {pick(item.lead) && (
-                      <Typography sx={{ color: accent, fontSize: 13, fontWeight: 700, mb: 0.5 }}>
-                        {pick(item.lead)}
+                    {ROW[key].serifTitle ? (
+                      <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 18, fontWeight: 600, lineHeight: 1.25 }}>
+                        {pick(item.title)}
+                      </Typography>
+                    ) : (
+                      <Typography sx={{ fontSize: { xs: 15, md: 17 }, lineHeight: 1.55, fontWeight: 600 }}>
+                        {pick(item.title)}
                       </Typography>
                     )}
-                    <Typography sx={{ fontSize: { xs: 15, md: 17 }, lineHeight: 1.55, fontWeight: 600 }}>{pick(item.title)}</Typography>
-                    {pick(item.body) && (
-                      <Typography sx={{ mt: 0.75, lineHeight: 1.65 }}>{pick(item.body)}</Typography>
+                    {ROW[key].showBody && pick(item.body) && (
+                      <Typography sx={{ fontSize: 13, lineHeight: 1.55, mt: 0.5 }}>{pick(item.body)}</Typography>
                     )}
-                    {(item.prompts ?? []).filter((p) => pick(p)).map((p, pi) => (
-                      <Typography key={pi} sx={{ mt: 1, pl: 1.5, borderLeft: `2px solid ${accent}`, fontStyle: "italic" }}>
-                        {pick(p)}
-                      </Typography>
-                    ))}
                   </Box>
                 </Box>
               ))}
