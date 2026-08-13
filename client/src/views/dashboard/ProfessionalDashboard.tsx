@@ -11,7 +11,6 @@ import {
   Typography,
 } from "@mui/material";
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
-import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
@@ -55,19 +54,6 @@ function StatCard({ icon, value, label, link }: { icon: ReactNode; value: number
   );
 }
 
-function BookmarkRow({ title, image }: { title: string; image: string }) {
-  return (
-    <Stack direction="row" spacing={1.4} alignItems="center">
-      <Box component="img" src={image} alt="" sx={{ width: 66, height: 52, borderRadius: "7px", objectFit: "cover" }} />
-      <Box sx={{ flex: 1, minWidth: 0 }}>
-        <Typography sx={{ fontSize: 12.5, fontWeight: 700, color: INK, lineHeight: 1.25 }}>{title}</Typography>
-        <Typography sx={{ fontSize: 11, color: MUTED, mt: .4 }}>Curriculum</Typography>
-      </Box>
-      <BookmarkBorderRoundedIcon sx={{ color: PURPLE }} />
-    </Stack>
-  );
-}
-
 /**
  * The professional dashboard's page content.
  *
@@ -107,11 +93,10 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
           <Typography sx={{ mt: 2.4, mb: 1.5, fontSize: 17, fontWeight: 800 }}>{spanish ? "Resumen" : "At a Glance"}</Typography>
           <Stack direction={{ xs: "column", md: "row" }} gap={2}>
             <StatCard icon={<CalendarMonthOutlinedIcon />} value={5} label={spanish ? "Próximas sesiones" : "Upcoming Sessions"} link={spanish ? "Ver calendario" : "View calendar"} />
-            <StatCard icon={<BookmarkBorderRoundedIcon />} value={15} label={spanish ? "Favoritos guardados" : "Saved Bookmark(s)"} link={spanish ? "Ver todos" : "View all"} />
             <StatCard icon={<PeopleAltOutlinedIcon />} value={0} label={spanish ? "Personas atendidas" : "People Served"} link={spanish ? "Ver impacto" : "View impact"} />
           </Stack>
 
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.25fr .95fr" }, gap: 2, mt: 2 }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2, mt: 2 }}>
             <Panel sx={{ p: 2.2 }}>
               <Stack direction="row" justifyContent="space-between">
                 <Typography sx={{ fontWeight: 800, fontSize: 14 }}>{spanish ? "Programar próximas sesiones" : "Schedule Upcoming Sessions"}</Typography>
@@ -134,18 +119,6 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
                   <Button variant="contained" sx={{ bgcolor: PURPLE, textTransform: "none" }}>{spanish ? "Programar sesión" : "Schedule Session"}</Button>
                 </Stack>
               </Box>
-            </Panel>
-            <Panel sx={{ p: 2.2 }}>
-              <Stack direction="row" justifyContent="space-between" sx={{ mb: 1.7 }}>
-                <Typography sx={{ fontWeight: 800, fontSize: 14 }}>{spanish ? "Tus favoritos (Currículos)" : "Your Bookmarks (Curriculums)"}</Typography>
-                <Typography sx={{ color: PURPLE, fontSize: 11 }}>View all</Typography>
-              </Stack>
-              <Stack spacing={1.25}>
-                <BookmarkRow title="Cuando la Tierra Cambia, Nosotros También" image={SUNSET} />
-                <BookmarkRow title="Cuando el Amor Permanece" image={SUNSET} />
-                <BookmarkRow title="Duelo y Pérdida: Herramientas para Acompañar" image={SUNSET} />
-              </Stack>
-              <Button fullWidth variant="outlined" sx={{ mt: 1.5, color: PURPLE, borderColor: "#d8c7ee", textTransform: "none" }}>{spanish ? "Ir a favoritos" : "Go to Bookmarks"}</Button>
             </Panel>
           </Box>
         </Box>
