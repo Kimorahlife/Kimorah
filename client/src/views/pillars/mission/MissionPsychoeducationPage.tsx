@@ -21,8 +21,8 @@ import CurriculumStepNavigation from "./CurriculumStepNavigation";
 
 const SERIF = '"Inter", "Segoe UI", Arial, sans-serif';
 const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
-const INK = "#151c5c";
-const PURPLE = "#6540b2";
+const INK = "#211866";
+const PURPLE = "#7650b3";
 const CARD = "rgba(255,255,255,.72)";
 type Lang = "en" | "es";
 const copy = (lang: Lang, en: string, es: string) => lang === "es" ? es : en;

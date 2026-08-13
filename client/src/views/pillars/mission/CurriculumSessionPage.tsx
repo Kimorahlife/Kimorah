@@ -115,7 +115,11 @@ const Section: React.FC<{ icon: React.ReactNode; title: string; subtitle?: strin
         {title}
       </Typography>
     </Box>
-    {subtitle && <Typography sx={{ ml: { xs: 0, sm: 8.25 }, mb: 2.25, fontSize: 13 }}>{subtitle}</Typography>}
+    {subtitle && (
+      <Typography sx={{ ml: { xs: 0, sm: 8.25 }, mt: 0.5, mb: 3, fontSize: 18, fontWeight: 700, color: PURPLE }}>
+        {subtitle}
+      </Typography>
+    )}
     {children}
   </Box>
 );
@@ -134,9 +138,10 @@ const FIXED = {
     en: "This is a space to accompany one another with respect, compassion, and humanity.",
     es: "Este es un espacio para acompañarnos con respeto, compasión y humanidad.",
   },
+  // Four runs, two of them bold — the emphasis is part of the copy.
   interventionNote: {
-    en: "You may choose any evidence-based intervention that aligns with the therapeutic focus and objectives of this session. Expressive and creative approaches—including art, music, poetry, writing, movement, or other evidence-informed activities—are encouraged when clinically appropriate and supportive of the group’s needs and therapeutic process.",
-    es: "Puede elegir cualquier intervención basada en evidencia que se alinee con el enfoque terapéutico y los objetivos de esta sesión. Se fomentan los enfoques expresivos y creativos—incluidos el arte, la música, la poesía, la escritura, el movimiento u otras actividades basadas en evidencia—cuando sean clínicamente apropiados y apoyen las necesidades del grupo y su proceso terapéutico.",
+    en: ["You may choose any ", "evidence-based intervention", " that aligns with the therapeutic focus and objectives of this session. ", "Expressive and creative approaches—including art, music, poetry, writing, movement, or other evidence-informed activities—are encouraged when clinically appropriate and supportive of the group’s needs and therapeutic process."],
+    es: ["Puede elegir cualquier ", "intervención basada en evidencia", " que se alinee con el enfoque terapéutico y los objetivos de esta sesión. ", "Se fomentan los enfoques expresivos y creativos—incluidos el arte, la música, la poesía, la escritura, el movimiento u otras actividades basadas en evidencia—cuando sean clínicamente apropiados y apoyen las necesidades del grupo y su proceso terapéutico."],
   },
 };
 
@@ -207,7 +212,9 @@ const CurriculumSessionPage: React.FC = () => {
     return (
       <>
         {pick(data?.intro) && (
-          <Typography sx={{ mt: 0.5, mb: 3, fontSize: { xs: 16, md: 18 } }}>{pick(data.intro)}</Typography>
+          <Typography sx={{ mt: 0.5, mb: 3, fontSize: 18, fontWeight: 700, color: PURPLE }}>
+            {pick(data.intro)}
+          </Typography>
         )}
         {groups.map((group, gi) => (
           <Box key={gi} sx={{ mb: 3 }}>
@@ -227,7 +234,7 @@ const CurriculumSessionPage: React.FC = () => {
                     alignItems: "center",
                     gap: 2.5,
                     p: 2.5,
-                    bgcolor: "rgba(255,255,255,.82)",
+                    bgcolor: "rgba(255,255,255,.88)",
                     border: "1px solid rgba(69,45,143,.14)",
                     borderRadius: 3,
                     boxShadow: "0 8px 22px rgba(67,45,126,.03)",
@@ -237,7 +244,7 @@ const CurriculumSessionPage: React.FC = () => {
                     sx={{
                       width: 58, height: 58, flexShrink: 0, borderRadius: "50%",
                       bgcolor: "#eee7fa", color: accent, display: "grid", placeItems: "center",
-                      fontWeight: 800, fontSize: 20,
+                      fontFamily: SERIF, fontSize: 26,
                     }}
                   >
                     {iconFor(item.icon, ii)}
@@ -248,7 +255,7 @@ const CurriculumSessionPage: React.FC = () => {
                         {pick(item.lead)}
                       </Typography>
                     )}
-                    <Typography sx={{ fontSize: 17, fontWeight: 600, lineHeight: 1.55 }}>{pick(item.title)}</Typography>
+                    <Typography sx={{ fontSize: { xs: 15, md: 17 }, lineHeight: 1.55, fontWeight: 600 }}>{pick(item.title)}</Typography>
                     {pick(item.body) && (
                       <Typography sx={{ mt: 0.75, lineHeight: 1.65 }}>{pick(item.body)}</Typography>
                     )}
@@ -512,7 +519,11 @@ const CurriculumSessionPage: React.FC = () => {
         {/* Page furniture: identical on every curriculum, so it is not stored. */}
         {active === "intervention" && (
           <Box sx={{ p: { xs: 2.5, md: 3 }, mt: 1.8, bgcolor: "rgba(255,255,255,.88)", border: "1px solid rgba(69,45,143,.14)", borderRadius: 3 }}>
-            <Typography sx={{ lineHeight: 1.7 }}>{FIXED.interventionNote[lang]}</Typography>
+            <Typography sx={{ lineHeight: 1.7 }}>
+              {FIXED.interventionNote[lang].map((run, i) =>
+                i % 2 ? <Box component="strong" key={i}>{run}</Box> : <React.Fragment key={i}>{run}</React.Fragment>,
+              )}
+            </Typography>
           </Box>
         )}
       </>

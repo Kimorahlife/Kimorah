@@ -4,8 +4,8 @@ import { Box, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
-const PURPLE = "#7650bd";
-const INK = "#17165b";
+const PURPLE = "#7650b3";
+const INK = "#211866";
 
 const sessionOneSteps = [
   { id: "presentation", en: "Introduction", es: "Introducción", path: "/mission/sessions/1" },
