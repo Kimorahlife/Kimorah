@@ -178,7 +178,7 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
                       direction="row"
                       spacing={1.4}
                       alignItems="center"
-                      onClick={() => navigate(`/groups/${group._id}`)}
+                      onClick={() => navigate("/groups")}
                       sx={{
                         cursor: "pointer",
                         p: 1.2,

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Box, Button, Container, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
@@ -18,6 +18,7 @@ import SelfImprovementOutlinedIcon from "@mui/icons-material/SelfImprovementOutl
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
+import CurriculumHeader from "../../shared/CurriculumHeader";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
@@ -217,6 +218,28 @@ const CurriculumSessionPage: React.FC = () => {
    * the reader is quietly back on the standalone copy.
    */
   const base = groupId ? `/groups/${groupId}/c/${slug}` : `/mission/c/${slug}`;
+
+  const tabsRef = useRef<HTMLElement | null>(null);
+
+  /**
+   * Start at the step tabs, not the very top.
+   *
+   * The router keeps the scroll offset across a navigation, so moving between
+   * sessions from the foot of a long one would land the reader partway down a
+   * page they have not read. Landing on the tabs rather than at the very top
+   * skips re-reading the hero on every move while still showing where in the
+   * session they are. The margin clears the site header, which is sticky when
+   * a curriculum is read from Mission.
+   */
+  useEffect(() => {
+    const tabs = tabsRef.current;
+    if (!tabs) {
+      window.scrollTo({ top: 0, behavior: "auto" });
+      return;
+    }
+    const top = tabs.getBoundingClientRect().top + window.scrollY - 96;
+    window.scrollTo({ top: Math.max(top, 0), behavior: "auto" });
+  }, [number, section]);
 
   useEffect(() => {
     if (!groupId) return;
@@ -693,6 +716,11 @@ const CurriculumSessionPage: React.FC = () => {
     >
       {/* Says whose curriculum this is when it was opened from a group, so the
           reader is never unsure which group they are recording against. */}
+      {/* Group only. Read from Mission the page keeps the site header, with its
+          pillar navigation; read as a group's own curriculum it gets a header
+          carrying just the brand, the dashboard and the language. */}
+      {groupId && <CurriculumHeader />}
+
       {groupId && (
         <Box
           sx={{
@@ -706,7 +734,7 @@ const CurriculumSessionPage: React.FC = () => {
           <Box
             component="button"
             type="button"
-            onClick={() => navigate(`/groups/${groupId}`)}
+            onClick={() => navigate("/groups")}
             sx={{
               appearance: "none", cursor: "pointer",
               display: "flex", alignItems: "center", gap: 0.75,
@@ -719,7 +747,7 @@ const CurriculumSessionPage: React.FC = () => {
             }}
           >
             <ArrowBackRoundedIcon sx={{ fontSize: 17 }} />
-            {lang === "es" ? "Volver al grupo" : "Back to group"}
+            {lang === "es" ? "Volver a grupos" : "Back to groups"}
           </Box>
 
           <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, minWidth: 0 }}>
@@ -770,6 +798,7 @@ const CurriculumSessionPage: React.FC = () => {
       <Container maxWidth="xl" sx={{ mt: { xs: -3, md: -4 }, pb: 4, position: "relative", zIndex: 2 }}>
         <Box
           component="nav"
+          ref={tabsRef}
           sx={{
             display: "grid",
             gridTemplateColumns: { xs: "repeat(2,1fr)", sm: "repeat(4,1fr)", md: "repeat(7,1fr)" },
@@ -803,44 +832,22 @@ const CurriculumSessionPage: React.FC = () => {
         </Box>
 
         <Box sx={{ bgcolor: "#fff", borderRadius: 3, py: 1.25, px: 2, mb: 2.5, display: "grid", gridTemplateColumns: "1fr auto 1fr", alignItems: "center", gap: 1, boxShadow: "0 8px 22px rgba(55,35,115,.06)" }}>
-          {/* Opposite Continue: the way out of the curriculum, then the step
-              back. A grid rather than absolute positioning, so the two can sit
-              together on the left without overlapping the step label. */}
+          {/* Opposite Continue. The way out lives at the top of the session
+              rail, not here — two of them a few pixels apart read as one
+              control repeated. */}
           <Box sx={{ display: "flex", alignItems: "center", gap: 1, justifySelf: "start", minWidth: 0 }}>
-            <Box
-              component="button"
-              type="button"
-              onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
-              sx={{
-                appearance: "none", cursor: "pointer", flexShrink: 0,
-                display: "flex", alignItems: "center", gap: 0.6,
-                px: 1.6, py: 0.7, borderRadius: 99,
-                border: `1px solid ${accent}`, bgcolor: "transparent", color: accent,
-                fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
-                "&:hover": { bgcolor: "#f4efff" },
-              }}
-            >
-              <ArrowBackRoundedIcon sx={{ fontSize: 17 }} />
-              <Box component="span" sx={{ display: { xs: "none", sm: "inline" } }}>
-                {groupId
-                  ? lang === "es"
-                    ? "Volver al grupo"
-                    : "Back to group"
-                  : lang === "es"
-                    ? "Currículos"
-                    : "Curriculums"}
-              </Box>
-            </Box>
-
             {step > 1 && (
               <Box
                 component="button"
                 type="button"
                 onClick={() => navigate(`${base}/session/${session.number}/${TABS[step - 2].id}`)}
                 sx={{
-                  appearance: "none", border: 0, cursor: "pointer", bgcolor: "transparent",
-                  color: accent, fontSize: 13, fontWeight: 700, fontFamily: "inherit",
-                  display: { xs: "none", md: "flex" }, alignItems: "center", gap: 0.75,
+                  // Mirrors Continue on the other side of the row.
+                  appearance: "none", border: 0, cursor: "pointer",
+                  bgcolor: accent, color: "white", borderRadius: 99, px: 2.5, py: 1,
+                  fontSize: 13, fontWeight: 700, fontFamily: "inherit",
+                  display: "flex", alignItems: "center", gap: 0.75,
+                  "&:hover": { filter: "brightness(1.1)" },
                 }}
               >
                 <ArrowBackRoundedIcon sx={{ fontSize: 18 }} />
@@ -900,7 +907,7 @@ const CurriculumSessionPage: React.FC = () => {
               <Box
                 component="button"
                 type="button"
-                onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
+                onClick={() => navigate(groupId ? "/groups" : "/mission")}
                 sx={{
                   appearance: "none", border: 0, cursor: "pointer", width: "100%",
                   display: "flex", alignItems: "center", gap: 0.75,
@@ -913,8 +920,8 @@ const CurriculumSessionPage: React.FC = () => {
                 <ArrowBackRoundedIcon sx={{ fontSize: 17 }} />
                 {groupId
                   ? lang === "es"
-                    ? "Volver al grupo"
-                    : "Back to group"
+                    ? "Volver a grupos"
+                    : "Back to groups"
                   : lang === "es"
                     ? "Todos los currículos"
                     : "All curriculums"}
@@ -939,7 +946,10 @@ const CurriculumSessionPage: React.FC = () => {
                       key={s.number}
                       component="button"
                       type="button"
-                      onClick={() => navigate(`${base}/session/${s.number}/${active}`)}
+                      // Always the introduction. Carrying the current step
+                      // across would drop the reader into the middle of a
+                      // session they have not started.
+                      onClick={() => navigate(`${base}/session/${s.number}/introduction`)}
                       sx={{
                         appearance: "none", border: 0, cursor: "pointer", textAlign: "left",
                         display: "flex", alignItems: "center", gap: 1.25,
@@ -1059,6 +1069,24 @@ const CurriculumSessionPage: React.FC = () => {
           and not leave, and every session carries the same furniture. */}
       <Box sx={{ mt: 0.75, py: 2.5, textAlign: "center", bgcolor: "rgba(232,222,247,.8)", borderTop: "1px solid rgba(73,50,139,.08)" }}>
         <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 1.5 }}>
+          {/* The footer could only ever move forward — previousSession was
+              computed and never rendered, so the last session was a dead end
+              apart from the rail. */}
+          {previousSession && (
+            <Button
+              onClick={() => navigate(`${base}/session/${previousSession.number}`)}
+              variant="outlined"
+              startIcon={<ArrowBackRoundedIcon />}
+              sx={{
+                minWidth: 300, minHeight: 54, px: 3.5, borderWidth: 1.5, color: INK,
+                borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500,
+              }}
+            >
+              {lang === "es"
+                ? `VOLVER A SESIÓN ${previousSession.number}`
+                : `BACK TO SESSION ${previousSession.number}`}
+            </Button>
+          )}
           {nextSession && (
             <Button
               onClick={() => navigate(`${base}/session/${nextSession.number}`)}
@@ -1077,7 +1105,7 @@ const CurriculumSessionPage: React.FC = () => {
               /groups/:id/c/:slug — that entry redirects to session one, so
               from session three it would quietly send the reader backwards. */}
           <Button
-            onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
+            onClick={() => navigate(groupId ? "/groups" : "/mission")}
             variant="outlined"
             startIcon={<ArrowBackRoundedIcon />}
             sx={{
@@ -1087,8 +1115,8 @@ const CurriculumSessionPage: React.FC = () => {
           >
             {groupId
               ? lang === "es"
-                ? "VOLVER AL GRUPO"
-                : "BACK TO GROUP"
+                ? "VOLVER A GRUPOS"
+                : "BACK TO GROUPS"
               : lang === "es"
                 ? "VOLVER A CURRÍCULOS"
                 : "BACK TO CURRICULUMS"}

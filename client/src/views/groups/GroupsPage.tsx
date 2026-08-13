@@ -138,10 +138,11 @@ const GroupsPage: React.FC = () => {
         <CreateGroupDialog
           open={creating}
           onClose={() => setCreating(false)}
-          onCreated={(groupId) => {
+          onCreated={() => {
             setCreating(false);
-            if (groupId) navigate(`/groups/${groupId}`);
-            else fetchGroups();
+            // Back to the list with the new group on it — the sessions dialog
+            // is where its participants get recorded.
+            fetchGroups();
           }}
         />
 

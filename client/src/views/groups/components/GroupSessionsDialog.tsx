@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from "react";
 import {
   Alert,
+  Autocomplete,
   Box,
   Button,
   Chip,
@@ -18,7 +19,7 @@ import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../api";
-import type { GroupDetail, GroupSessionRow } from "../../../types/groups";
+import type { GroupDetail, GroupSessionRow, ProfessionalRef } from "../../../types/groups";
 
 /**
  * A group's curriculum, session by session, with the participant count for
@@ -53,12 +54,19 @@ function GroupSessionsDialog({
   const [error, setError] = useState("");
   const [saving, setSaving] = useState<string | null>(null);
   const [dirty, setDirty] = useState(false);
+  const [professionals, setProfessionals] = useState<ProfessionalRef[]>([]);
+  const [coProfessionals, setCoProfessionals] = useState<ProfessionalRef[]>([]);
+  const [savingPeople, setSavingPeople] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
     api
       .get(`/api/groups/${groupId}`)
-      .then(({ data }) => setGroup(data?.message ?? null))
+      .then(({ data }) => {
+        const detail: GroupDetail | null = data?.message ?? null;
+        setGroup(detail);
+        setCoProfessionals(detail?.coProfessionalIds ?? []);
+      })
       .catch((err) =>
         setError(err?.response?.data?.message || "Could not load this group's sessions."),
       )
@@ -68,6 +76,34 @@ function GroupSessionsDialog({
   useEffect(() => {
     if (open) load();
   }, [open, load]);
+
+  // Who may be added. Served by the groups API rather than the user directory,
+  // so a professional does not need permission to read every user.
+  useEffect(() => {
+    if (!open) return;
+    api
+      .get("/api/groups/professionals")
+      .then(({ data }) => setProfessionals(data?.message ?? []))
+      .catch(() => undefined);
+  }, [open]);
+
+  /** Saved on change, like the participant counts — there is no save button. */
+  const saveCoProfessionals = async (next: ProfessionalRef[]) => {
+    const previous = coProfessionals;
+    setCoProfessionals(next);
+    setSavingPeople(true);
+    try {
+      await api.put(`/api/groups/${groupId}`, {
+        coProfessionalIds: next.map((p) => p._id),
+      });
+      setDirty(true);
+    } catch (err: any) {
+      setCoProfessionals(previous);
+      setError(err?.response?.data?.message || "Could not update the professionals.");
+    } finally {
+      setSavingPeople(false);
+    }
+  };
 
   /**
    * Written straight through on change rather than behind a save button: the
@@ -131,6 +167,62 @@ function GroupSessionsDialog({
           <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>
             {error}
           </Alert>
+        )}
+
+        {/* Who runs this group. The main professional is fixed — they are the
+            person accountable for the record — and everyone else is added
+            here. Only they or an admin may change it, which the server also
+            enforces. */}
+        {group && (
+          <Box sx={{ mb: 2.5, p: 2, border: "1px solid rgba(69,45,143,.14)", borderRadius: 2.5 }}>
+            <Typography sx={{ fontWeight: 800, fontSize: 13.5, mb: 1.25 }}>
+              {spanish ? "Profesionales" : "Professionals"}
+            </Typography>
+
+            <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1.5 }}>
+              <Chip
+                size="small"
+                color="primary"
+                label={`${group.mainProfessionalId?.name || group.mainProfessionalId?.email || "—"} · ${
+                  spanish ? "principal" : "main"
+                }`}
+              />
+            </Stack>
+
+            <Autocomplete
+              multiple
+              disabled={!group.canManage || savingPeople}
+              options={professionals.filter(
+                (p) => String(p._id) !== String(group.mainProfessionalId?._id),
+              )}
+              value={coProfessionals}
+              onChange={(_event, next) => saveCoProfessionals(next)}
+              getOptionLabel={(option) => option.name || option.email || ""}
+              isOptionEqualToValue={(option, value) => String(option._id) === String(value._id)}
+              renderInput={(params) => (
+                <TextField
+                  {...params}
+                  size="small"
+                  label={spanish ? "Co-profesionales" : "Co-professionals"}
+                  placeholder={
+                    group.canManage
+                      ? spanish
+                        ? "Agregar profesional"
+                        : "Add a professional"
+                      : ""
+                  }
+                />
+              )}
+            />
+
+            {!group.canManage && (
+              <Typography sx={{ fontSize: 11.5, color: "text.secondary", mt: 0.75 }}>
+                {spanish
+                  ? "Solo el profesional principal o un administrador puede cambiar esto."
+                  : "Only the main professional or an admin can change this."}
+              </Typography>
+            )}
+          </Box>
         )}
 
         {loading ? (
@@ -230,9 +322,6 @@ function GroupSessionsDialog({
             {spanish ? "Ver currículo completo" : "Open full curriculum"}
           </Button>
         )}
-        <Button onClick={() => navigate(`/groups/${groupId}`)} sx={{ textTransform: "none" }}>
-          {spanish ? "Ver grupo completo" : "Open full group"}
-        </Button>
         <Box sx={{ flex: 1 }} />
         <Button variant="contained" onClick={close} sx={{ textTransform: "none" }}>
           {spanish ? "Listo" : "Done"}

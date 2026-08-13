@@ -19,7 +19,6 @@ import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import CurriculumSessionPage from "./views/pillars/mission/CurriculumSessionPage";
 import GroupsPage from "./views/groups/GroupsPage";
-import GroupDetailPage from "./views/groups/GroupDetailPage";
 import GroupCurriculumEntry from "./views/groups/GroupCurriculumEntry";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
@@ -49,6 +48,9 @@ const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset
 // The set above matches exact paths. A page with sub-paths of its own needs a
 // prefix instead, or the detail view gets the marketing banner stacked on top
 // of the dashboard chrome while its list page does not.
+// Only the group pages. A curriculum read from Mission keeps the site header;
+// read as a group's own it carries CurriculumHeader instead, which is what
+// makes the two visibly different things.
 const NO_HEADER_PREFIXES = ["/groups/"];
 // Auth screens keep a floating language switcher; the landing page has its own.
 const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
@@ -85,7 +87,6 @@ const App: React.FC = () => {
           chrome, so routing these anywhere else renders them with the
           marketing header and no sidebar. */}
       <Route path="/groups" element={<PrivateRoute requireFeature="groups" element={<GroupsPage />} />} />
-      <Route path="/groups/:id" element={<PrivateRoute requireFeature="groups" element={<GroupDetailPage />} />} />
       {/* The curriculum read as a group's own. Same page as /mission/c/... —
           it just carries the group through, so every tab and step keeps the
           context and the way out leads back to the group. */}

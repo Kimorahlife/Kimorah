@@ -3,6 +3,8 @@ import mongoose from "mongoose";
 import { Groups } from "../models/group-model";
 import { GroupSessions } from "../models/group-session-model";
 import { Curriculums } from "../models/curriculum-model";
+import { Users } from "../models/user-model";
+import { Roles } from "../models/roles-model";
 import { Sessions } from "../models/session-model";
 import { CurriculumChangeLogs } from "../models/curriculum-change-log-model";
 import { isGlobalRole } from "../services/permission-cache";
@@ -128,6 +130,45 @@ const reconcileSessions = async (
   }
 
   return { added, removed };
+};
+
+/**
+ * GET /api/groups/professionals — who may be added to a group.
+ *
+ * Deliberately not `/api/users/all`: that needs `users:read`, and granting a
+ * professional the whole user directory so they can pick a co-facilitator is
+ * far more than the task needs. This returns names only, and only of people
+ * whose role can actually run a group.
+ *
+ * Membership is derived from permissions rather than a role named
+ * "Professional", so a new role composed in the Roles UI appears here the day
+ * it is granted, with no code change. Global roles are included because they
+ * bypass permission checks and would otherwise be invisible.
+ */
+export const getProfessionals = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+): Promise<void> => {
+  try {
+    const roles = await Roles.find({
+      $or: [
+        { permissions: { $in: ["groups:read", "groups:add", "groups:write", "groups:delete"] } },
+        { isGlobal: true },
+      ],
+    })
+      .select("name")
+      .lean();
+
+    const users = await Users.find({ roles: { $in: roles.map((r) => r.name) } })
+      .select("name email roles")
+      .sort({ name: 1 })
+      .lean();
+
+    res.json({ message: users });
+  } catch (error: any) {
+    return next(new HttpError(error.message || "Failed to load professionals", 500));
+  }
 };
 
 /** GET /api/groups — the caller's groups, newest first. */

@@ -5,6 +5,7 @@ import {
   getGroupById,
   getGroupHistory,
   getGroups,
+  getProfessionals,
   setParticipants,
   updateGroup,
 } from "../controllers/group-controller";
@@ -18,6 +19,9 @@ const router = express.Router();
 // global role.
 router.get("/", authorize("groups:read"), getGroups);
 router.post("/", authorize("groups:add"), createGroup);
+
+// Must stay above "/:id" or Express reads "professionals" as a group id.
+router.get("/professionals", authorize("groups:read"), getProfessionals);
 
 router.get("/:id", authorize("groups:read"), getGroupById);
 router.get("/:id/history", authorize("groups:read"), getGroupHistory);
