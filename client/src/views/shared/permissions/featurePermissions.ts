@@ -65,22 +65,28 @@ export function canDoOn(userPermissions: string[], feature: Feature, action: Act
 }
 
 /**
- * Page-level access. A user has UI access to a feature if they hold ANY of its
- * read/add/write/delete keys (the "View" column was removed). Granting only Add
- * OR only Edit OR only Delete surfaces the page; individual buttons gate via
- * <CanAdd> / <CanEdit> / <CanDelete>.
+ * DATA access — holds any key on the feature, so the API will serve them.
  *
- * Delegates to the "read" action, which is exactly the OR across every key of
- * the feature. It must NOT check "add" alone — that would hide the page from a
- * role granted only Edit and/or Delete, which is a valid, common grant.
+ * This is the server's rule, mirrored: `authorize` lets a `:read` route through
+ * for a role holding any `<feature>:` permission. It is deliberately NOT what
+ * decides whether a page or nav entry appears — see hasFullUiAccess for that.
+ * Add on its own means "can reach the data", not "gets a page".
  */
 export function hasUiAccess(userPermissions: string[], feature: Feature, isGlobal = false): boolean {
   return canDoOn(userPermissions, feature, "read", isGlobal);
 }
 
 /**
- * "Full" UI access — Add + (Edit OR Delete): the user can DO something beyond
- * reading. Used for nav visibility decisions.
+ * PAGE access — Add AND (Edit OR Delete). The rule for every nav entry, route
+ * guard and feature gate in the app.
+ *
+ * Add is the base: it grants the data. A page only appears once the role can
+ * also change something there, because a page you may open but not act on is
+ * not a feature, it is a dead end. Which affordances then show is a separate
+ * question, answered per button by <CanEdit> / <CanDelete> — so Delete without
+ * Edit gives a page that deletes but does not edit.
+ *
+ * A global role bypasses all of it and reaches everything.
  */
 export function hasFullUiAccess(userPermissions: string[], feature: Feature, isGlobal = false): boolean {
   if (isGlobal) return true;

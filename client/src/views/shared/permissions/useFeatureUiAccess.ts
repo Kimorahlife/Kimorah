@@ -2,11 +2,11 @@ import { useCurrentRole } from "./useCan";
 import { hasUiAccess, hasFullUiAccess, isViewOnly, type Feature } from "./featurePermissions";
 
 /**
- * The universal UI visibility rule. Renders the nav entry / page when the user
- * can view the feature (a global role always can). Edit / Delete affordances
- * are gated separately by <CanEdit> / <CanDelete>.
+ * DATA access — the role holds any key on the feature, so the API will serve
+ * it. This is NOT the rule for showing a page: reach for useFeatureFullAccess.
  *
- *   const showRolesNav = useFeatureUiAccess("roles");
+ * Kept because it mirrors the server's `:read` behaviour, and because
+ * isViewOnly is defined in terms of it.
  */
 export function useFeatureUiAccess(feature: Feature): boolean {
   const { permissions, isGlobal } = useCurrentRole();
@@ -14,11 +14,13 @@ export function useFeatureUiAccess(feature: Feature): boolean {
 }
 
 /**
- * The stricter tier: Add AND (Edit OR Delete). Use for surfaces that should
- * open only to someone who can genuinely work in the feature, not merely reach
- * it — a partial grant leaves them out. A global role always passes.
+ * PAGE access — Add AND (Edit OR Delete). The rule for every nav entry, route
+ * guard and feature gate in the app.
  *
- *   const canOpenCurriculum = useFeatureFullAccess("curriculums");
+ * Add grants the data; a page appears only once the role can also change
+ * something there. A global role always passes.
+ *
+ *   const showRolesNav = useFeatureFullAccess("roles");
  */
 export function useFeatureFullAccess(feature: Feature): boolean {
   const { permissions, isGlobal } = useCurrentRole();

@@ -15,7 +15,7 @@ import { ReactNode } from "react";
 import { Alert } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import { useCan } from "./useCan";
-import { useFeatureUiAccess, useIsViewOnly } from "./useFeatureUiAccess";
+import { useFeatureFullAccess, useIsViewOnly } from "./useFeatureUiAccess";
 import type { Feature } from "./featurePermissions";
 
 interface GateProps {
@@ -45,7 +45,7 @@ export const CanDelete: React.FC<GateProps> = ({ feature, children, fallback = n
  * Edit/Delete affordances are gated separately by the action-specific wrappers.
  */
 export const FeatureUiGate: React.FC<GateProps> = ({ feature, children, fallback = null }) => {
-  return useFeatureUiAccess(feature) ? <>{children}</> : <>{fallback}</>;
+  return useFeatureFullAccess(feature) ? <>{children}</> : <>{fallback}</>;
 };
 
 interface ReadOnlyBannerProps {

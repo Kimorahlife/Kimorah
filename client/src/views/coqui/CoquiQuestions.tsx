@@ -11,7 +11,7 @@ import { useTranslation } from "react-i18next";
 import { api } from "../../api";
 import Spinner from "../shared/buttons/Spinner";
 import MainCard from "../../Berry/ui-component/cards/MainCard";
-import { useFeatureUiAccess } from "../shared/permissions";
+import { useFeatureFullAccess } from "../shared/permissions";
 import type { SurveyQuestion, Lang } from "../pillars/kindness/survey-data";
 
 const TYPE_COLORS: Record<string, "default" | "primary" | "success" | "warning" | "info"> = {
@@ -33,7 +33,7 @@ const TYPE_COLORS: Record<string, "default" | "primary" | "success" | "warning" 
 const CoquiQuestions: React.FC = () => {
   const { t, i18n } = useTranslation();
   const lang: Lang = (i18n.resolvedLanguage || i18n.language || "en").startsWith("es") ? "es" : "en";
-  const canView = useFeatureUiAccess("research");
+  const canView = useFeatureFullAccess("research");
 
   const [questions, setQuestions] = useState<SurveyQuestion[]>([]);
   const [loading, setLoading] = useState(true);

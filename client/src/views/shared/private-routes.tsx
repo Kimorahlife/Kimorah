@@ -11,7 +11,7 @@ import { loadRoles } from "../../store/slices/roles";
 import { loadUserIds, resetPresence } from "../../store/slices/presence";
 import { useUser } from "../authentication/components/useUser";
 import { useToken } from "../authentication/components/useToken";
-import { canDoOn, hasUiAccess } from "./permissions";
+import { canDoOn, hasFullUiAccess } from "./permissions";
 import type { Feature } from "./permissions/featurePermissions";
 import { getVisibleNavigation } from "./navigation";
 import { getSession, SidebarFooter } from "./appProviderHelper";
@@ -120,7 +120,7 @@ export const PrivateRoute: React.FC<PrivateRouteProps> = ({ element, requireFeat
   const denied =
     Boolean(requireFeature) &&
     !rolesPending &&
-    !hasUiAccess(userPermissions, requireFeature as Feature, isGlobal);
+    !hasFullUiAccess(userPermissions, requireFeature as Feature, isGlobal);
 
   const content = rolesPending ? <Spinner /> : denied ? <AccessRestricted /> : element;
 

@@ -15,7 +15,7 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import HelpOutlineRoundedIcon from "@mui/icons-material/HelpOutlineRounded";
 import type { ReactNode } from "react";
 import { TFunction } from "i18next";
-import { hasUiAccess } from "./permissions";
+import { hasFullUiAccess } from "./permissions";
 import type { Feature } from "./permissions/featurePermissions";
 
 /**
@@ -55,13 +55,13 @@ const WORKSPACE_ITEMS: Array<{
 export function getVisibleNavigation(userPermissions: string[], isGlobal: boolean, t: TFunction) {
   const nav: any[] = [];
 
-  const showUsers = hasUiAccess(userPermissions, "users", isGlobal);
-  const showRoles = hasUiAccess(userPermissions, "roles", isGlobal);
-  const showResearch = hasUiAccess(userPermissions, "research", isGlobal);
-  const showCurriculums = hasUiAccess(userPermissions, "curriculums", isGlobal);
-  const showGroups = hasUiAccess(userPermissions, "groups", isGlobal);
-  const showDashboard = hasUiAccess(userPermissions, "dashboard", isGlobal);
-  const showProfessionalDashboard = hasUiAccess(userPermissions, "professional-dashboard", isGlobal);
+  const showUsers = hasFullUiAccess(userPermissions, "users", isGlobal);
+  const showRoles = hasFullUiAccess(userPermissions, "roles", isGlobal);
+  const showResearch = hasFullUiAccess(userPermissions, "research", isGlobal);
+  const showCurriculums = hasFullUiAccess(userPermissions, "curriculums", isGlobal);
+  const showGroups = hasFullUiAccess(userPermissions, "groups", isGlobal);
+  const showDashboard = hasFullUiAccess(userPermissions, "dashboard", isGlobal);
+  const showProfessionalDashboard = hasFullUiAccess(userPermissions, "professional-dashboard", isGlobal);
 
   // Dashboards — each is its own permission, so a role can grant one, the
   // other, or both. When only one is granted it is simply "Dashboard"; when
@@ -87,7 +87,7 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
   // Member workspace — sits directly under the dashboards, no section header,
   // matching the design. Each entry appears only for a role that grants it.
   for (const item of WORKSPACE_ITEMS) {
-    if (!hasUiAccess(userPermissions, item.feature, isGlobal)) continue;
+    if (!hasFullUiAccess(userPermissions, item.feature, isGlobal)) continue;
     nav.push({
       segment: item.segment,
       title: t(item.key, item.fallback),

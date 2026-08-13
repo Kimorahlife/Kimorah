@@ -19,7 +19,7 @@ import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../authentication/components/useUser";
-import { useFeatureUiAccess } from "../shared/permissions";
+import { useFeatureFullAccess } from "../shared/permissions";
 import { api } from "../../api";
 import type { GroupSummary } from "../../types/groups";
 
@@ -79,7 +79,7 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
     subtitle: spanish ? "Este es tu espacio para reflexionar, crecer y generar impacto." : "Good evening! Here’s your space to reflect, grow and make an impact.",
   };
 
-  const canSeeGroups = useFeatureUiAccess("groups");
+  const canSeeGroups = useFeatureFullAccess("groups");
   const [groups, setGroups] = useState<GroupSummary[]>([]);
 
   // The dashboard reads groups rather than owning them: the list page is the

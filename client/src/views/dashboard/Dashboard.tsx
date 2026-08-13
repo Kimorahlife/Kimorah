@@ -21,7 +21,7 @@ import { useToken } from "../authentication/components/useToken";
 import { AppDispatch, getUser, getRole, getCoqui } from "../../store/store";
 import { loadUsers } from "../../store/slices/users";
 import { loadCoquiAggregates } from "../../store/slices/coqui";
-import { useCan, useFeatureUiAccess, useCurrentRole } from "../shared/permissions";
+import { useCan, useFeatureFullAccess, useCurrentRole } from "../shared/permissions";
 import { api } from "../../api";
 import AccessRestricted from "../shared/AccessRestricted";
 
@@ -85,12 +85,12 @@ export default function Dashboard() {
   const coqui = useSelector(getCoqui);
 
   const canReadUsers = useCan("users", "read");
-  const showUsers = useFeatureUiAccess("users");
-  const showRoles = useFeatureUiAccess("roles");
-  const showResearch = useFeatureUiAccess("research");
-  const showGroups = useFeatureUiAccess("groups");
-  const showDashboard = useFeatureUiAccess("dashboard");
-  const showProfessionalDashboard = useFeatureUiAccess("professional-dashboard");
+  const showUsers = useFeatureFullAccess("users");
+  const showRoles = useFeatureFullAccess("roles");
+  const showResearch = useFeatureFullAccess("research");
+  const showGroups = useFeatureFullAccess("groups");
+  const showDashboard = useFeatureFullAccess("dashboard");
+  const showProfessionalDashboard = useFeatureFullAccess("professional-dashboard");
   const { isGlobal, permissions } = useCurrentRole();
 
   const firstName = user?.name?.split(" ")[0] ?? "there";
