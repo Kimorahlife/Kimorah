@@ -111,7 +111,7 @@ export const missionData: MissionContent = {
     ],
     audience: "DESIGNED FOR MENTAL HEALTH PROFESSIONALS",
     audienceDescription:
-      "Evidence-based. Trauma-informed. Integrative and culturally sensitive approaches.",
+      "Evidence-informed. Trauma-informed. Integrative and culturally sensitive approaches.",
     secondaryAction: "WATCH INTRODUCTORY VIDEO",
     imageUrl: "/pillars/priority-program-sunset.png",
   },
@@ -127,8 +127,8 @@ export const missionData: MissionContent = {
     imageUrl: "/pillars/mission-frog.png",
   },
   partners: [
-    { id: "humanamente", name: "Humanamente", description: "Humanamente connects people still experiencing the consequences of the earthquake in Venezuela with verified mental health professionals, free of charge.", accent: "#4f91cb", logoUrl: "/pillars/partner-humanamente.svg" },
-    { id: "gem", name: "Global Empowerment Mission", description: "GEM: One of the world's most effective disaster relief organizations.", accent: "#31568f", logoUrl: "/pillars/partner-gem.svg" },
+    { id: "humanamente", name: "Humanamente", description: "Humanamente connects people still experiencing the consequences of the earthquake in Venezuela with verified mental health professionals, free of charge.", accent: "#4f91cb", logoUrl: "/pillars/partner-humanamente.svg", url: "https://humanamentevenezuela.org" },
+    { id: "gem", name: "Global Empowerment Mission", description: "GEM: One of the world's most effective disaster relief organizations.", accent: "#31568f", logoUrl: "/pillars/partner-gem.svg", url: "https://www.globalempowermentmission.org" },
   ],
   cta: {
     heading: "Want to get involved?",
@@ -191,8 +191,8 @@ export const missionDataEs: MissionContent = {
     imageUrl: "/pillars/mission-frog.png",
   },
   partners: [
-    { id: "humanamente", name: "Humanamente", description: "Humanamente conecta a quienes siguen sintiendo las consecuencias del terremoto en Venezuela con profesionales de salud mental verificados, de forma gratuita.", accent: "#4f91cb", logoUrl: "/pillars/partner-humanamente.svg" },
-    { id: "gem", name: "Global Empowerment Mission", description: "GEM: Una de las organizaciones de ayuda en desastres más eficaces del mundo.", accent: "#31568f", logoUrl: "/pillars/partner-gem.svg" },
+    { id: "humanamente", name: "Humanamente", description: "Humanamente conecta a quienes siguen sintiendo las consecuencias del terremoto en Venezuela con profesionales de salud mental verificados, de forma gratuita.", accent: "#4f91cb", logoUrl: "/pillars/partner-humanamente.svg", url: "https://humanamentevenezuela.org" },
+    { id: "gem", name: "Global Empowerment Mission", description: "GEM: Una de las organizaciones de ayuda en desastres más eficaces del mundo.", accent: "#31568f", logoUrl: "/pillars/partner-gem.svg", url: "https://www.globalempowermentmission.org" },
   ],
   cta: {
     heading: "¿Quieres participar?",

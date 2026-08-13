@@ -93,6 +93,9 @@ const PriorityProgramCard: React.FC<{
       <Typography sx={{ textAlign: "center", fontSize: { xs: 15, sm: 17 }, fontWeight: 700, letterSpacing: 2.2, lineHeight: 1.45, px: 2, mb: 2.5 }}>
         {item.purpose}
       </Typography>
+      <Typography sx={{ textAlign: "center", color: "rgba(255,255,255,.72)", fontSize: 13, fontStyle: "italic", mt: -1.5, mb: 2.5 }}>
+        Author by Claudia A. Gonzalez
+      </Typography>
 
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
         {item.curricula.map((curriculum, index) => (

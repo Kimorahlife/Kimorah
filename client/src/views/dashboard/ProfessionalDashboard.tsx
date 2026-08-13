@@ -15,7 +15,6 @@ import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
-import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../authentication/components/useUser";
@@ -261,7 +260,7 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
             <Typography sx={{ fontWeight: 800, fontSize: 15 }}>{spanish ? "Acceso profesional KIMORAH Life" : "KIMORAH Life Professional Access"}</Typography>
             <Typography sx={{ color: MUTED, fontSize: 12, lineHeight: 1.5, mt: 1 }}>{spanish ? "Tu centro de recursos profesionales, currículos e investigación." : "Your hub for professional resources, curriculums, and research."}</Typography>
             <Stack spacing={2.2} sx={{ mt: 2.2 }}>
-              {[{ icon: <AutoStoriesOutlinedIcon />, title: "Curriculums", sub: "Access psychoeducational curriculums and guides.", path: "/mission" }, { icon: <SearchRoundedIcon />, title: "Research", sub: "Explore research projects and publications.", path: "/mission/coqui" }].map((item) => (
+              {[{ icon: <AutoStoriesOutlinedIcon />, title: "Curriculums", sub: "Access psychoeducational curriculums and guides.", path: "/mission" }].map((item) => (
                 <Stack key={item.title} direction="row" spacing={1.5} alignItems="center" onClick={() => navigate(item.path)} sx={{ cursor: "pointer" }}>
                   <Box sx={{ width: 50, height: 50, borderRadius: "50%", bgcolor: "#f1e9fc", color: PURPLE, display: "grid", placeItems: "center" }}>{item.icon}</Box>
                   <Box sx={{ flex: 1 }}><Typography sx={{ fontWeight: 800, fontSize: 12.5 }}>{item.title}</Typography><Typography sx={{ color: MUTED, fontSize: 11, lineHeight: 1.45 }}>{item.sub}</Typography></Box>

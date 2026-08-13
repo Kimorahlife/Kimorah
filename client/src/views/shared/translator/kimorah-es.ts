@@ -148,7 +148,7 @@ export const KIMORAH_ES: Record<string, string> = {
   "When the Earth Changes,": "Cuando la Tierra Cambia,", "We Change Too": "Nosotros También",
   "A psychoeducational curriculum offering support and processing for people directly and indirectly affected by the earthquake in Venezuela.": "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas directa e indirectamente por el terremoto de Venezuela.",
   "DESIGNED FOR MENTAL HEALTH PROFESSIONALS": "DISEÑADO PARA PROFESIONALES DE LA SALUD MENTAL",
-  "Evidence-based. Trauma-informed. Integrative and culturally sensitive approaches.": "Basado en evidencia. Informado por trauma. Enfoques integrativos y culturalmente sensibles.",
+  "Evidence-informed. Trauma-informed. Integrative and culturally sensitive approaches.": "Informado por evidencia. Informado por trauma. Enfoques integrativos y culturalmente sensibles.",
   "EXPLORE SESSIONS": "EXPLORAR SESIONES", "WATCH INTRODUCTORY VIDEO": "VER VIDEO INTRODUCTORIO",
   // Coquí research components
   "COQUÍ RESEARCH DATA": "DATOS DE LA INVESTIGACIÓN DEL COQUÍ", "Overview": "Resumen", "Key Findings": "Hallazgos principales", "Demographics": "Datos demográficos", "Emotional Responses": "Respuestas emocionales", "Somatic Responses": "Respuestas somáticas", "Time & Exposure": "Tiempo y exposición", "Location & Displacement": "Ubicación y desplazamiento", "Methodology": "Metodología", "Survey": "Encuesta", "About the Study": "Acerca del estudio",

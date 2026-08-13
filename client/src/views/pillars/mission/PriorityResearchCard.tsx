@@ -1,6 +1,7 @@
 import React from "react";
 import { Avatar, Box, Button, Typography } from "@mui/material";
 import StarRoundedIcon from "@mui/icons-material/StarRounded";
+import AccessTimeRoundedIcon from "@mui/icons-material/AccessTimeRounded";
 import { useTranslation } from "react-i18next";
 import { PriorityResearchItem } from "./mission-data";
 
@@ -11,7 +12,7 @@ const PriorityResearchCard: React.FC<{
   item: PriorityResearchItem;
   onTakeSurvey?: () => void;
   onReviewData?: () => void;
-}> = ({ item, onTakeSurvey, onReviewData }) => {
+}> = ({ item }) => {
   const { i18n } = useTranslation();
   const spanish = (i18n.resolvedLanguage || i18n.language).startsWith("es");
   return (
@@ -26,6 +27,8 @@ const PriorityResearchCard: React.FC<{
       bgcolor: "rgba(244,242,251,0.9)",
       backdropFilter: "blur(8px)",
       boxShadow: "0 10px 30px rgba(0,0,0,0.15)",
+      filter: "grayscale(1)",
+      opacity: 0.78,
     }}
   >
     <Avatar
@@ -41,7 +44,7 @@ const PriorityResearchCard: React.FC<{
     >
       🐸
     </Avatar>
-    <Box>
+    <Box sx={{ flex: 1 }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: 0.5, color: "#c99a1e", mb: 0.5 }}>
         <StarRoundedIcon sx={{ fontSize: 18 }} />
         <Typography sx={{ fontWeight: 700, letterSpacing: 1, fontSize: 12 }}>{item.badge}</Typography>
@@ -60,19 +63,46 @@ const PriorityResearchCard: React.FC<{
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1.5, mt: 2 }}>
         <Button
           variant="contained"
-          onClick={onTakeSurvey}
+          disabled
           sx={{ bgcolor: "#5a4a9c", color: "#fff", textTransform: "none", borderRadius: 999, boxShadow: "none", "&:hover": { bgcolor: "#4c3f88", boxShadow: "none" } }}
         >
           {spanish ? "Realizar encuesta ›" : "Take Survey ›"}
         </Button>
         <Button
           variant="outlined"
-          onClick={onReviewData}
+          disabled
           sx={{ color: "#5a4a9c", borderColor: "#5a4a9c", textTransform: "none", borderRadius: 999, "&:hover": { borderColor: "#4c3f88", bgcolor: "rgba(90,74,156,0.08)" } }}
         >
           {spanish ? "Revisar datos ›" : "Review Data ›"}
         </Button>
       </Box>
+    </Box>
+    <Box
+      sx={{
+        width: { xs: "100%", md: 230 },
+        minHeight: { md: 190 },
+        borderTop: { xs: "1px dashed rgba(47,42,99,.35)", md: 0 },
+        borderLeft: { xs: 0, md: "1px dashed rgba(47,42,99,.35)" },
+        pt: { xs: 2, md: 0 },
+        pl: { md: 3 },
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+        color: "#4f4b67",
+      }}
+    >
+      <AccessTimeRoundedIcon sx={{ fontSize: 64, mb: 1 }} />
+      <Typography sx={{ fontWeight: 800, fontSize: 22, letterSpacing: 1 }}>
+        {spanish ? "PRÓXIMAMENTE" : "COMING SOON"}
+      </Typography>
+      <Typography sx={{ fontSize: 13.5, lineHeight: 1.45, mt: 1 }}>
+        {spanish ? "Este proyecto de investigación está actualmente en desarrollo." : "This research project is currently in development."}
+      </Typography>
+      <Typography sx={{ fontSize: 13, fontStyle: "italic", mt: 2 }}>
+        {spanish ? "¡Mantente al tanto!" : "Stay tuned for updates!"}
+      </Typography>
     </Box>
   </Box>
   );

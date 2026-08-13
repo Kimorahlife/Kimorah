@@ -62,6 +62,8 @@ const PartnerRow: React.FC<{ partner: MissionPartner }> = ({ partner }) => {
       variant="contained"
       endIcon={<ChevronRightRoundedIcon />}
       href={partner.url}
+      target={partner.url ? "_blank" : undefined}
+      rel={partner.url ? "noopener noreferrer" : undefined}
       sx={{
         bgcolor: partner.accent,
         color: "#fff",

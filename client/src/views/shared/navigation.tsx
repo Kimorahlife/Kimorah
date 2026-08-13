@@ -87,6 +87,7 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
   // Member workspace — sits directly under the dashboards, no section header,
   // matching the design. Each entry appears only for a role that grants it.
   for (const item of WORKSPACE_ITEMS) {
+    if (showProfessionalDashboard && item.feature === "bookmarks") continue;
     if (!hasFullUiAccess(userPermissions, item.feature, isGlobal)) continue;
     nav.push({
       segment: item.segment,

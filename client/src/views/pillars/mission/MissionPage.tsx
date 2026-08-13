@@ -1,13 +1,10 @@
 import React from "react";
-import { Box, Button, Container, Typography } from "@mui/material";
-import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
-import FavoriteRoundedIcon from "@mui/icons-material/FavoriteRounded";
+import { Box, Container, Typography } from "@mui/material";
 import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafRounded";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LogoBadge from "../../landing/LogoBadge";
 import { missionData, missionDataEs } from "./mission-data";
-import CauseCard from "./CauseCard";
 import PartnerRow from "./PartnerRow";
 import PriorityResearchCard from "./PriorityResearchCard";
 import PriorityProgramCard from "./PriorityProgramCard";
@@ -59,7 +56,7 @@ const CompareLabel: React.FC<{ text: string; tone: string }> = ({ text, tone }) 
 
 /**
  * Mission pillar page — a full-width, data-driven layout built from modular
- * components (CauseCard, PriorityResearchCard, PartnerRow). Content comes from
+ * components (PriorityResearchCard, PartnerRow). Content comes from
  * `missionData` today; swap that for an API call when the backend is ready.
  */
 const MissionPage: React.FC = () => {
@@ -192,7 +189,7 @@ const MissionPage: React.FC = () => {
 
           {/* Priority Research */}
           <SectionHeading title={spanish ? "INVESTIGACIÓN PRIORITARIA" : "PRIORITY RESEARCH"} />
-          <PriorityResearchCard item={d.priority} onReviewData={() => navigate("/mission/coqui")} />
+          <PriorityResearchCard item={d.priority} />
 
           {/* Featured Partners */}
           <SectionHeading title={spanish ? "ORGANIZACIONES DESTACADAS" : "FEATURED ORGANIZATIONS"} />
@@ -202,65 +199,6 @@ const MissionPage: React.FC = () => {
             ))}
           </Box>
 
-          {/* Explore Causes */}
-          <SectionHeading title={spanish ? "EXPLORA CAUSAS" : "EXPLORE CAUSES"} action={spanish ? "Ver todo ›" : "View All ›"} />
-          <Box
-            sx={{
-              display: "grid",
-              gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" },
-              gap: { xs: 1.5, sm: 2.5 },
-            }}
-          >
-            {d.causes.map((c) => (
-              <CauseCard key={c.id} cause={c} />
-            ))}
-          </Box>
-
-          {/* Get involved CTA */}
-          <Box
-            sx={{
-              mt: { xs: 4, sm: 5 },
-              p: { xs: 2.5, sm: 3 },
-              borderRadius: 4,
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: 2,
-              background: "linear-gradient(120deg, #3a3170 0%, #52489a 100%)",
-              boxShadow: "0 10px 30px rgba(0,0,0,0.25)",
-            }}
-          >
-            <Box sx={{ display: "flex", alignItems: "center", gap: 2 }}>
-              <Box component="img" src="/pillars/leaf.png" alt="" sx={{ width: 44, height: 44, objectFit: "contain" }} />
-              <Box>
-                <Typography sx={{ color: "#fff", fontWeight: 700, fontSize: { xs: 18, sm: 22 } }}>
-                  {d.cta.heading}
-                </Typography>
-                <Typography sx={{ color: "rgba(255,255,255,0.85)", fontSize: { xs: 13, sm: 15 } }}>
-                  {d.cta.subtext}
-                </Typography>
-              </Box>
-            </Box>
-            <Button
-              variant="contained"
-              endIcon={<FavoriteRoundedIcon />}
-              sx={{
-                bgcolor: GOLD,
-                color: "#3a2f10",
-                fontWeight: 700,
-                textTransform: "none",
-                borderRadius: 999,
-                px: 3,
-                py: 1,
-                whiteSpace: "nowrap",
-                boxShadow: "none",
-                "&:hover": { bgcolor: "#d8a92a", boxShadow: "none" },
-              }}
-            >
-              {d.cta.buttonLabel}
-            </Button>
-          </Box>
         </Container>
       </Box>
     </Box>
