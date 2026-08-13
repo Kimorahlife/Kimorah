@@ -42,17 +42,37 @@ const visibilityFilter = (req: Request): Record<string, unknown> => {
 type GroupDoc = {
   _id: mongoose.Types.ObjectId;
   curriculumId: mongoose.Types.ObjectId;
-  mainProfessionalId: mongoose.Types.ObjectId;
-  coProfessionalIds: mongoose.Types.ObjectId[];
+  // Either an id or, on the routes that populate for display, the user
+  // document. `idOf` below reads both — see the note there.
+  mainProfessionalId: mongoose.Types.ObjectId | { _id: mongoose.Types.ObjectId };
+  coProfessionalIds: Array<mongoose.Types.ObjectId | { _id: mongoose.Types.ObjectId }>;
   createdAt?: Date;
+};
+
+/**
+ * The id of a reference, whether or not it has been populated.
+ *
+ * The detail route populates the professionals so it can show their names, and
+ * a populated field is the user document, not an ObjectId — `String()` on it
+ * yields "[object Object]", which matches nobody. Comparing that against the
+ * caller locked every creator out of the group they had just made. Normalising
+ * here means the checks below no longer care whether their caller populated.
+ */
+const idOf = (value: unknown): string => {
+  if (!value) return "";
+  if (typeof value === "object" && value !== null && "_id" in (value as Record<string, unknown>)) {
+    return String((value as { _id: unknown })._id);
+  }
+  return String(value);
 };
 
 const canView = (req: Request, group: GroupDoc): boolean => {
   if (isGlobal(req)) return true;
   const me = String(currentUserId(req) ?? "");
+  if (!me) return false;
   return (
-    String(group.mainProfessionalId) === me ||
-    group.coProfessionalIds.some((id) => String(id) === me)
+    idOf(group.mainProfessionalId) === me ||
+    (group.coProfessionalIds ?? []).some((id) => idOf(id) === me)
   );
 };
 
@@ -61,8 +81,11 @@ const canView = (req: Request, group: GroupDoc): boolean => {
  * accountable for it — the main professional — or to an admin. A
  * co-professional records participants but does not reshape the record.
  */
-const canManage = (req: Request, group: GroupDoc): boolean =>
-  isGlobal(req) || String(group.mainProfessionalId) === String(currentUserId(req) ?? "");
+const canManage = (req: Request, group: GroupDoc): boolean => {
+  if (isGlobal(req)) return true;
+  const me = String(currentUserId(req) ?? "");
+  return Boolean(me) && idOf(group.mainProfessionalId) === me;
+};
 
 /**
  * Bring a group's session rows in line with its curriculum.
