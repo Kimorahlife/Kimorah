@@ -73,8 +73,19 @@ const MissionPage: React.FC = () => {
   // Development only — a visitor should never see the page twice.
   const stored = useDatabaseCurricula(d.priorityProgram);
   const comparing = import.meta.env.DEV;
-  /** Title of a stored curriculum whose page does not exist yet. */
-  const [noPageFor, setNoPageFor] = React.useState<string | null>(null);
+
+  const explore = (
+    curriculum: (typeof d.priorityProgram)["curricula"][number],
+    index: number,
+  ) => {
+    if (curriculum.slug) navigate(`/mission/c/${curriculum.slug}/session/1`);
+    else navigate(index === 0 ? "/mission/sessions/1" : "/mission/grief/session/1/introduction");
+  };
+
+  // In production the page shows one card: the stored curricula when any are
+  // published, the hardcoded pair until then. In development both are shown so
+  // they can still be compared.
+  const primary = !comparing && stored.program ? stored.program : d.priorityProgram;
 
   return (
     <Box
@@ -142,14 +153,7 @@ const MissionPage: React.FC = () => {
           {/* data-compare lets the comparison check measure the two cards'
               computed styles against each other instead of guessing selectors. */}
           <Box data-compare="hardcoded">
-            <PriorityProgramCard
-              item={d.priorityProgram}
-              // The hardcoded pair is positional — there are exactly two, and
-              // each has had its own page since before any of this was data.
-              onExplore={(_, index) =>
-                navigate(index === 0 ? "/mission/sessions/1" : "/mission/grief/session/1/introduction")
-              }
-            />
+            <PriorityProgramCard item={primary} onExplore={explore} />
           </Box>
 
           {comparing && (
@@ -171,25 +175,9 @@ const MissionPage: React.FC = () => {
                     : "Nothing published yet — turn on Published in the Curriculum Builder to show a curriculum here."}
                 </Typography>
               )}
-              {noPageFor && (
-                <Typography sx={{ color: "#b3261e", fontSize: 13, mb: 1 }}>
-                  {`“${noPageFor}” has no page yet — the session pages are still hardcoded, one per curriculum.`}
-                </Typography>
-              )}
               {stored.program && (
                 <Box data-compare="database">
-                  <PriorityProgramCard
-                    item={stored.program}
-                    // Routed by slug, never by position — the stored list can
-                    // hold any number of curricula, in any order.
-                    // Every stored curriculum opens its own session through the
-                    // template — never the hardcoded page, which is what made
-                    // both cards land on the same URL.
-                    onExplore={(curriculum) => {
-                      if (curriculum.slug) navigate(`/mission/c/${curriculum.slug}/session/1`);
-                      else setNoPageFor(curriculum.title);
-                    }}
-                  />
+                  <PriorityProgramCard item={stored.program} onExplore={explore} />
                 </Box>
               )}
             </Box>
