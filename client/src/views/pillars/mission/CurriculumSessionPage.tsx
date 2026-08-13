@@ -138,6 +138,24 @@ const FIXED = {
     en: "This is a space to accompany one another with respect, compassion, and humanity.",
     es: "Este es un espacio para acompañarnos con respeto, compasión y humanidad.",
   },
+  cohesion: {
+    quickTip: { en: "QUICK TIP", es: "CONSEJO RÁPIDO" },
+    title: { en: "GROUP COHESION", es: "COHESIÓN GRUPAL" },
+    source: {
+      en: "Inspired by Irvin Yalom’s Theory of Group Psychotherapy.",
+      es: "Inspirado en la Teoría de Psicoterapia de Grupo de Irvin Yalom.",
+    },
+    body: {
+      en: "Cohesion grows when members feel belonging, acceptance, trust, and connection. Yalom viewed this connection as a key therapeutic factor supporting participation, mutual support, and deeper healing.",
+      es: "La cohesión crece cuando los miembros sienten pertenencia, aceptación, confianza y conexión. Yalom consideraba esta conexión un factor terapéutico clave que favorece la participación, el apoyo mutuo y una sanación más profunda.",
+    },
+    reminderLabel: { en: "Facilitator reminder: ", es: "Recordatorio para quien facilita: " },
+    reminder: {
+      en: "You are not just guiding the process—you are cultivating connection. Create moments for everyone to feel seen, heard, and valued.",
+      es: "No solo está guiando el proceso; está cultivando la conexión. Cree momentos para que todas las personas se sientan vistas, escuchadas y valoradas.",
+    },
+  },
+
   // Four runs, two of them bold — the emphasis is part of the copy.
   interventionNote: {
     en: ["You may choose any ", "evidence-based intervention", " that aligns with the therapeutic focus and objectives of this session. ", "Expressive and creative approaches—including art, music, poetry, writing, movement, or other evidence-informed activities—are encouraged when clinically appropriate and supportive of the group’s needs and therapeutic process."],
@@ -488,7 +506,7 @@ const CurriculumSessionPage: React.FC = () => {
       const questions = (data?.groups ?? []).flatMap((g) => g.items);
       return (
         <Section icon={<TabIcon />} title={label} subtitle={pick(data?.intro) || undefined}>
-          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: 1.5, ml: { md: 8.25 } }}>
+          <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: 1.5 }}>
             {questions.map((q, i) => (
               <Box
                 key={i}
@@ -506,6 +524,37 @@ const CurriculumSessionPage: React.FC = () => {
                 <Typography sx={{ fontSize: 17 }}>{pick(q.title)}</Typography>
               </Box>
             ))}
+            {/* Page furniture: the same tip on every curriculum. */}
+            <Box
+              sx={{
+                gridColumn: "1 / -1", width: "100%", p: 2.5,
+                border: "1px solid rgba(101,64,178,.18)", borderRadius: 3,
+                bgcolor: "#f0e9fa", boxShadow: "0 8px 22px rgba(67,45,126,.06)",
+                "& .MuiTypography-root": { fontWeight: 700 },
+              }}
+            >
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <Box sx={{ width: 52, height: 52, flexShrink: 0, borderRadius: "50%", bgcolor: "#eee7fa", color: PURPLE, display: "grid", placeItems: "center" }}>
+                  <LightbulbOutlinedIcon sx={{ fontSize: 31 }} />
+                </Box>
+                <Box>
+                  <Typography sx={{ color: PURPLE, fontSize: 12, fontWeight: 800, letterSpacing: 0.6 }}>{FIXED.cohesion.quickTip[lang]}</Typography>
+                  <Typography sx={{ color: PURPLE, fontSize: 20, fontWeight: 800 }}>{FIXED.cohesion.title[lang]}</Typography>
+                </Box>
+              </Box>
+              <Typography sx={{ mt: 1.5, fontSize: 13, lineHeight: 1.55 }}>{FIXED.cohesion.source[lang]}</Typography>
+              <Box sx={{ display: "flex", gap: 1.25, mt: 2, pt: 2, borderTop: "1px solid rgba(101,64,178,.16)" }}>
+                <GroupsOutlinedIcon sx={{ color: PURPLE, flexShrink: 0 }} />
+                <Typography sx={{ fontSize: 13, lineHeight: 1.55 }}>{FIXED.cohesion.body[lang]}</Typography>
+              </Box>
+              <Box sx={{ display: "flex", gap: 1.25, mt: 2, p: 1.75, bgcolor: "rgba(238,231,250,.72)", borderRadius: 2 }}>
+                <SpaOutlinedIcon sx={{ color: PURPLE, flexShrink: 0 }} />
+                <Typography sx={{ fontSize: 13, lineHeight: 1.55 }}>
+                  <Box component="strong" sx={{ color: PURPLE }}>{FIXED.cohesion.reminderLabel[lang]}</Box>
+                  {FIXED.cohesion.reminder[lang]}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
         </Section>
       );
