@@ -1,6 +1,7 @@
 import GroupRoundedIcon from "@mui/icons-material/GroupRounded";
 import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 import QuizRoundedIcon from "@mui/icons-material/QuizRounded";
+import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import DashboardRoundedIcon from "@mui/icons-material/DashboardRounded";
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
@@ -112,7 +113,7 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
   }
 
   // Administration — user/role management plus the Coquí question bank.
-  if (showUsers || showRoles || showResearch) {
+  if (showUsers || showRoles || showResearch || showCurriculums) {
     nav.push({ kind: "header", title: t("nav.administration", "Administration") });
     if (showUsers) {
       nav.push({
@@ -133,6 +134,16 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
         segment: "coqui-questions",
         title: t("nav.coquiQuestions", "Coquí Questions"),
         icon: <QuizRoundedIcon />,
+      });
+    }
+    // Authoring for the Mission curricula. It sits in Administration rather
+    // than Professional Access because that section is for editing, and it
+    // keeps the read-only "Curriculums" → /mission entry unambiguous.
+    if (showCurriculums) {
+      nav.push({
+        segment: "curriculums",
+        title: t("nav.curriculumBuilder", "Curriculum Builder"),
+        icon: <MenuBookRoundedIcon />,
       });
     }
   }

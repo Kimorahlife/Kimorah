@@ -49,6 +49,12 @@ export interface PriorityProgramItem {
     description: string;
     action: string;
     accent: string;
+    /**
+     * Identifies which curriculum this card is, so "Explore" can open the right
+     * one. Absent on the hardcoded pair, which is positional by definition;
+     * carried by anything built from the database, where position means nothing.
+     */
+    slug?: string;
   }>;
   audience: string;
   audienceDescription: string;

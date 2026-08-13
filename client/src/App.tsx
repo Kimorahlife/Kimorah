@@ -13,9 +13,11 @@ import Users from "./views/users/Users";
 import CoquiQuestions from "./views/coqui/CoquiQuestions";
 import Diagnostics from "./views/shared/Diagnostics";
 import ComingSoon from "./views/shared/ComingSoon";
+import CurriculumBuilder from "./views/curriculum/CurriculumBuilder";
 import Landing from "./views/landing/Landing";
 import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
+import CurriculumSessionPage from "./views/pillars/mission/CurriculumSessionPage";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
 import MissionSessionTwoPage from "./views/pillars/mission/MissionSessionTwoPage";
 import MissionSessionThreePage from "./views/pillars/mission/MissionSessionThreePage";
@@ -42,7 +44,7 @@ import SiteHeader from "./views/shared/SiteHeader";
 import { useAutoTranslate } from "./views/shared/useAutoTranslate";
 
 // Pages that manage their own top-of-page chrome (no global SiteHeader).
-const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/dashboard/professional", "/roles", "/users", "/coqui-questions", "/diagnostics", "/profile", "/bookmarks", "/forum", "/messages", "/settings", "/help"]);
+const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/dashboard/professional", "/roles", "/users", "/coqui-questions", "/curriculums", "/diagnostics", "/profile", "/bookmarks", "/forum", "/messages", "/settings", "/help"]);
 // Auth screens keep a floating language switcher; the landing page has its own.
 const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
 
@@ -73,6 +75,7 @@ const App: React.FC = () => {
       <Route path="/roles" element={<PrivateRoute requireFeature="roles" element={<Roles />} />} />
       <Route path="/users" element={<PrivateRoute requireFeature="users" element={<Users />} />} />
       <Route path="/coqui-questions" element={<PrivateRoute requireFeature="research" element={<CoquiQuestions />} />} />
+      <Route path="/curriculums" element={<PrivateRoute requireFeature="curriculums" element={<CurriculumBuilder />} />} />
 
       {/* Member workspace — permissions and sidebar entries exist, the pages
           don't yet. Each is gated like a finished page, so building the real
@@ -91,6 +94,11 @@ const App: React.FC = () => {
           without a login. Its curriculum sub-pages below stay gated, and the
           "Explore curriculum" buttons gate on the curriculums permission. */}
       <Route path="/mission" element={<MissionPage />} />
+      {/* Database-driven sessions. One template — Session 1's design — for
+          every session of every stored curriculum. The hardcoded pages below
+          stay as they are so the two can be compared. */}
+      <Route path="/mission/c/:slug/session/:number" element={<RequireAuth element={<CurriculumSessionPage />} />} />
+      <Route path="/mission/c/:slug/session/:number/:section" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
       <Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
       <Route path="/mission/sessions/1/concepts" element={<RequireAuth element={<MissionConceptsPage />} />} />

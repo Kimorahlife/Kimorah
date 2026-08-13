@@ -1,6 +1,7 @@
 import { User } from "../types/users";
 import { Role } from "../types/roles";
 import { Permission } from "../types/permissions";
+import { Curriculum } from "../views/curriculum/curriculum-types";
 
 interface slice {
   loading?: boolean;
@@ -15,6 +16,10 @@ export interface userSlice extends slice {
 
 export interface roleSlice extends slice {
   list: Array<Role>;
+}
+
+export interface curriculumSlice extends slice {
+  list: Array<Curriculum>;
 }
 
 export interface permissionSlice extends slice {

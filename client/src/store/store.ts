@@ -39,6 +39,8 @@ export const getRole = (state: RootState) => state.reducer.entities.roles;
 // Coquí Research Data aggregates
 export const getCoqui = (state: RootState) => state.reducer.entities.coqui;
 
+export const getCurriculum = (state: RootState) => state.reducer.entities.curriculums;
+
 // Persistor
 export const persistor = persistStore(store);
 

@@ -22,10 +22,14 @@ const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
  */
 const PriorityProgramCard: React.FC<{
   item: PriorityProgramItem;
-  onExplore?: () => void;
-  onExploreSecondary?: () => void;
+  /**
+   * Opens one curriculum. Given the curriculum itself rather than a handler per
+   * slot, because the card renders whatever it is handed — two entries or five
+   * — and position stops meaning anything the moment the list is data.
+   */
+  onExplore?: (curriculum: PriorityProgramItem["curricula"][number], index: number) => void;
   onWatchVideo?: () => void;
-}> = ({ item, onExplore, onExploreSecondary, onWatchVideo }) => {
+}> = ({ item, onExplore, onWatchVideo }) => {
   const canOpenCurriculum = useFeatureFullAccess("curriculums");
   const [, , isTokenValid] = useToken();
   const [gateOpen, setGateOpen] = useState(false);
@@ -135,7 +139,7 @@ const PriorityProgramCard: React.FC<{
             <Button
               fullWidth
               variant="contained"
-              onClick={() => openCurriculum(index === 0 ? onExplore : onExploreSecondary)}
+              onClick={() => openCurriculum(() => onExplore?.(curriculum, index))}
               endIcon={<ArrowForwardRoundedIcon />}
               sx={{
                 mt: 2,

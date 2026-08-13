@@ -11,6 +11,7 @@ import CauseCard from "./CauseCard";
 import PartnerRow from "./PartnerRow";
 import PriorityResearchCard from "./PriorityResearchCard";
 import PriorityProgramCard from "./PriorityProgramCard";
+import { useDatabaseCurricula } from "./useDatabaseCurricula";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 const INDIGO = "#2f2a63";
@@ -36,6 +37,26 @@ const SectionHeading: React.FC<{ title: string; action?: string; onAction?: () =
   </Box>
 );
 
+/** Marks which source a card was built from, while the two are side by side. */
+const CompareLabel: React.FC<{ text: string; tone: string }> = ({ text, tone }) => (
+  <Box
+    sx={{
+      display: "inline-block",
+      mb: 1,
+      px: 1.25,
+      py: 0.4,
+      border: `1px solid ${tone}`,
+      borderRadius: 99,
+      color: tone,
+      fontSize: 11,
+      fontWeight: 800,
+      letterSpacing: 1.1,
+    }}
+  >
+    {text}
+  </Box>
+);
+
 /**
  * Mission pillar page — a full-width, data-driven layout built from modular
  * components (CauseCard, PriorityResearchCard, PartnerRow). Content comes from
@@ -46,6 +67,14 @@ const MissionPage: React.FC = () => {
   const { i18n } = useTranslation();
   const spanish = (i18n.resolvedLanguage || i18n.language).startsWith("es");
   const d = spanish ? missionDataEs : missionData;
+
+  // The same card, built from the stored curricula, shown beneath the hardcoded
+  // one so the two can be compared before the hardcoded copy is retired.
+  // Development only — a visitor should never see the page twice.
+  const stored = useDatabaseCurricula(d.priorityProgram);
+  const comparing = import.meta.env.DEV;
+  /** Title of a stored curriculum whose page does not exist yet. */
+  const [noPageFor, setNoPageFor] = React.useState<string | null>(null);
 
   return (
     <Box
@@ -109,11 +138,62 @@ const MissionPage: React.FC = () => {
 
           {/* Priority Programs */}
           <SectionHeading title={spanish ? "PROGRAMAS PRIORITARIOS" : "PRIORITY PROGRAMS"} />
-          <PriorityProgramCard
-            item={d.priorityProgram}
-            onExplore={() => navigate("/mission/sessions/1")}
-            onExploreSecondary={() => navigate("/mission/grief/session/1/introduction")}
-          />
+          {comparing && <CompareLabel text="HARDCODED — mission-data.ts" tone="#8a8fb5" />}
+          {/* data-compare lets the comparison check measure the two cards'
+              computed styles against each other instead of guessing selectors. */}
+          <Box data-compare="hardcoded">
+            <PriorityProgramCard
+              item={d.priorityProgram}
+              // The hardcoded pair is positional — there are exactly two, and
+              // each has had its own page since before any of this was data.
+              onExplore={(_, index) =>
+                navigate(index === 0 ? "/mission/sessions/1" : "/mission/grief/session/1/introduction")
+              }
+            />
+          </Box>
+
+          {comparing && (
+            <Box sx={{ mt: 4 }}>
+              <CompareLabel
+                text={
+                  stored.includesDrafts
+                    ? "FROM THE DATABASE — includes drafts, because you are signed in"
+                    : "FROM THE DATABASE — published only"
+                }
+                tone="#6540b2"
+              />
+              {stored.loading && <Typography sx={{ color: INDIGO, fontSize: 13 }}>Loading stored curricula…</Typography>}
+              {stored.error && <Typography sx={{ color: "#b3261e", fontSize: 13 }}>{stored.error}</Typography>}
+              {!stored.loading && !stored.error && !stored.program && (
+                <Typography sx={{ color: INDIGO, fontSize: 13 }}>
+                  {stored.includesDrafts
+                    ? "No curricula stored yet — create one in the Curriculum Builder."
+                    : "Nothing published yet — turn on Published in the Curriculum Builder to show a curriculum here."}
+                </Typography>
+              )}
+              {noPageFor && (
+                <Typography sx={{ color: "#b3261e", fontSize: 13, mb: 1 }}>
+                  {`“${noPageFor}” has no page yet — the session pages are still hardcoded, one per curriculum.`}
+                </Typography>
+              )}
+              {stored.program && (
+                <Box data-compare="database">
+                  <PriorityProgramCard
+                    item={stored.program}
+                    // Routed by slug, never by position — the stored list can
+                    // hold any number of curricula, in any order.
+                    // Every stored curriculum opens its own session through the
+                    // template — never the hardcoded page, which is what made
+                    // both cards land on the same URL.
+                    onExplore={(curriculum) => {
+                      if (curriculum.slug) navigate(`/mission/c/${curriculum.slug}/session/1`);
+                      else setNoPageFor(curriculum.title);
+                    }}
+                  />
+                </Box>
+              )}
+            </Box>
+          )}
 
           {/* Priority Research */}
           <SectionHeading title={spanish ? "INVESTIGACIÓN PRIORITARIA" : "PRIORITY RESEARCH"} />

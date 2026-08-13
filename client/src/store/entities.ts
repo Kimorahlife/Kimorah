@@ -5,6 +5,7 @@ import userSlice from "./slices/users";
 import roleSlice from "./slices/roles";
 import permissionSlice from "./slices/permissions";
 import coquiSlice from "./slices/coqui";
+import curriculumSlice from "./slices/curriculums";
 
 // Persist the Coquí aggregates so a full page refresh shows the last-known
 // numbers immediately (then a background refetch keeps them fresh).
@@ -15,4 +16,5 @@ export default combineReducers({
   roles: roleSlice,
   permissions: permissionSlice,
   coqui: persistedCoqui,
+  curriculums: curriculumSlice,
 });

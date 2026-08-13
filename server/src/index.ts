@@ -12,6 +12,8 @@ import userRoutes from "./routes/user-routes";
 import roleRoutes from "./routes/role-routes";
 import permissionRoutes from "./routes/permission-routes";
 import researchRoutes from "./routes/research-routes";
+import curriculumRoutes from "./routes/curriculum-routes";
+import translationRoutes from "./routes/translation-routes";
 
 /**
  * Warn loudly at boot if required configuration is missing, so a bad deploy is
@@ -30,6 +32,9 @@ function validateEnv(): void {
     `🔧 Env: NODE_ENV=${config.env} · MONGO_URI=${process.env.MONGO_URI ? "set" : "MISSING"} · ` +
       `JWT_SECRET=${process.env.JWT_SECRET ? "set" : "MISSING"} · ORIGIN_URL=${process.env.ORIGIN_URL || "MISSING"}`,
   );
+  if (!process.env.ANTHROPIC_API_KEY) {
+    console.warn("⚠️  ANTHROPIC_API_KEY is not set — curriculum auto-translation will return 503.");
+  }
 }
 
 validateEnv();
@@ -50,6 +55,8 @@ app.use("/api/users", userRoutes);
 app.use("/api/roles", roleRoutes);
 app.use("/api/permissions", permissionRoutes);
 app.use("/api/research", researchRoutes);
+app.use("/api/curriculums", curriculumRoutes);
+app.use("/api/translate", translationRoutes);
 
 // 404 + global error handler
 app.use(notFound);
