@@ -74,6 +74,12 @@ const App: React.FC = () => {
       <Route path="/dashboard/professional" element={<PrivateRoute requireFeature="professional-dashboard" element={<ProfessionalDashboard />} />} />
       <Route path="/roles" element={<PrivateRoute requireFeature="roles" element={<Roles />} />} />
       <Route path="/users" element={<PrivateRoute requireFeature="users" element={<Users />} />} />
+      {/* Groups belong with the other managed lists, not with the public
+          Mission pages — PrivateRoute is what puts a page inside the dashboard
+          chrome, so routing these anywhere else renders them with the
+          marketing header and no sidebar. */}
+      <Route path="/groups" element={<PrivateRoute requireFeature="groups" element={<GroupsPage />} />} />
+      <Route path="/groups/:id" element={<PrivateRoute requireFeature="groups" element={<GroupDetailPage />} />} />
       <Route path="/coqui-questions" element={<PrivateRoute requireFeature="research" element={<CoquiQuestions />} />} />
       <Route path="/curriculums" element={<PrivateRoute requireFeature="curriculums" element={<CurriculumBuilder />} />} />
 
@@ -99,12 +105,6 @@ const App: React.FC = () => {
           stay as they are so the two can be compared. */}
       <Route path="/mission/c/:slug/session/:number" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/mission/c/:slug/session/:number/:section" element={<RequireAuth element={<CurriculumSessionPage />} />} />
-
-      {/* Groups — a professional's record of running a curriculum with a set
-          of people. The pages render whatever the server returns; which groups
-          a caller may see is narrowed there, not here. */}
-      <Route path="/groups" element={<RequireAuth element={<GroupsPage />} />} />
-      <Route path="/groups/:id" element={<RequireAuth element={<GroupDetailPage />} />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
       {/* Session 1 is the only hardcoded session — the design the database
           template is measured against. Every later session is data, so any
