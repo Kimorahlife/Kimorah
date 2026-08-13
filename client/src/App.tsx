@@ -85,6 +85,11 @@ const App: React.FC = () => {
           marketing header and no sidebar. */}
       <Route path="/groups" element={<PrivateRoute requireFeature="groups" element={<GroupsPage />} />} />
       <Route path="/groups/:id" element={<PrivateRoute requireFeature="groups" element={<GroupDetailPage />} />} />
+      {/* The curriculum read as a group's own. Same page as /mission/c/... —
+          it just carries the group through, so every tab and step keeps the
+          context and the way out leads back to the group. */}
+      <Route path="/groups/:groupId/c/:slug/session/:number" element={<RequireAuth element={<CurriculumSessionPage />} />} />
+      <Route path="/groups/:groupId/c/:slug/session/:number/:section" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/coqui-questions" element={<PrivateRoute requireFeature="research" element={<CoquiQuestions />} />} />
       <Route path="/curriculums" element={<PrivateRoute requireFeature="curriculums" element={<CurriculumBuilder />} />} />
 

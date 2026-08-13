@@ -18,6 +18,7 @@ import PsychologyOutlinedIcon from "@mui/icons-material/PsychologyOutlined";
 import SelfImprovementOutlinedIcon from "@mui/icons-material/SelfImprovementOutlined";
 import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
@@ -199,13 +200,40 @@ const FIXED = {
 
 const CurriculumSessionPage: React.FC = () => {
   const navigate = useNavigate();
-  const { slug = "", number = "1", section = "introduction" } = useParams();
+  const { slug = "", number = "1", section = "introduction", groupId } = useParams();
   const { i18n } = useTranslation();
   const lang: Lang = (i18n.resolvedLanguage || i18n.language).startsWith("es") ? "es" : "en";
   const pick = (v?: Localized): string => (v ? (lang === "es" ? v.es || v.en : v.en || v.es) : "");
 
   const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [groupName, setGroupName] = useState("");
+
+  /**
+   * The same page, read either on its own or as a group's curriculum.
+   *
+   * Every link inside the page is built from this, so entering from a group
+   * keeps that context through the tabs, the prev/next steps and the jump to
+   * the following session. Without it the group is lost on the first click and
+   * the reader is quietly back on the standalone copy.
+   */
+  const base = groupId ? `/groups/${groupId}/c/${slug}` : `/mission/c/${slug}`;
+
+  useEffect(() => {
+    if (!groupId) return;
+    let live = true;
+    api
+      .get(`/api/groups/${groupId}`)
+      .then(({ data }) => {
+        if (!live) return;
+        const g = data?.message;
+        setGroupName(g?.name?.[lang] || g?.name?.en || g?.name?.es || "");
+      })
+      .catch(() => undefined);
+    return () => {
+      live = false;
+    };
+  }, [groupId, lang]);
 
   useEffect(() => {
     let live = true;
@@ -664,6 +692,29 @@ const CurriculumSessionPage: React.FC = () => {
           "radial-gradient(circle at 12% 55%,rgba(136,94,193,.08),transparent 32%),radial-gradient(circle at 88% 70%,rgba(136,94,193,.07),transparent 30%)",
       }}
     >
+      {/* Says whose curriculum this is when it was opened from a group, so the
+          reader is never unsure which group they are recording against. */}
+      {groupId && (
+        <Box
+          onClick={() => navigate(`/groups/${groupId}`)}
+          sx={{
+            display: "flex", alignItems: "center", justifyContent: "center", gap: 1,
+            py: 1.1, px: 2, cursor: "pointer",
+            bgcolor: PURPLE, color: "white", fontSize: 13.5, fontWeight: 700,
+            "&:hover": { bgcolor: "#5a3aa8" },
+          }}
+        >
+          <GroupsRoundedIcon sx={{ fontSize: 19 }} />
+          <Box component="span">
+            {lang === "es" ? "Grupo" : "Group"}
+            {groupName ? `: ${groupName}` : ""}
+          </Box>
+          <Box component="span" sx={{ opacity: 0.75, fontWeight: 500 }}>
+            · {lang === "es" ? "volver al grupo" : "back to group"}
+          </Box>
+        </Box>
+      )}
+
       <Box
         component="header"
         sx={{
@@ -714,7 +765,7 @@ const CurriculumSessionPage: React.FC = () => {
                 component="button"
                 type="button"
                 aria-current={selected ? "page" : undefined}
-                onClick={() => navigate(`/mission/c/${slug}/session/${session.number}/${id}`)}
+                onClick={() => navigate(`${base}/session/${session.number}/${id}`)}
                 sx={{
                   appearance: "none", border: 0,
                   borderBottom: selected ? `4px solid ${accent}` : "4px solid transparent",
@@ -737,7 +788,7 @@ const CurriculumSessionPage: React.FC = () => {
             <Box
               component="button"
               type="button"
-              onClick={() => navigate(`/mission/c/${slug}/session/${session.number}/${TABS[step - 2].id}`)}
+              onClick={() => navigate(`${base}/session/${session.number}/${TABS[step - 2].id}`)}
               sx={{
                 position: { md: "absolute" }, left: { md: 16 }, mr: { xs: 2, md: 0 },
                 appearance: "none", border: 0, cursor: "pointer", bgcolor: "transparent",
@@ -761,7 +812,7 @@ const CurriculumSessionPage: React.FC = () => {
             <Box
               component="button"
               type="button"
-              onClick={() => navigate(`/mission/c/${slug}/session/${session.number}/${TABS[step].id}`)}
+              onClick={() => navigate(`${base}/session/${session.number}/${TABS[step].id}`)}
               sx={{
                 position: { md: "absolute" }, right: { md: 16 }, ml: { xs: 2, md: 0 },
                 appearance: "none", border: 0, cursor: "pointer",
@@ -859,7 +910,7 @@ const CurriculumSessionPage: React.FC = () => {
         <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 1.5 }}>
           {nextSession && (
             <Button
-              onClick={() => navigate(`/mission/c/${slug}/session/${nextSession.number}`)}
+              onClick={() => navigate(`${base}/session/${nextSession.number}`)}
               variant="contained"
               endIcon={<ArrowForwardRoundedIcon />}
               sx={{
@@ -871,8 +922,10 @@ const CurriculumSessionPage: React.FC = () => {
               {lang === "es" ? `CONTINUAR A SESIÓN ${nextSession.number}` : `CONTINUE TO SESSION ${nextSession.number}`}
             </Button>
           )}
+          {/* Read from a group, the way out is back to that group — the
+              curriculum index is not where the reader came from. */}
           <Button
-            onClick={() => navigate("/mission")}
+            onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
             variant="outlined"
             startIcon={<AppsRoundedIcon />}
             sx={{
@@ -880,7 +933,13 @@ const CurriculumSessionPage: React.FC = () => {
               borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500,
             }}
           >
-            {lang === "es" ? "IR AL ÍNDICE DEL CURRÍCULO" : "CURRICULUM INDEX"}
+            {groupId
+              ? lang === "es"
+                ? "VOLVER AL GRUPO"
+                : "BACK TO GROUP"
+              : lang === "es"
+                ? "IR AL ÍNDICE DEL CURRÍCULO"
+                : "CURRICULUM INDEX"}
           </Button>
         </Box>
       </Box>

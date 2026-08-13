@@ -13,16 +13,16 @@ import {
   Typography,
 } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
-import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api";
 import type { GroupSummary } from "../../types/groups";
 import Spinner from "../shared/buttons/Spinner";
 import Delete from "../shared/buttons/Delete";
-import { CanAdd, CanDelete, FeatureUiGate, ReadOnlyBanner } from "../shared/permissions";
+import { CanAdd, CanDelete, CanEdit, FeatureUiGate, ReadOnlyBanner } from "../shared/permissions";
 import MainCard from "../../Berry/ui-component/cards/MainCard";
 import ChangeHistoryDialog from "./components/ChangeHistoryDialog";
 import CreateGroupDialog from "./components/CreateGroupDialog";
@@ -226,15 +226,20 @@ const GroupsPage: React.FC = () => {
 
                   <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: "center" }} />
 
-                  <Tooltip title={t("groups.open", "Open")}>
-                    <IconButton
-                      size="small"
-                      onClick={() => navigate(`/groups/${group._id}`)}
-                      sx={{ color: "primary.main" }}
-                    >
-                      <VisibilityOutlinedIcon fontSize="small" />
-                    </IconButton>
-                  </Tooltip>
+                  {/* Opening a group is how you work in it — record
+                      participants, rename it, read its curriculum — so this
+                      reads as Edit, the same as the Users row. */}
+                  <CanEdit feature="groups">
+                    <Tooltip title={t("common.edit", "Edit")}>
+                      <IconButton
+                        size="small"
+                        onClick={() => navigate(`/groups/${group._id}`)}
+                        sx={{ color: "primary.main" }}
+                      >
+                        <EditIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  </CanEdit>
 
                   <Tooltip title={t("groups.history", "Change history")}>
                     <IconButton

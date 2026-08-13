@@ -222,7 +222,9 @@ function GroupDetailPage() {
                 size="small"
                 endIcon={<OpenInNewRoundedIcon />}
                 onClick={() =>
-                  navigate(`/mission/c/${group.curriculum?.slug}/session/${row.number}`)
+                  // Through the group, not the standalone curriculum, so the
+                  // reader keeps the context and lands back here afterwards.
+                  navigate(`/groups/${id}/c/${group.curriculum?.slug}/session/${row.number}`)
                 }
                 sx={{ textTransform: "none", flexShrink: 0 }}
               >
