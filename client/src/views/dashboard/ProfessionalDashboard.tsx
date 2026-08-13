@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import {
   Box,
   Button,
@@ -13,11 +13,15 @@ import {
 import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../authentication/components/useUser";
+import { useFeatureUiAccess } from "../shared/permissions";
+import { api } from "../../api";
+import type { GroupSummary } from "../../types/groups";
 
 const PURPLE = "#6330be";
 const INK = "#101331";
@@ -75,6 +79,32 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
     subtitle: spanish ? "Este es tu espacio para reflexionar, crecer y generar impacto." : "Good evening! Here’s your space to reflect, grow and make an impact.",
   };
 
+  const canSeeGroups = useFeatureUiAccess("groups");
+  const [groups, setGroups] = useState<GroupSummary[]>([]);
+
+  // The dashboard reads groups rather than owning them: the list page is the
+  // place to manage them, this is a way in and a count worth glancing at.
+  useEffect(() => {
+    if (!canSeeGroups) return;
+    let cancelled = false;
+    api
+      .get("/api/groups")
+      .then((response) => {
+        if (!cancelled) setGroups(response.data?.message ?? []);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [canSeeGroups]);
+
+  const groupName = (group: GroupSummary): string =>
+    group.name?.[spanish ? "es" : "en"] ||
+    group.name?.en ||
+    group.name?.es ||
+    group.curriculumId?.title?.[spanish ? "es" : "en"] ||
+    (spanish ? "Grupo sin nombre" : "Untitled group");
+
   return (
     <Box sx={{ color: INK, fontFamily: "'Inter', 'Arial', sans-serif" }}>
       <Box>
@@ -93,8 +123,104 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
           <Typography sx={{ mt: 2.4, mb: 1.5, fontSize: 17, fontWeight: 800 }}>{spanish ? "Resumen" : "At a Glance"}</Typography>
           <Stack direction={{ xs: "column", md: "row" }} gap={2}>
             <StatCard icon={<CalendarMonthOutlinedIcon />} value={5} label={spanish ? "Próximas sesiones" : "Upcoming Sessions"} link={spanish ? "Ver calendario" : "View calendar"} />
-            <StatCard icon={<PeopleAltOutlinedIcon />} value={0} label={spanish ? "Personas atendidas" : "People Served"} link={spanish ? "Ver impacto" : "View impact"} />
+            {canSeeGroups && (
+              <StatCard
+                icon={<GroupsRoundedIcon />}
+                value={groups.length}
+                label={spanish ? "Mis grupos" : "My Groups"}
+                link={spanish ? "Ver grupos" : "View groups"}
+              />
+            )}
+            {/* Live, unlike the two beside it: this counts participants actually
+                recorded across the professional's groups. */}
+            <StatCard
+              icon={<PeopleAltOutlinedIcon />}
+              value={groups.reduce((sum, group) => sum + (group.totalParticipants ?? 0), 0)}
+              label={spanish ? "Personas atendidas" : "People Served"}
+              link={spanish ? "Ver impacto" : "View impact"}
+            />
           </Stack>
+
+          {canSeeGroups && (
+            <Panel sx={{ p: 2.2, mt: 2 }}>
+              <Stack direction="row" justifyContent="space-between" alignItems="center">
+                <Typography sx={{ fontWeight: 800, fontSize: 14 }}>
+                  {spanish ? "Mis grupos" : "My Groups"}
+                </Typography>
+                <Typography
+                  onClick={() => navigate("/groups")}
+                  sx={{ color: PURPLE, fontSize: 11, cursor: "pointer" }}
+                >
+                  {spanish ? "Ver todos" : "View all"}
+                </Typography>
+              </Stack>
+
+              {groups.length === 0 ? (
+                <Stack spacing={1.5} alignItems="flex-start" sx={{ mt: 1.8 }}>
+                  <Typography sx={{ color: MUTED, fontSize: 12.5 }}>
+                    {spanish
+                      ? "Todavía no lleva ningún grupo. Cree uno para registrar participantes por sesión."
+                      : "You are not running any groups yet. Create one to record participants per session."}
+                  </Typography>
+                  <Button
+                    variant="outlined"
+                    size="small"
+                    onClick={() => navigate("/groups")}
+                    sx={{ color: PURPLE, borderColor: "#d8c7ee", textTransform: "none" }}
+                  >
+                    {spanish ? "Ir a grupos" : "Go to Groups"}
+                  </Button>
+                </Stack>
+              ) : (
+                <Stack spacing={1.25} sx={{ mt: 1.8 }}>
+                  {groups.slice(0, 4).map((group) => (
+                    <Stack
+                      key={group._id}
+                      direction="row"
+                      spacing={1.4}
+                      alignItems="center"
+                      onClick={() => navigate(`/groups/${group._id}`)}
+                      sx={{
+                        cursor: "pointer",
+                        p: 1.2,
+                        borderRadius: "10px",
+                        "&:hover": { bgcolor: "#faf7ff" },
+                      }}
+                    >
+                      <Box
+                        sx={{
+                          width: 34,
+                          height: 34,
+                          flexShrink: 0,
+                          borderRadius: "50%",
+                          bgcolor: "#f1e9fc",
+                          color: PURPLE,
+                          display: "grid",
+                          placeItems: "center",
+                        }}
+                      >
+                        <GroupsRoundedIcon fontSize="small" />
+                      </Box>
+                      <Box sx={{ flex: 1, minWidth: 0 }}>
+                        <Typography sx={{ fontWeight: 700, fontSize: 12.5 }} noWrap>
+                          {groupName(group)}
+                        </Typography>
+                        <Typography sx={{ color: MUTED, fontSize: 11 }} noWrap>
+                          {group.curriculumId?.title?.[spanish ? "es" : "en"] ||
+                            group.curriculumId?.slug ||
+                            "—"}
+                        </Typography>
+                      </Box>
+                      <Typography sx={{ fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                        {group.totalParticipants ?? 0}
+                      </Typography>
+                      <ChevronRightRoundedIcon sx={{ color: MUTED, flexShrink: 0 }} />
+                    </Stack>
+                  ))}
+                </Stack>
+              )}
+            </Panel>
+          )}
 
           <Box sx={{ display: "grid", gridTemplateColumns: "1fr", gap: 2, mt: 2 }}>
             <Panel sx={{ p: 2.2 }}>
