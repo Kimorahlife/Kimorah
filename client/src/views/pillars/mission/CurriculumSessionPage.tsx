@@ -697,9 +697,8 @@ const CurriculumSessionPage: React.FC = () => {
       </Container>
 
       {/* Session-to-session navigation, styled exactly as Session 1's footer.
-          The hardcoded pages show it on the first and last steps only; the
-          middle steps navigate from the step bar. */}
-      {(active === "introduction" || active === "closing") && (
+          Shown on every step: a session must never be a place you can reach
+          and not leave, and every session carries the same furniture. */}
       <Box sx={{ mt: 0.75, py: 2.5, textAlign: "center", bgcolor: "rgba(232,222,247,.8)", borderTop: "1px solid rgba(73,50,139,.08)" }}>
         <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 1.5 }}>
           {nextSession && (
@@ -729,7 +728,6 @@ const CurriculumSessionPage: React.FC = () => {
           </Button>
         </Box>
       </Box>
-      )}
     </Box>
   );
 };
