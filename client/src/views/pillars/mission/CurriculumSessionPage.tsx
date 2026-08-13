@@ -96,6 +96,25 @@ const iconFor = (key: string | undefined, index: number): React.ReactNode => {
   return Icon ? <Icon sx={{ fontSize: 34 }} /> : index + 1;
 };
 
+/**
+ * The Introduction's psychoeducation overview follows the six-icon visual
+ * language established by Session 3. This presentation is intentionally
+ * consistent across sessions, independent of the editor's list-item icons.
+ */
+const PSYCHOEDUCATION_OVERVIEW_ICONS = [
+  PsychologyOutlinedIcon,
+  PsychologyOutlinedIcon,
+  SpaOutlinedIcon,
+  FavoriteBorderRoundedIcon,
+  VolunteerActivismOutlinedIcon,
+  MenuBookOutlinedIcon,
+];
+
+const psychoeducationOverviewIcon = (index: number): React.ReactNode => {
+  const Icon = PSYCHOEDUCATION_OVERVIEW_ICONS[index % PSYCHOEDUCATION_OVERVIEW_ICONS.length];
+  return <Icon sx={{ fontSize: 42 }} />;
+};
+
 const sectionCard = {
   border: "1px solid rgba(73,50,139,.16)",
   borderRadius: { xs: 2.5, md: 3 },
@@ -282,10 +301,13 @@ const CurriculumSessionPage: React.FC = () => {
 
   const active: TabId = (TABS.some((t) => t.id === section) ? section : "introduction") as TabId;
   const session = curriculum?.sessions?.find((s) => String(s.number) === String(number));
-  // Session 1's own purple, not the curriculum's stored accent: every session
-  // from the database is meant to look exactly like that page, and it paints
-  // its chrome with PURPLE regardless of which curriculum is being shown.
-  const accent = PURPLE;
+  // When Love Remains has its own magenta identity; all other curricula retain
+  // the original Session 1 purple treatment.
+  const isWhenLoveRemains = slug === "when-love-remains";
+  const accent = isWhenLoveRemains ? "#aa3f7b" : PURPLE;
+  const headerBackground = isWhenLoveRemains
+    ? "radial-gradient(circle at 50% 44%,#aa3f7b 0%,#68264f 48%,#29142b 100%)"
+    : "radial-gradient(circle at 50% 44%,#292455 0%,#17173d 48%,#10122f 100%)";
 
   if (error || (curriculum && !session)) {
     return (
@@ -401,6 +423,7 @@ const CurriculumSessionPage: React.FC = () => {
       const psychoedSource =
         (psychoed?.groups ?? []).find((g) => g.items.length > 1) ?? psychoed?.groups?.[0];
       const psychoedItems = (psychoedSource?.items ?? []).slice(0, 6);
+      const prosePsychoeducation = slug === "when-love-remains" && session.number >= 2 && session.number <= 7;
       return (
         <>
           {pick(session.presentation?.body) && (
@@ -463,29 +486,41 @@ const CurriculumSessionPage: React.FC = () => {
               title={lang === "es" ? "Psicoeducación" : "Psychoeducation"}
               subtitle={pick(psychoed?.intro) || undefined}
             >
-              {/* The first headed run, as a row of tiles — Session 1's shape. */}
-              <Box
-                sx={{
-                  display: "grid",
-                  gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: `repeat(${Math.max(psychoedItems.length, 1)},1fr)` },
-                  ml: { md: 2.5 },
-                }}
-              >
-                {psychoedItems.map((item, i) => (
-                  <Box
-                    key={i}
-                    sx={{
-                      textAlign: "center", px: 2, py: 1,
-                      borderRight: { md: i < psychoedItems.length - 1 ? "1px solid rgba(73,50,139,.14)" : 0 },
-                    }}
-                  >
-                    <Box sx={{ color: PURPLE, display: "grid", placeItems: "center", "& svg": { fontSize: 42, strokeWidth: 0.75 } }}>
-                      {iconFor(item.icon, i)}
+              {prosePsychoeducation ? (
+                <Box sx={{ ml: { md: 8.25 }, maxWidth: 1050 }}>
+                  {(psychoedSource?.items ?? []).filter((item) => pick(item.title)).map((item, i) => (
+                    <Typography key={i} component="p" sx={{ m: 0, mb: 1.5, fontSize: { xs: 14, md: 15.5 }, lineHeight: 1.75, color: INK }}>
+                      {pick(item.title)}
+                    </Typography>
+                  ))}
+                </Box>
+              ) : (
+                /* The first headed run, as a row of icon tiles — Session 1's shape. */
+                <Box
+                  sx={{
+                    display: "grid",
+                    gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: `repeat(${Math.max(psychoedItems.length, 1)},1fr)` },
+                    ml: { md: 2.5 },
+                    alignItems: "stretch",
+                  }}
+                >
+                  {psychoedItems.map((item, i) => (
+                    <Box
+                      key={i}
+                      sx={{
+                        textAlign: "center", px: 2, py: 1.5, minHeight: 165,
+                        display: "flex", flexDirection: "column", alignItems: "center",
+                        borderRight: { md: i < psychoedItems.length - 1 ? "1px solid rgba(73,50,139,.14)" : 0 },
+                      }}
+                    >
+                      <Box sx={{ minHeight: 58, mb: 1.25, color: PURPLE, display: "grid", placeItems: "center", "& svg": { fontSize: 42, strokeWidth: 0.75 } }}>
+                        {psychoeducationOverviewIcon(i)}
+                      </Box>
+                      <Typography sx={{ fontSize: 12, lineHeight: 1.4, maxWidth: 210 }}>{pick(item.title)}</Typography>
                     </Box>
-                    <Typography sx={{ fontSize: 12, lineHeight: 1.4 }}>{pick(item.title)}</Typography>
-                  </Box>
-                ))}
-              </Box>
+                  ))}
+                </Box>
+              )}
             </Section>
           )}
         </>
@@ -766,7 +801,7 @@ const CurriculumSessionPage: React.FC = () => {
         component="header"
         sx={{
           position: "relative", overflow: "hidden", color: "white", textAlign: "center",
-          background: "radial-gradient(circle at 50% 44%,#292455 0%,#17173d 48%,#10122f 100%)",
+          background: headerBackground,
           pb: { xs: 9, md: 10.5 },
           "&::after": {
             content: '""', position: "absolute", left: "-5%", right: "-5%", bottom: -45,
@@ -1069,36 +1104,18 @@ const CurriculumSessionPage: React.FC = () => {
           and not leave, and every session carries the same furniture. */}
       <Box sx={{ mt: 0.75, py: 2.5, textAlign: "center", bgcolor: "rgba(232,222,247,.8)", borderTop: "1px solid rgba(73,50,139,.08)" }}>
         <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 1.5 }}>
-          {/* The footer could only ever move forward — previousSession was
-              computed and never rendered, so the last session was a dead end
-              apart from the rail. */}
           {previousSession && (
             <Button
               onClick={() => navigate(`${base}/session/${previousSession.number}`)}
-              variant="outlined"
+              variant="contained"
               startIcon={<ArrowBackRoundedIcon />}
               sx={{
-                minWidth: 300, minHeight: 54, px: 3.5, borderWidth: 1.5, color: INK,
-                borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500,
-              }}
-            >
-              {lang === "es"
-                ? `VOLVER A SESIÓN ${previousSession.number}`
-                : `BACK TO SESSION ${previousSession.number}`}
-            </Button>
-          )}
-          {nextSession && (
-            <Button
-              onClick={() => navigate(`${base}/session/${nextSession.number}`)}
-              variant="contained"
-              endIcon={<ArrowForwardRoundedIcon />}
-              sx={{
-                minWidth: 300, minHeight: 54, px: 3.5, bgcolor: PURPLE, borderRadius: 99,
+                minWidth: 300, minHeight: 54, px: 3.5, bgcolor: accent, borderRadius: 99,
                 fontSize: 16, fontWeight: 500, boxShadow: "0 5px 12px rgba(57,36,118,.28)",
-                "&:hover": { bgcolor: "#6742a7" },
+                "&:hover": { bgcolor: accent, filter: "brightness(.9)" },
               }}
             >
-              {lang === "es" ? `CONTINUAR A SESIÓN ${nextSession.number}` : `CONTINUE TO SESSION ${nextSession.number}`}
+              {lang === "es" ? `VOLVER A SESIÓN ${previousSession.number}` : `BACK TO SESSION ${previousSession.number}`}
             </Button>
           )}
           {/* In a group this leads back to the group. It must not point at
@@ -1110,7 +1127,7 @@ const CurriculumSessionPage: React.FC = () => {
             startIcon={<ArrowBackRoundedIcon />}
             sx={{
               minWidth: 300, minHeight: 54, px: 3.5, borderWidth: 1.5, color: INK,
-              borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500,
+              borderColor: accent, borderRadius: 99, fontSize: 16, fontWeight: 500,
             }}
           >
             {groupId
@@ -1121,6 +1138,20 @@ const CurriculumSessionPage: React.FC = () => {
                 ? "VOLVER A CURRÍCULOS"
                 : "BACK TO CURRICULUMS"}
           </Button>
+          {nextSession && (
+            <Button
+              onClick={() => navigate(`${base}/session/${nextSession.number}`)}
+              variant="contained"
+              endIcon={<ArrowForwardRoundedIcon />}
+              sx={{
+                minWidth: 300, minHeight: 54, px: 3.5, bgcolor: accent, borderRadius: 99,
+                fontSize: 16, fontWeight: 500, boxShadow: "0 5px 12px rgba(57,36,118,.28)",
+                "&:hover": { bgcolor: accent, filter: "brightness(.9)" },
+              }}
+            >
+              {lang === "es" ? `CONTINUAR A SESIÓN ${nextSession.number}` : `CONTINUE TO SESSION ${nextSession.number}`}
+            </Button>
+          )}
         </Box>
       </Box>
     </Box>

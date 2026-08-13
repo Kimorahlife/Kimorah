@@ -11,6 +11,11 @@
     "predev": "node scripts/free-port.cjs",
     "dev": "dotenv -e .env.development.local -- tsx watch src/index.ts",
     "build": "tsc -p tsconfig.backend.json",
+    "content:session-four": "dotenv -e .env.development.local -- tsx src/scripts/upsert-session-four.ts",
+    "content:sessions-five-seven": "dotenv -e .env.development.local -- tsx src/scripts/upsert-sessions-five-seven.ts",
+    "content:session-presentations": "dotenv -e .env.development.local -- tsx src/scripts/backfill-session-presentations.ts",
+    "content:psychoeducation-icons": "dotenv -e .env.development.local -- tsx src/scripts/backfill-psychoeducation-icons.ts",
+    "content:when-love-remains": "dotenv -e .env.development.local -- tsx src/scripts/import-when-love-remains-sessions.ts",
     "postbuild": "node scripts/copy-config.cjs",
     "start": "node dist/index.js"
   },
