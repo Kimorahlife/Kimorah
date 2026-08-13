@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Box, Button, Container, Typography } from "@mui/material";
+import { Box, Button, Container, TextField, Typography } from "@mui/material";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import CheckCircleOutlineRoundedIcon from "@mui/icons-material/CheckCircleOutlineRounded";
@@ -19,6 +19,7 @@ import ShieldOutlinedIcon from "@mui/icons-material/ShieldOutlined";
 import StarBorderRoundedIcon from "@mui/icons-material/StarBorderRounded";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import CurriculumHeader from "../../shared/CurriculumHeader";
+import type { GroupDetail } from "../../../types/groups";
 import VolunteerActivismOutlinedIcon from "@mui/icons-material/VolunteerActivismOutlined";
 import Diversity3OutlinedIcon from "@mui/icons-material/Diversity3Outlined";
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined";
@@ -46,6 +47,10 @@ const TITLE_FONT = '"Playfair Display", Georgia, "Times New Roman", serif';
 const INK = "#211866";
 const PURPLE = "#7650b3";
 const PAPER = "rgba(255,255,255,.72)";
+/** What the curriculum model stores when no colour has been chosen. */
+const DEFAULT_ACCENT = "#7950c3";
+const WHEN_LOVE_REMAINS_SLUG = "when-love-remains";
+const WHEN_LOVE_REMAINS_MAGENTA = "#aa3f7b";
 
 type Lang = "en" | "es";
 interface Localized { en: string; es: string }
@@ -122,13 +127,30 @@ const sectionCard = {
   boxShadow: "0 12px 30px rgba(67,45,126,.025)",
 };
 
-/** Session 1's panel: a gradient disc, a serif heading, then the content. */
-const Section: React.FC<{ icon: React.ReactNode; title: string; subtitle?: string; children: React.ReactNode }> = ({
-  icon, title, subtitle, children,
-}) => (
+/**
+ * Session 1's panel: a disc, a serif heading, then the content.
+ *
+ * The disc takes the curriculum's accent. `bgcolor` is set first as a flat
+ * fallback and the gradient layered over it, so a browser without `color-mix`
+ * still gets a filled disc in the right colour rather than an empty ring.
+ */
+const Section: React.FC<{
+  icon: React.ReactNode;
+  title: string;
+  subtitle?: string;
+  accent?: string;
+  children: React.ReactNode;
+}> = ({ icon, title, subtitle, accent = PURPLE, children }) => (
   <Box component="section" sx={{ ...sectionCard, scrollMarginTop: 24, p: { xs: 2.25, md: 3 }, mb: 1.75 }}>
     <Box sx={{ display: "flex", alignItems: "center", gap: 2, mb: subtitle ? 0.25 : 2 }}>
-      <Box sx={{ width: 50, height: 50, borderRadius: "50%", background: "linear-gradient(145deg,#7f5bc1,#4c2b9c)", color: "white", display: "grid", placeItems: "center", flexShrink: 0 }}>
+      <Box
+        sx={{
+          width: 50, height: 50, borderRadius: "50%", color: "white",
+          display: "grid", placeItems: "center", flexShrink: 0,
+          bgcolor: accent,
+          backgroundImage: `linear-gradient(145deg, ${accent}, color-mix(in srgb, ${accent} 62%, #000))`,
+        }}
+      >
         {icon}
       </Box>
       <Typography component="h2" sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK }}>
@@ -136,7 +158,7 @@ const Section: React.FC<{ icon: React.ReactNode; title: string; subtitle?: strin
       </Typography>
     </Box>
     {subtitle && (
-      <Typography sx={{ ml: { xs: 0, sm: 8.25 }, mt: 0.5, mb: 3, fontSize: 18, fontWeight: 700, color: PURPLE }}>
+      <Typography sx={{ ml: { xs: 0, sm: 8.25 }, mt: 0.5, mb: 3, fontSize: 18, fontWeight: 700, color: accent }}>
         {subtitle}
       </Typography>
     )}
@@ -226,7 +248,13 @@ const CurriculumSessionPage: React.FC = () => {
 
   const [curriculum, setCurriculum] = useState<Curriculum | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [groupName, setGroupName] = useState("");
+  // The whole group, not just its name: it carries each session's id and the
+  // participants recorded against it, which is what the participation card
+  // below reads and writes.
+  const [group, setGroup] = useState<GroupDetail | null>(null);
+  const [participants, setParticipants] = useState("");
+  const [savingParticipants, setSavingParticipants] = useState(false);
+  const [participantsSaved, setParticipantsSaved] = useState(false);
 
   /**
    * The same page, read either on its own or as a group's curriculum.
@@ -266,15 +294,62 @@ const CurriculumSessionPage: React.FC = () => {
     api
       .get(`/api/groups/${groupId}`)
       .then(({ data }) => {
-        if (!live) return;
-        const g = data?.message;
-        setGroupName(g?.name?.[lang] || g?.name?.en || g?.name?.es || "");
+        if (live) setGroup(data?.message ?? null);
       })
       .catch(() => undefined);
     return () => {
       live = false;
     };
-  }, [groupId, lang]);
+  }, [groupId]);
+
+  /** This session's row in the group, or null when read as the template. */
+  const participationRow =
+    group?.sessions.find((s) => String(s.number) === String(number)) ?? null;
+
+  // Keep the field in step with whichever session is open.
+  useEffect(() => {
+    setParticipants(participationRow ? String(participationRow.participants) : "");
+    setParticipantsSaved(false);
+  }, [participationRow?.sessionId, participationRow?.participants]);
+
+  /** Whether the field holds something other than what is recorded. */
+  const participantsChanged =
+    participationRow !== null &&
+    participants.trim() !== "" &&
+    Math.max(0, Number(participants) || 0) !== participationRow.participants;
+
+  /**
+   * Saved on blur rather than on every keystroke — typing "12" would otherwise
+   * record a 1 on the way past.
+   */
+  const saveParticipants = async () => {
+    if (!groupId || !participationRow) return;
+    const value = Math.max(0, Number(participants) || 0);
+    if (value === participationRow.participants) return;
+
+    setSavingParticipants(true);
+    try {
+      await api.patch(`/api/groups/${groupId}/sessions/${participationRow.sessionId}`, {
+        participants: value,
+      });
+      setGroup((current) =>
+        current
+          ? {
+              ...current,
+              sessions: current.sessions.map((s) =>
+                s.sessionId === participationRow.sessionId ? { ...s, participants: value } : s,
+              ),
+            }
+          : current,
+      );
+      setParticipants(String(value));
+      setParticipantsSaved(true);
+    } catch {
+      // Leave what was typed so it can be retried rather than silently lost.
+    } finally {
+      setSavingParticipants(false);
+    }
+  };
 
   useEffect(() => {
     let live = true;
@@ -301,13 +376,27 @@ const CurriculumSessionPage: React.FC = () => {
 
   const active: TabId = (TABS.some((t) => t.id === section) ? section : "introduction") as TabId;
   const session = curriculum?.sessions?.find((s) => String(s.number) === String(number));
-  // When Love Remains has its own magenta identity; all other curricula retain
-  // the original Session 1 purple treatment.
-  const isWhenLoveRemains = slug === "when-love-remains";
-  const accent = isWhenLoveRemains ? "#aa3f7b" : PURPLE;
-  const headerBackground = isWhenLoveRemains
-    ? "radial-gradient(circle at 50% 44%,#aa3f7b 0%,#68264f 48%,#29142b 100%)"
-    : "radial-gradient(circle at 50% 44%,#292455 0%,#17173d 48%,#10122f 100%)";
+  /**
+   * The curriculum's own colour themes the page.
+   *
+   * This was pinned to Session 1's purple, so every stored curriculum looked
+   * like that page. The colour an author picks in the builder now paints the
+   * chrome, so two curricula read as two curricula.
+   *
+   * DEFAULT_ACCENT is what the model writes when nobody has chosen a colour,
+   * so it means "unset" rather than "purple on purpose". When Love Remains was
+   * themed by hand before the builder carried a colour; it keeps that until its
+   * accent is stored, and then this last special case can go.
+   */
+  const stored = curriculum?.accent?.trim();
+  const authored = stored && stored !== DEFAULT_ACCENT ? stored : "";
+  const accent = authored || (slug === WHEN_LOVE_REMAINS_SLUG ? WHEN_LOVE_REMAINS_MAGENTA : PURPLE);
+  // The hero keeps its near-black plum unless a curriculum carries its own
+  // colour, in which case it is mixed down from that rather than hand-picked.
+  const headerBackground =
+    accent === PURPLE
+      ? "radial-gradient(circle at 50% 44%,#292455 0%,#17173d 48%,#10122f 100%)"
+      : `radial-gradient(circle at 50% 44%,${accent} 0%,color-mix(in srgb,${accent} 55%,#000) 48%,color-mix(in srgb,${accent} 25%,#000) 100%)`;
 
   if (error || (curriculum && !session)) {
     return (
@@ -336,7 +425,7 @@ const CurriculumSessionPage: React.FC = () => {
     return (
       <>
         {pick(data?.intro) && (
-          <Typography sx={{ mt: 0.5, mb: 3, fontSize: 18, fontWeight: 700, color: PURPLE }}>
+          <Typography sx={{ mt: 0.5, mb: 3, fontSize: 18, fontWeight: 700, color: accent }}>
             {pick(data.intro)}
           </Typography>
         )}
@@ -367,7 +456,7 @@ const CurriculumSessionPage: React.FC = () => {
                   <Box
                     sx={{
                       width: ROW[key].disc, height: ROW[key].disc, flexShrink: 0, borderRadius: "50%",
-                      bgcolor: "#eee7fa", color: accent, display: "grid", placeItems: "center",
+                      bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`, color: accent, display: "grid", placeItems: "center",
                       fontFamily: SERIF, fontSize: ROW[key].discFont,
                     }}
                   >
@@ -375,7 +464,7 @@ const CurriculumSessionPage: React.FC = () => {
                   </Box>
                   <Box sx={{ minWidth: 0 }}>
                     {ROW[key].serifTitle ? (
-                      <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 18, fontWeight: 600, lineHeight: 1.25 }}>
+                      <Typography sx={{ fontFamily: SERIF, color: accent, fontSize: 18, fontWeight: 600, lineHeight: 1.25 }}>
                         {pick(item.title)}
                       </Typography>
                     ) : (
@@ -426,14 +515,94 @@ const CurriculumSessionPage: React.FC = () => {
       const prosePsychoeducation = slug === "when-love-remains" && session.number >= 2 && session.number <= 7;
       return (
         <>
+          {/* Group only — the template has no participants to record. Sits at
+              the head of the introduction because attendance is taken as a
+              session opens, not after it. */}
+          {groupId && participationRow && (
+            <Box
+              component="section"
+              sx={{
+                ...sectionCard,
+                p: { xs: 2.25, md: 2.75 }, mb: 1.75,
+                display: "flex", alignItems: "center", gap: 2, flexWrap: "wrap",
+              }}
+            >
+              {/* A plain outlined mark rather than a filled disc — this is a
+                  quiet input row, not one of the numbered content sections. */}
+              <GroupsOutlinedIcon sx={{ fontSize: 27, color: accent, flexShrink: 0 }} />
+
+              <Box sx={{ flex: 1, minWidth: 200 }}>
+                <Typography sx={{ fontFamily: SERIF, fontSize: 16.5, fontWeight: 700, color: INK }}>
+                  {lang === "es"
+                    ? `Participación · Sesión ${session.number}`
+                    : `Session ${session.number} participation`}
+                </Typography>
+                <Typography sx={{ fontSize: 12.5, color: "#5b5680", mt: 0.25 }}>
+                  {lang === "es"
+                    ? "Indique cuántas personas del grupo participaron en esta sesión."
+                    : "Enter the number of group members participating in this session."}
+                </Typography>
+              </Box>
+
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, flexShrink: 0 }}>
+                <TextField
+                  type="number"
+                  size="small"
+                  value={participants}
+                  disabled={savingParticipants}
+                  onChange={(event) => setParticipants(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter") saveParticipants();
+                  }}
+                  inputProps={{ min: 0, style: { textAlign: "center", fontWeight: 700, fontSize: 18 } }}
+                  sx={{
+                    width: 116, bgcolor: "#fff",
+                    "& .MuiOutlinedInput-root": {
+                      height: 52, borderRadius: 2.5,
+                      "& fieldset": { borderColor: accent, borderWidth: 1.5 },
+                      "&:hover fieldset": { borderColor: accent },
+                    },
+                  }}
+                />
+                <Button
+                  variant="contained"
+                  onClick={saveParticipants}
+                  // Nothing to save until the number actually differs, which
+                  // also makes the button the answer to "did that record?".
+                  disabled={savingParticipants || !participantsChanged}
+                  sx={{
+                    bgcolor: accent, borderRadius: 2.5, height: 52, px: 3,
+                    textTransform: "none", fontWeight: 700, whiteSpace: "nowrap",
+                    // Brightness rather than a second fixed colour, so the
+                    // hover follows whatever accent the author chose.
+                    boxShadow: "none",
+                    "&:hover": { bgcolor: accent, filter: "brightness(1.1)", boxShadow: "none" },
+                  }}
+                >
+                  {savingParticipants
+                    ? lang === "es"
+                      ? "Guardando…"
+                      : "Saving…"
+                    : participantsSaved
+                      ? lang === "es"
+                        ? "Guardado ✓"
+                        : "Saved ✓"
+                      : lang === "es"
+                        ? "Guardar"
+                        : "Save"}
+                </Button>
+              </Box>
+            </Box>
+          )}
+
           {pick(session.presentation?.body) && (
-            <Section icon={<GroupsOutlinedIcon />} title={lang === "es" ? "Presentación de los participantes" : "Participant introductions"}>
+            <Section icon={<GroupsOutlinedIcon />} title={lang === "es" ? "Presentación de los participantes" : "Participant introductions"} accent={accent}>
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.15fr .85fr" }, gap: { xs: 2.5, md: 4 }, ml: { md: 8.25 } }}>
                 <Box>
                   <Typography sx={{ lineHeight: 1.65, fontSize: 14 }}>{pick(session.presentation.body)}</Typography>
                   {pick(session.presentation.reminder) && (
-                    <Box sx={{ mt: 3, p: 1.7, bgcolor: "#eee9f8", border: "1px solid rgba(118,80,179,.14)", borderRadius: 2, display: "flex", gap: 1.4, alignItems: "center" }}>
-                      <ShieldOutlinedIcon sx={{ color: PURPLE }} />
+                    <Box sx={{ mt: 3, p: 1.7, bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`, border: "1px solid rgba(118,80,179,.14)", borderRadius: 2, display: "flex", gap: 1.4, alignItems: "center" }}>
+                      <ShieldOutlinedIcon sx={{ color: accent }} />
                       <Typography sx={{ fontSize: 13.5 }}>
                         <Box component="strong">{lang === "es" ? "Recordatorio: " : "Reminder: "}</Box>
                         {pick(session.presentation.reminder)}
@@ -442,13 +611,13 @@ const CurriculumSessionPage: React.FC = () => {
                   )}
                 </Box>
                 {(session.presentation.prompts ?? []).filter((q) => pick(q)).length > 0 && (
-                  <Box sx={{ bgcolor: "#f0ebf7", borderRadius: 2.5, p: 2.25, mt: { md: -8.25 }, alignSelf: "start" }}>
+                  <Box sx={{ bgcolor: `color-mix(in srgb, ${accent} 10%, #fff)`, borderRadius: 2.5, p: 2.25, mt: { md: -8.25 }, alignSelf: "start" }}>
                     <Typography sx={{ fontFamily: SERIF, fontSize: 20, mb: 1.75 }}>
                       {lang === "es" ? "Preguntas sugeridas para el grupo" : "Suggested group questions"}
                     </Typography>
                     {session.presentation.prompts.filter((q) => pick(q)).map((q, i) => (
                       <Box key={i} sx={{ display: "flex", gap: 1.2, bgcolor: "white", borderRadius: 2, p: 1.6, mb: 1.2 }}>
-                        <Typography sx={{ color: PURPLE, fontFamily: TITLE_FONT, fontSize: 22, lineHeight: 1 }}>“</Typography>
+                        <Typography sx={{ color: accent, fontFamily: TITLE_FONT, fontSize: 22, lineHeight: 1 }}>“</Typography>
                         <Typography sx={{ fontSize: 13.5, lineHeight: 1.5 }}>{pick(q)}</Typography>
                       </Box>
                     ))}
@@ -459,7 +628,7 @@ const CurriculumSessionPage: React.FC = () => {
           )}
 
           {objectives.length > 0 && (
-            <Section icon={<TrackChangesOutlinedIcon />} title={lang === "es" ? "Objetivos de la sesión" : "Session objectives"}>
+            <Section icon={<TrackChangesOutlinedIcon />} title={lang === "es" ? "Objetivos de la sesión" : "Session objectives"} accent={accent}>
               <Box
                 sx={{
                   display: "grid",
@@ -472,7 +641,7 @@ const CurriculumSessionPage: React.FC = () => {
               >
                 {objectives.map((o, i) => (
                   <Box key={i} sx={{ display: "flex", gap: 1.5, alignItems: "flex-start" }}>
-                    <CheckCircleOutlineRoundedIcon sx={{ color: PURPLE, fontSize: 18, mt: 0.2, flexShrink: 0 }} />
+                    <CheckCircleOutlineRoundedIcon sx={{ color: accent, fontSize: 18, mt: 0.2, flexShrink: 0 }} />
                     <Typography sx={{ fontSize: 13.5 }}>{pick(o.title)}</Typography>
                   </Box>
                 ))}
@@ -485,6 +654,7 @@ const CurriculumSessionPage: React.FC = () => {
               icon={<MenuBookOutlinedIcon />}
               title={lang === "es" ? "Psicoeducación" : "Psychoeducation"}
               subtitle={pick(psychoed?.intro) || undefined}
+              accent={accent}
             >
               {prosePsychoeducation ? (
                 <Box sx={{ ml: { md: 8.25 }, maxWidth: 1050 }}>
@@ -513,7 +683,7 @@ const CurriculumSessionPage: React.FC = () => {
                         borderRight: { md: i < psychoedItems.length - 1 ? "1px solid rgba(73,50,139,.14)" : 0 },
                       }}
                     >
-                      <Box sx={{ minHeight: 58, mb: 1.25, color: PURPLE, display: "grid", placeItems: "center", "& svg": { fontSize: 42, strokeWidth: 0.75 } }}>
+                      <Box sx={{ minHeight: 58, mb: 1.25, color: accent, display: "grid", placeItems: "center", "& svg": { fontSize: 42, strokeWidth: 0.75 } }}>
                         {psychoeducationOverviewIcon(i)}
                       </Box>
                       <Typography sx={{ fontSize: 12, lineHeight: 1.4, maxWidth: 210 }}>{pick(item.title)}</Typography>
@@ -541,7 +711,7 @@ const CurriculumSessionPage: React.FC = () => {
           {pick(session.closing) && (
             <Box sx={{ ...card, p: { xs: 2.5, md: 4 } }}>
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 42 }} />
+                <FavoriteBorderRoundedIcon sx={{ color: accent, fontSize: 42 }} />
                 <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK }}>
                   {lang === "es" ? "Cierre psicoeducativo" : "Psychoeducational closing"}
                 </Typography>
@@ -557,8 +727,8 @@ const CurriculumSessionPage: React.FC = () => {
               </Typography>
               <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: 2 }}>
                 {feedback.map((f, i) => (
-                  <Box key={i} sx={{ minHeight: 115, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f1ebf8", borderRadius: 3, p: 2.5 }}>
-                    <FormatQuoteRoundedIcon sx={{ color: PURPLE }} />
+                  <Box key={i} sx={{ minHeight: 115, display: "flex", alignItems: "center", gap: 1.5, bgcolor: `color-mix(in srgb, ${accent} 10%, #fff)`, borderRadius: 3, p: 2.5 }}>
+                    <FormatQuoteRoundedIcon sx={{ color: accent }} />
                     <Typography sx={{ fontFamily: SERIF, fontSize: { xs: 19, md: 22 }, lineHeight: 1.35 }}>{pick(f)}</Typography>
                   </Box>
                 ))}
@@ -571,7 +741,7 @@ const CurriculumSessionPage: React.FC = () => {
               {pick(session.therapeuticApproach) && (
                 <Box sx={{ ...card, p: 3 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
-                    <SpaOutlinedIcon sx={{ color: PURPLE, fontSize: 36 }} />
+                    <SpaOutlinedIcon sx={{ color: accent, fontSize: 36 }} />
                     <Typography sx={{ fontFamily: SERIF, fontSize: 26 }}>
                       {lang === "es" ? "Enfoque terapéutico" : "Therapeutic approach"}
                     </Typography>
@@ -582,7 +752,7 @@ const CurriculumSessionPage: React.FC = () => {
               {pick(session.clinicalReference) && (
                 <Box sx={{ ...card, p: 3 }}>
                   <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
-                    <MenuBookOutlinedIcon sx={{ color: PURPLE, fontSize: 36 }} />
+                    <MenuBookOutlinedIcon sx={{ color: accent, fontSize: 36 }} />
                     <Typography sx={{ fontFamily: SERIF, fontSize: 26 }}>
                       {lang === "es" ? "Referencia clínica" : "Clinical reference"}
                     </Typography>
@@ -604,24 +774,24 @@ const CurriculumSessionPage: React.FC = () => {
       const data = session.sections?.psychoeducation;
       const [first, ...rest] = data?.groups ?? [];
       return (
-        <Section icon={<TabIcon />} title={label} subtitle={pick(data?.intro) || undefined}>
+        <Section icon={<TabIcon />} title={label} subtitle={pick(data?.intro) || undefined} accent={accent}>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1.1fr .9fr" }, gap: 2.5, alignItems: "start" }}>
             {first && (
               <Box sx={{ border: "1px solid rgba(69,45,143,.14)", borderRadius: 3, p: 2.5 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}>
-                  <Box sx={{ width: 42, height: 42, borderRadius: "50%", bgcolor: PURPLE, color: "white", display: "grid", placeItems: "center" }}>
+                  <Box sx={{ width: 42, height: 42, borderRadius: "50%", bgcolor: accent, color: "white", display: "grid", placeItems: "center" }}>
                     <LightbulbOutlinedIcon />
                   </Box>
-                  <Typography sx={{ fontFamily: SERIF, fontSize: 25, color: PURPLE }}>{pick(first.heading)}</Typography>
+                  <Typography sx={{ fontFamily: SERIF, fontSize: 25, color: accent }}>{pick(first.heading)}</Typography>
                 </Box>
                 <Box sx={{ display: "grid", gap: 1.2 }}>
                   {first.items.map((item, i) => (
                     <Box key={i} sx={{ display: "flex", gap: 1.5, p: 1.7, bgcolor: "rgba(255,255,255,.86)", border: "1px solid rgba(69,45,143,.11)", borderRadius: 2.5 }}>
-                      <Box sx={{ width: 46, height: 46, flexShrink: 0, borderRadius: "50%", bgcolor: "#eee7fa", color: PURPLE, display: "grid", placeItems: "center", "& svg": { fontSize: 24 } }}>
+                      <Box sx={{ width: 46, height: 46, flexShrink: 0, borderRadius: "50%", bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`, color: accent, display: "grid", placeItems: "center", "& svg": { fontSize: 24 } }}>
                         {iconFor(item.icon, i)}
                       </Box>
                       <Box>
-                        <Typography sx={{ color: PURPLE, fontSize: 15.5, fontWeight: 800, lineHeight: 1.3 }}>{pick(item.title)}</Typography>
+                        <Typography sx={{ color: accent, fontSize: 15.5, fontWeight: 800, lineHeight: 1.3 }}>{pick(item.title)}</Typography>
                         {pick(item.body) && <Typography sx={{ fontSize: 13.5, lineHeight: 1.5, mt: 0.4 }}>{pick(item.body)}</Typography>}
                       </Box>
                     </Box>
@@ -630,15 +800,15 @@ const CurriculumSessionPage: React.FC = () => {
               </Box>
             )}
             {rest.map((group, gi) => (
-              <Box key={gi} sx={{ bgcolor: "#f4effb", border: "1px solid rgba(69,45,143,.12)", borderRadius: 3, p: 2.5 }}>
+              <Box key={gi} sx={{ bgcolor: `color-mix(in srgb, ${accent} 8%, #fff)`, border: "1px solid rgba(69,45,143,.12)", borderRadius: 3, p: 2.5 }}>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}>
-                  <Diversity3OutlinedIcon sx={{ color: PURPLE, fontSize: 34 }} />
-                  <Typography sx={{ fontFamily: SERIF, fontSize: 23, color: PURPLE }}>{pick(group.heading)}</Typography>
+                  <Diversity3OutlinedIcon sx={{ color: accent, fontSize: 34 }} />
+                  <Typography sx={{ fontFamily: SERIF, fontSize: 23, color: accent }}>{pick(group.heading)}</Typography>
                 </Box>
                 <Box sx={{ display: "grid", gap: 1.2 }}>
                   {group.items.map((item, i) => (
                     <Box key={i} sx={{ minHeight: 68, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "rgba(255,255,255,.9)", borderRadius: 2.5, p: 1.5 }}>
-                      <Box sx={{ color: PURPLE, display: "flex", "& svg": { fontSize: 24 } }}>{iconFor(item.icon, i)}</Box>
+                      <Box sx={{ color: accent, display: "flex", "& svg": { fontSize: 24 } }}>{iconFor(item.icon, i)}</Box>
                       <Typography sx={{ fontSize: 14, fontWeight: 700 }}>{pick(item.title)}</Typography>
                     </Box>
                   ))}
@@ -656,7 +826,7 @@ const CurriculumSessionPage: React.FC = () => {
       const data = session.sections?.processing;
       const questions = (data?.groups ?? []).flatMap((g) => g.items);
       return (
-        <Section icon={<TabIcon />} title={label} subtitle={pick(data?.intro) || undefined}>
+        <Section icon={<TabIcon />} title={label} subtitle={pick(data?.intro) || undefined} accent={accent}>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: 1.5 }}>
             {questions.map((q, i) => (
               <Box
@@ -668,10 +838,10 @@ const CurriculumSessionPage: React.FC = () => {
                   display: "flex",
                   alignItems: "center",
                   gap: 1,
-                  bgcolor: i % 2 ? "#faf0f8" : "#f4effb",
+                  bgcolor: i % 2 ? `color-mix(in srgb, ${accent} 7%, #fff)` : `color-mix(in srgb, ${accent} 8%, #fff)`,
                 }}
               >
-                <FormatQuoteRoundedIcon sx={{ color: PURPLE }} />
+                <FormatQuoteRoundedIcon sx={{ color: accent }} />
                 <Typography sx={{ fontSize: 17 }}>{pick(q.title)}</Typography>
               </Box>
             ))}
@@ -680,28 +850,28 @@ const CurriculumSessionPage: React.FC = () => {
               sx={{
                 gridColumn: "1 / -1", width: "100%", p: 2.5,
                 border: "1px solid rgba(101,64,178,.18)", borderRadius: 3,
-                bgcolor: "#f0e9fa", boxShadow: "0 8px 22px rgba(67,45,126,.06)",
+                bgcolor: `color-mix(in srgb, ${accent} 10%, #fff)`, boxShadow: "0 8px 22px rgba(67,45,126,.06)",
                 "& .MuiTypography-root": { fontWeight: 700 },
               }}
             >
               <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
-                <Box sx={{ width: 52, height: 52, flexShrink: 0, borderRadius: "50%", bgcolor: "#eee7fa", color: PURPLE, display: "grid", placeItems: "center" }}>
+                <Box sx={{ width: 52, height: 52, flexShrink: 0, borderRadius: "50%", bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`, color: accent, display: "grid", placeItems: "center" }}>
                   <LightbulbOutlinedIcon sx={{ fontSize: 31 }} />
                 </Box>
                 <Box>
-                  <Typography sx={{ color: PURPLE, fontSize: 12, fontWeight: 800, letterSpacing: 0.6 }}>{FIXED.cohesion.quickTip[lang]}</Typography>
-                  <Typography sx={{ color: PURPLE, fontSize: 20, fontWeight: 800 }}>{FIXED.cohesion.title[lang]}</Typography>
+                  <Typography sx={{ color: accent, fontSize: 12, fontWeight: 800, letterSpacing: 0.6 }}>{FIXED.cohesion.quickTip[lang]}</Typography>
+                  <Typography sx={{ color: accent, fontSize: 20, fontWeight: 800 }}>{FIXED.cohesion.title[lang]}</Typography>
                 </Box>
               </Box>
               <Typography sx={{ mt: 1.5, fontSize: 13, lineHeight: 1.55 }}>{FIXED.cohesion.source[lang]}</Typography>
               <Box sx={{ display: "flex", gap: 1.25, mt: 2, pt: 2, borderTop: "1px solid rgba(101,64,178,.16)" }}>
-                <GroupsOutlinedIcon sx={{ color: PURPLE, flexShrink: 0 }} />
+                <GroupsOutlinedIcon sx={{ color: accent, flexShrink: 0 }} />
                 <Typography sx={{ fontSize: 13, lineHeight: 1.55 }}>{FIXED.cohesion.body[lang]}</Typography>
               </Box>
               <Box sx={{ display: "flex", gap: 1.25, mt: 2, p: 1.75, bgcolor: "rgba(238,231,250,.72)", borderRadius: 2 }}>
-                <SpaOutlinedIcon sx={{ color: PURPLE, flexShrink: 0 }} />
+                <SpaOutlinedIcon sx={{ color: accent, flexShrink: 0 }} />
                 <Typography sx={{ fontSize: 13, lineHeight: 1.55 }}>
-                  <Box component="strong" sx={{ color: PURPLE }}>{FIXED.cohesion.reminderLabel[lang]}</Box>
+                  <Box component="strong" sx={{ color: accent }}>{FIXED.cohesion.reminderLabel[lang]}</Box>
                   {FIXED.cohesion.reminder[lang]}
                 </Typography>
               </Box>
@@ -713,7 +883,7 @@ const CurriculumSessionPage: React.FC = () => {
 
     return (
       <>
-        <Section icon={<TabIcon />} title={label}>
+        <Section icon={<TabIcon />} title={label} accent={accent}>
           {renderSection(active)}
         </Section>
         {/* Page furniture: identical on every curriculum, so it is not stored. */}
@@ -761,7 +931,7 @@ const CurriculumSessionPage: React.FC = () => {
           sx={{
             display: "flex", alignItems: "center", gap: 1.5,
             py: 1, px: { xs: 1.5, md: 2.5 },
-            bgcolor: PURPLE, color: "white",
+            bgcolor: accent, color: "white",
           }}
         >
           {/* A real button rather than a clickable strip: this is the way out
@@ -791,7 +961,10 @@ const CurriculumSessionPage: React.FC = () => {
               component="span"
               sx={{ fontSize: 13.5, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
             >
-              {groupName || (lang === "es" ? "Grupo" : "Group")}
+              {group?.name?.[lang] ||
+                group?.name?.en ||
+                group?.name?.es ||
+                (lang === "es" ? "Grupo" : "Group")}
             </Box>
           </Box>
         </Box>
@@ -949,7 +1122,7 @@ const CurriculumSessionPage: React.FC = () => {
                   px: 1.25, py: 1, mb: 0.5, borderRadius: 2.5,
                   bgcolor: "transparent", color: accent,
                   fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
-                  "&:hover": { bgcolor: "#f6f2fd" },
+                  "&:hover": { bgcolor: `color-mix(in srgb, ${accent} 6%, #fff)` },
                 }}
               >
                 <ArrowBackRoundedIcon sx={{ fontSize: 17 }} />
@@ -989,9 +1162,9 @@ const CurriculumSessionPage: React.FC = () => {
                         appearance: "none", border: 0, cursor: "pointer", textAlign: "left",
                         display: "flex", alignItems: "center", gap: 1.25,
                         p: 1, borderRadius: 2.5,
-                        bgcolor: current ? "#efe8fb" : "transparent",
+                        bgcolor: current ? `color-mix(in srgb, ${accent} 12%, #fff)` : "transparent",
                         transition: "background-color .15s",
-                        "&:hover": { bgcolor: current ? "#efe8fb" : "#f6f2fd" },
+                        "&:hover": { bgcolor: current ? `color-mix(in srgb, ${accent} 12%, #fff)` : `color-mix(in srgb, ${accent} 6%, #fff)` },
                       }}
                     >
                       <Box
@@ -999,7 +1172,7 @@ const CurriculumSessionPage: React.FC = () => {
                           width: 28, height: 28, flexShrink: 0, borderRadius: "50%",
                           display: "grid", placeItems: "center",
                           fontFamily: TITLE_FONT, fontSize: 15, fontWeight: 700,
-                          bgcolor: current ? accent : "#f0ebf8",
+                          bgcolor: current ? accent : `color-mix(in srgb, ${accent} 10%, #fff)`,
                           color: current ? "#fff" : accent,
                         }}
                       >
@@ -1049,12 +1222,12 @@ const CurriculumSessionPage: React.FC = () => {
                 tabs carry their own content and shouldn't repeat it. */}
             {active === "introduction" && (
               <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.25, mt: 4, textAlign: "left" }}>
-                <Typography sx={{ fontFamily: SERIF, fontSize: 19, fontWeight: 600, color: PURPLE, mb: 1.25 }}>
+                <Typography sx={{ fontFamily: SERIF, fontSize: 19, fontWeight: 600, color: accent, mb: 1.25 }}>
                   {lang === "es" ? "¿Cómo los aplicaremos?" : "How will we apply them?"}
                 </Typography>
                 {APPLICATIONS.map(({ icon: Icon, en, es }) => (
                   <Box key={en} sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.75 }}>
-                    <Icon sx={{ color: PURPLE, fontSize: 22, flexShrink: 0 }} />
+                    <Icon sx={{ color: accent, fontSize: 22, flexShrink: 0 }} />
                     <Typography sx={{ fontSize: 11.5, lineHeight: 1.35 }}>{lang === "es" ? es : en}</Typography>
                   </Box>
                 ))}
@@ -1065,17 +1238,17 @@ const CurriculumSessionPage: React.FC = () => {
                  the way the hardcoded objectives page lays them out. */
               <>
                 <Box sx={{ bgcolor: "rgba(255,255,255,.72)", borderRadius: 3, p: 2, mt: 3, textAlign: "left" }}>
-                  <TrackChangesOutlinedIcon sx={{ color: PURPLE, fontSize: 31 }} />
-                  <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600, mt: 0.5 }}>
+                  <TrackChangesOutlinedIcon sx={{ color: accent, fontSize: 31 }} />
+                  <Typography sx={{ fontFamily: SERIF, color: accent, fontSize: 19, fontWeight: 600, mt: 0.5 }}>
                     {FIXED.objectivesWhy.title[lang]}
                   </Typography>
                   <Typography sx={{ mt: 0.7, fontSize: 12, lineHeight: 1.5 }}>
                     {FIXED.objectivesWhy.body[lang]}
                   </Typography>
                 </Box>
-                <Box sx={{ bgcolor: "rgba(244,239,251,.9)", borderLeft: `4px solid ${PURPLE}`, borderRadius: 3, p: 2, mt: 2, textAlign: "left" }}>
-                  <StarBorderRoundedIcon sx={{ color: PURPLE, fontSize: 30 }} />
-                  <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600 }}>
+                <Box sx={{ bgcolor: `color-mix(in srgb, ${accent} 8%, #fff)`, borderLeft: `4px solid ${accent}`, borderRadius: 3, p: 2, mt: 2, textAlign: "left" }}>
+                  <StarBorderRoundedIcon sx={{ color: accent, fontSize: 30 }} />
+                  <Typography sx={{ fontFamily: SERIF, color: accent, fontSize: 19, fontWeight: 600 }}>
                     {FIXED.objectivesReminder.title[lang]}
                   </Typography>
                   <Typography sx={{ mt: 0.7, fontSize: 11.5, lineHeight: 1.45 }}>
