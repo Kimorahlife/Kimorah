@@ -411,37 +411,71 @@ const CurriculumSessionPage: React.FC = () => {
     }
 
     if (active === "closing") {
+      // Four cards, as the hardcoded closing page lays them out — not a
+      // Section panel, so this tab deliberately skips the shared wrapper.
+      const card = {
+        bgcolor: "rgba(255,255,255,.76)",
+        border: "1px solid rgba(69,45,143,.15)",
+        borderRadius: 3,
+      };
+      const feedback = (session.feedback ?? []).filter((f) => pick(f));
       return (
-        <>
-          {heading(lang === "es" ? "Cierre psicoeducativo" : "Psychoeducational closing")}
-          {pick(session.closing) && <Typography sx={{ lineHeight: 1.8, mb: 3 }}>{pick(session.closing)}</Typography>}
-          {(session.feedback ?? []).filter((f) => pick(f)).length > 0 && (
-            <Box sx={{ mb: 3 }}>
-              <Typography sx={{ fontFamily: SERIF, fontSize: { xs: 22, md: 26 }, mb: 1.5 }}>
+        <Box sx={{ display: "grid", gap: 2, minWidth: 0 }}>
+          {pick(session.closing) && (
+            <Box sx={{ ...card, p: { xs: 2.5, md: 4 } }}>
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1.5 }}>
+                <FavoriteBorderRoundedIcon sx={{ color: PURPLE, fontSize: 42 }} />
+                <Typography component="h1" sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK }}>
+                  {lang === "es" ? "Cierre psicoeducativo" : "Psychoeducational closing"}
+                </Typography>
+              </Box>
+              <Typography sx={{ mt: 2.5, fontSize: { xs: 15, md: 17 }, lineHeight: 1.75 }}>{pick(session.closing)}</Typography>
+            </Box>
+          )}
+
+          {feedback.length > 0 && (
+            <Box sx={{ ...card, p: { xs: 2.5, md: 4 } }}>
+              <Typography sx={{ fontFamily: SERIF, fontSize: { xs: 25, md: 29 }, lineHeight: 1.1, color: INK, mb: 2.5 }}>
                 {lang === "es" ? "Feedback y cierre en una nota positiva" : "Feedback and closing on a positive note"}
               </Typography>
-              {session.feedback.filter((f) => pick(f)).map((f, i) => (
-                <Typography key={i} sx={{ mb: 0.75 }}>• {pick(f)}</Typography>
-              ))}
+              <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1fr 1fr" }, gap: 2 }}>
+                {feedback.map((f, i) => (
+                  <Box key={i} sx={{ minHeight: 115, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "#f1ebf8", borderRadius: 3, p: 2.5 }}>
+                    <FormatQuoteRoundedIcon sx={{ color: PURPLE }} />
+                    <Typography sx={{ fontFamily: SERIF, fontSize: { xs: 19, md: 22 }, lineHeight: 1.35 }}>{pick(f)}</Typography>
+                  </Box>
+                ))}
+              </Box>
             </Box>
           )}
-          {pick(session.therapeuticApproach) && (
-            <Box sx={{ mb: 2 }}>
-              <Typography sx={{ color: accent, fontWeight: 800, fontSize: 13 }}>
-                {lang === "es" ? "Enfoque terapéutico" : "Therapeutic approach"}
-              </Typography>
-              <Typography>{pick(session.therapeuticApproach)}</Typography>
+
+          {(pick(session.therapeuticApproach) || pick(session.clinicalReference)) && (
+            <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: ".85fr 1.15fr" }, gap: 2 }}>
+              {pick(session.therapeuticApproach) && (
+                <Box sx={{ ...card, p: 3 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                    <SpaOutlinedIcon sx={{ color: PURPLE, fontSize: 36 }} />
+                    <Typography sx={{ fontFamily: SERIF, fontSize: 26 }}>
+                      {lang === "es" ? "Enfoque terapéutico" : "Therapeutic approach"}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ mt: 1.5, lineHeight: 1.65, fontStyle: "italic" }}>{pick(session.therapeuticApproach)}</Typography>
+                </Box>
+              )}
+              {pick(session.clinicalReference) && (
+                <Box sx={{ ...card, p: 3 }}>
+                  <Box sx={{ display: "flex", alignItems: "center", gap: 1.2 }}>
+                    <MenuBookOutlinedIcon sx={{ color: PURPLE, fontSize: 36 }} />
+                    <Typography sx={{ fontFamily: SERIF, fontSize: 26 }}>
+                      {lang === "es" ? "Referencia clínica" : "Clinical reference"}
+                    </Typography>
+                  </Box>
+                  <Typography sx={{ mt: 1.5, lineHeight: 1.65, fontStyle: "italic" }}>{pick(session.clinicalReference)}</Typography>
+                </Box>
+              )}
             </Box>
           )}
-          {pick(session.clinicalReference) && (
-            <Box>
-              <Typography sx={{ color: accent, fontWeight: 800, fontSize: 13 }}>
-                {lang === "es" ? "Referencia clínica" : "Clinical reference"}
-              </Typography>
-              <Typography sx={{ fontStyle: "italic", lineHeight: 1.65 }}>{pick(session.clinicalReference)}</Typography>
-            </Box>
-          )}
-        </>
+        </Box>
       );
     }
 
