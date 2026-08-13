@@ -138,12 +138,14 @@ function GroupCurriculumPage() {
       </Box>
 
       <Container maxWidth="md" sx={{ py: { xs: 3, md: 4 } }}>
+        {/* The list, not this group — the ribbon above already leads back to
+            the group itself, so the two exits go to different places. */}
         <Button
           startIcon={<ArrowBackRoundedIcon />}
-          onClick={() => navigate(`/groups/${groupId}`)}
+          onClick={() => navigate("/groups")}
           sx={{ textTransform: "none", mb: 2, color: PURPLE }}
         >
-          {spanish ? "Volver al grupo" : "Back to group"}
+          {spanish ? "Volver a grupos" : "Back to groups"}
         </Button>
 
         <Stack spacing={1.5}>
