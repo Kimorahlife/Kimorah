@@ -781,18 +781,23 @@ const CurriculumSessionPage: React.FC = () => {
                 <Typography sx={{ fontWeight: 700, lineHeight: 1.5, mt: 1 }}>{topics}</Typography>
               </>
             )}
-            <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.25, mt: 4, textAlign: "left" }}>
-              <Typography sx={{ fontFamily: SERIF, fontSize: 19, fontWeight: 600, color: PURPLE, mb: 1.25 }}>
-                {lang === "es" ? "¿Cómo los aplicaremos?" : "How will we apply them?"}
-              </Typography>
-              {APPLICATIONS.map(({ icon: Icon, en, es }) => (
-                <Box key={en} sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.75 }}>
-                  <Icon sx={{ color: PURPLE, fontSize: 22, flexShrink: 0 }} />
-                  <Typography sx={{ fontSize: 11.5, lineHeight: 1.35 }}>{lang === "es" ? es : en}</Typography>
-                </Box>
-              ))}
-            </Box>
-            <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: 2 }}>
+            {/* The applications list belongs to the Introduction only — the other
+                tabs carry their own content and shouldn't repeat it. */}
+            {active === "introduction" && (
+              <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.25, mt: 4, textAlign: "left" }}>
+                <Typography sx={{ fontFamily: SERIF, fontSize: 19, fontWeight: 600, color: PURPLE, mb: 1.25 }}>
+                  {lang === "es" ? "¿Cómo los aplicaremos?" : "How will we apply them?"}
+                </Typography>
+                {APPLICATIONS.map(({ icon: Icon, en, es }) => (
+                  <Box key={en} sx={{ display: "flex", alignItems: "center", gap: 1, py: 0.75 }}>
+                    <Icon sx={{ color: PURPLE, fontSize: 22, flexShrink: 0 }} />
+                    <Typography sx={{ fontSize: 11.5, lineHeight: 1.35 }}>{lang === "es" ? es : en}</Typography>
+                  </Box>
+                ))}
+              </Box>
+            )}
+            {/* Without the box above, this one takes over its top margin. */}
+            <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: active === "introduction" ? 2 : 4 }}>
               <FavoriteBorderRoundedIcon sx={{ color: accent, fontSize: 38 }} />
               <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{FIXED.aside[lang]}</Typography>
             </Box>
