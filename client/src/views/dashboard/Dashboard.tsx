@@ -1,4 +1,4 @@
-import { ReactNode, useEffect } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Box,
@@ -12,6 +12,7 @@ import {
 import ManageAccountsRoundedIcon from "@mui/icons-material/ManageAccountsRounded";
 import AdminPanelSettingsRoundedIcon from "@mui/icons-material/AdminPanelSettingsRounded";
 import PublicRoundedIcon from "@mui/icons-material/PublicRounded";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
 import { useTranslation } from "react-i18next";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -21,6 +22,7 @@ import { AppDispatch, getUser, getRole, getCoqui } from "../../store/store";
 import { loadUsers } from "../../store/slices/users";
 import { loadCoquiAggregates } from "../../store/slices/coqui";
 import { useCan, useFeatureUiAccess, useCurrentRole } from "../shared/permissions";
+import { api } from "../../api";
 import AccessRestricted from "../shared/AccessRestricted";
 
 /** A single stat tile with a coloured left accent. */
@@ -86,6 +88,7 @@ export default function Dashboard() {
   const showUsers = useFeatureUiAccess("users");
   const showRoles = useFeatureUiAccess("roles");
   const showResearch = useFeatureUiAccess("research");
+  const showGroups = useFeatureUiAccess("groups");
   const showDashboard = useFeatureUiAccess("dashboard");
   const showProfessionalDashboard = useFeatureUiAccess("professional-dashboard");
   const { isGlobal, permissions } = useCurrentRole();
@@ -116,6 +119,24 @@ export default function Dashboard() {
     return <AccessRestricted />;
   }
 
+  // Groups have no Redux slice — this is the only place the admin dashboard
+  // needs their count, so it reads it directly rather than adding one.
+  const [groupCount, setGroupCount] = useState(0);
+
+  useEffect(() => {
+    if (!showGroups) return;
+    let cancelled = false;
+    api
+      .get("/api/groups")
+      .then((response) => {
+        if (!cancelled) setGroupCount((response.data?.message ?? []).length);
+      })
+      .catch(() => undefined);
+    return () => {
+      cancelled = true;
+    };
+  }, [showGroups]);
+
   const stats = [
     showUsers && {
       icon: <ManageAccountsRoundedIcon fontSize="large" />,
@@ -130,6 +151,13 @@ export default function Dashboard() {
       label: t("dashboard.totalRoles", "Total Roles"),
       color: "#4a86c4",
       onClick: () => navigate("/roles"),
+    },
+    showGroups && {
+      icon: <GroupsRoundedIcon fontSize="large" />,
+      value: groupCount,
+      label: t("dashboard.totalGroups", "Total Groups"),
+      color: "#b06fae",
+      onClick: () => navigate("/groups"),
     },
     {
       icon: <PublicRoundedIcon fontSize="large" />,
@@ -149,6 +177,7 @@ export default function Dashboard() {
   const quickActions = [
     showRoles && { label: t("dashboard.manageRoles", "Manage Roles"), to: "/roles" },
     showUsers && { label: t("dashboard.manageUsers", "Manage Users"), to: "/users" },
+    showGroups && { label: t("dashboard.manageGroups", "Manage Groups"), to: "/groups" },
     showResearch && { label: t("dashboard.coquiQuestions", "Coquí Questions"), to: "/coqui-questions" },
     { label: t("dashboard.reviewCoqui", "Review Coquí Data"), to: "/mission/coqui" },
     { label: t("dashboard.mission", "Mission"), to: "/mission" },

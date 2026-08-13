@@ -1,38 +1,45 @@
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Alert,
   Box,
   Button,
   Chip,
-  CircularProgress,
-  Container,
+  Divider,
   IconButton,
+  Paper,
+  Snackbar,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableRow,
   Tooltip,
   Typography,
 } from "@mui/material";
-import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import AddIcon from "@mui/icons-material/Add";
+import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
+import VisibilityOutlinedIcon from "@mui/icons-material/VisibilityOutlined";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api";
 import type { GroupSummary } from "../../types/groups";
+import Spinner from "../shared/buttons/Spinner";
+import Delete from "../shared/buttons/Delete";
+import { CanAdd, CanDelete, FeatureUiGate, ReadOnlyBanner } from "../shared/permissions";
+import MainCard from "../../Berry/ui-component/cards/MainCard";
 import ChangeHistoryDialog from "./components/ChangeHistoryDialog";
 import CreateGroupDialog from "./components/CreateGroupDialog";
 
 /**
- * The groups table.
+ * Groups — a professional running a curriculum with a set of people.
  *
- * What a professional sees here is their own groups; a global role sees every
- * group in the workspace. That narrowing happens on the server, so this page
- * renders whatever it is given without deciding who may see what.
+ * Laid out like the Users page on purpose: same gate, same card, same row
+ * shape, same action cluster. A management list should not look like a
+ * different product depending on which one you opened.
+ *
+ * Which groups appear is decided on the server — your own if you are a
+ * professional, all of them for a global role — so this renders whatever it is
+ * given rather than filtering here.
  */
-function GroupsPage() {
+const GroupsPage: React.FC = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const spanish = (i18n.resolvedLanguage || i18n.language || "").startsWith("es");
@@ -44,16 +51,30 @@ function GroupsPage() {
   const [creating, setCreating] = useState(false);
   const [historyFor, setHistoryFor] = useState<GroupSummary | null>(null);
 
-  const load = useCallback(() => {
+  const fetchGroups = useCallback(async () => {
     setLoading(true);
-    api
-      .get("/api/groups")
-      .then((response) => setGroups(response.data?.message ?? []))
-      .catch((err) => setError(err?.response?.data?.message || "Could not load your groups."))
-      .finally(() => setLoading(false));
-  }, []);
+    try {
+      const response = await api.get("/api/groups");
+      setGroups(response.data?.message ?? []);
+    } catch (err: any) {
+      setError(err?.response?.data?.message || t("groups.loadFailed", "Could not load groups."));
+    } finally {
+      setLoading(false);
+    }
+  }, [t]);
 
-  useEffect(load, [load]);
+  useEffect(() => {
+    fetchGroups();
+  }, [fetchGroups]);
+
+  const removeGroup = async (group: GroupSummary) => {
+    try {
+      await api.delete(`/api/groups/${group._id}`);
+      setGroups((current) => current.filter((g) => g._id !== group._id));
+    } catch (err: any) {
+      setError(err?.response?.data?.message || t("groups.deleteFailed", "Could not delete the group."));
+    }
+  };
 
   /** A group's own name, falling back to the other language then the curriculum. */
   const nameOf = (group: GroupSummary): string =>
@@ -61,168 +82,184 @@ function GroupsPage() {
     group.name?.en ||
     group.name?.es ||
     group.curriculumId?.title?.[lang] ||
-    (spanish ? "Grupo sin nombre" : "Untitled group");
+    t("groups.untitled", "Untitled group");
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{ mb: 3 }}>
-        <Box>
-          <Typography sx={{ fontSize: 27, fontWeight: 800 }}>
-            {spanish ? "Grupos" : "Groups"}
-          </Typography>
-          <Typography sx={{ color: "text.secondary", fontSize: 14, mt: 0.5 }}>
-            {spanish
-              ? "Cada grupo lleva un currículo con un conjunto de personas."
-              : "Each group runs one curriculum with one set of people."}
-          </Typography>
+    <FeatureUiGate
+      feature="groups"
+      fallback={
+        <Box p={3}>
+          <Alert severity="warning">
+            {t("groups.noAccess", "You don't have permission to view groups.")}
+          </Alert>
         </Box>
-        <Button
-          variant="contained"
-          startIcon={<AddRoundedIcon />}
-          onClick={() => setCreating(true)}
-          sx={{ textTransform: "none", borderRadius: 2 }}
-        >
-          {spanish ? "Nuevo grupo" : "New group"}
-        </Button>
-      </Stack>
-
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }}>
-          {error}
-        </Alert>
-      )}
-
-      {loading ? (
-        <Stack alignItems="center" sx={{ py: 6 }}>
-          <CircularProgress />
+      }
+    >
+      <Box p={3}>
+        <Stack direction="row" alignItems="flex-start" justifyContent="space-between" mb={2}>
+          <Box>
+            <Typography variant="h4" fontWeight="bold">
+              {t("groups.title", "Groups")}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              {t("groups.subtitle", "Each group runs one curriculum with one set of people")}
+            </Typography>
+          </Box>
+          <CanAdd feature="groups">
+            <Button
+              variant="contained"
+              startIcon={<AddIcon />}
+              onClick={() => setCreating(true)}
+              sx={{ textTransform: "none", borderRadius: 2 }}
+            >
+              {t("groups.new", "New group")}
+            </Button>
+          </CanAdd>
         </Stack>
-      ) : groups.length === 0 ? (
-        <Box
-          sx={{
-            p: 5,
-            textAlign: "center",
-            border: "1px dashed rgba(69,45,143,.3)",
-            borderRadius: 3,
+
+        <ReadOnlyBanner feature="groups" />
+
+        {error && (
+          <Snackbar
+            open={Boolean(error)}
+            autoHideDuration={6000}
+            onClose={() => setError("")}
+            anchorOrigin={{ vertical: "top", horizontal: "center" }}
+          >
+            <Alert onClose={() => setError("")} severity="error" sx={{ width: "100%" }}>
+              {error}
+            </Alert>
+          </Snackbar>
+        )}
+
+        <CreateGroupDialog
+          open={creating}
+          onClose={() => setCreating(false)}
+          onCreated={(groupId) => {
+            setCreating(false);
+            if (groupId) navigate(`/groups/${groupId}`);
+            else fetchGroups();
           }}
-        >
-          <Typography sx={{ fontWeight: 700 }}>
-            {spanish ? "Todavía no hay grupos" : "No groups yet"}
-          </Typography>
-          <Typography sx={{ color: "text.secondary", fontSize: 14, mt: 0.5 }}>
-            {spanish
-              ? "Cree uno para empezar a registrar participantes por sesión."
-              : "Create one to start recording participants per session."}
-          </Typography>
-        </Box>
-      ) : (
-        <Box sx={{ border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, overflowX: "auto" }}>
-          <Table size="small">
-            <TableHead>
-              <TableRow>
-                <TableCell sx={{ fontWeight: 800 }}>{spanish ? "Grupo" : "Group"}</TableCell>
-                <TableCell sx={{ fontWeight: 800 }}>
-                  {spanish ? "Currículo" : "Curriculum"}
-                </TableCell>
-                <TableCell sx={{ fontWeight: 800 }}>
-                  {spanish ? "Profesional principal" : "Main professional"}
-                </TableCell>
-                <TableCell sx={{ fontWeight: 800 }} align="right">
-                  {spanish ? "Sesiones" : "Sessions"}
-                </TableCell>
-                <TableCell sx={{ fontWeight: 800 }} align="right">
-                  {spanish ? "Participantes" : "Participants"}
-                </TableCell>
-                <TableCell sx={{ fontWeight: 800 }} align="right">
-                  {spanish ? "Historial" : "History"}
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
+        />
+
+        {historyFor && (
+          <ChangeHistoryDialog
+            open
+            onClose={() => setHistoryFor(null)}
+            title={`${t("groups.history", "Change history")} — ${nameOf(historyFor)}`}
+            url={`/api/groups/${historyFor._id}/history`}
+          />
+        )}
+
+        {loading ? (
+          <Spinner />
+        ) : (
+          <MainCard border boxShadow title={t("groups.title", "Groups")}>
+            <Stack spacing={2}>
+              {groups.length === 0 && (
+                <Typography variant="body2" color="text.secondary">
+                  {t("groups.empty", "No groups yet. Create one to record participants per session.")}
+                </Typography>
+              )}
+
               {groups.map((group) => (
-                <TableRow
+                <Paper
                   key={group._id}
-                  hover
-                  sx={{ cursor: "pointer" }}
-                  onClick={() => navigate(`/groups/${group._id}`)}
+                  elevation={0}
+                  sx={{
+                    border: "1px solid",
+                    borderColor: "divider",
+                    borderRadius: 3,
+                    p: 2,
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                    "&:hover": { boxShadow: 3 },
+                    transition: "box-shadow 0.2s",
+                  }}
                 >
-                  <TableCell>
-                    <Typography sx={{ fontWeight: 700, fontSize: 13.5 }}>
+                  <GroupsRoundedIcon sx={{ color: "primary.main" }} />
+
+                  <Box sx={{ flex: 1, minWidth: 0 }}>
+                    <Typography variant="subtitle2" fontWeight={700} noWrap>
                       {nameOf(group)}
                     </Typography>
-                    {group.coProfessionalIds.length > 0 && (
-                      <Typography sx={{ fontSize: 11.5, color: "text.secondary" }}>
-                        +{group.coProfessionalIds.length}{" "}
-                        {spanish ? "co-profesional(es)" : "co-professional(s)"}
-                      </Typography>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      <Typography sx={{ fontSize: 13 }}>
-                        {group.curriculumId?.title?.[lang] ||
-                          group.curriculumId?.slug ||
-                          "—"}
-                      </Typography>
-                      {group.curriculumId?.archived && (
-                        <Chip
-                          size="small"
-                          variant="outlined"
-                          color="warning"
-                          label={spanish ? "Archivado" : "Archived"}
-                        />
-                      )}
-                    </Stack>
-                  </TableCell>
-                  <TableCell sx={{ fontSize: 13 }}>
-                    {group.mainProfessionalId?.name || group.mainProfessionalId?.email || "—"}
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontSize: 13 }}>
-                    {group.sessionCount}
-                  </TableCell>
-                  <TableCell align="right" sx={{ fontSize: 13, fontWeight: 700 }}>
-                    {group.totalParticipants}
-                  </TableCell>
-                  <TableCell align="right">
-                    <Tooltip title={spanish ? "Ver historial de cambios" : "View change history"}>
-                      <IconButton
-                        size="small"
-                        onClick={(event) => {
-                          // The row navigates; this button must not.
-                          event.stopPropagation();
-                          setHistoryFor(group);
-                        }}
-                      >
-                        <HistoryRoundedIcon fontSize="small" />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
-                </TableRow>
+                    <Typography variant="caption" color="text.secondary" noWrap sx={{ display: "block" }}>
+                      {group.curriculumId?.title?.[lang] || group.curriculumId?.slug || "—"}
+                      {" · "}
+                      {group.mainProfessionalId?.name || group.mainProfessionalId?.email || "—"}
+                    </Typography>
+                  </Box>
+
+                  {group.curriculumId?.archived && (
+                    <Chip
+                      size="small"
+                      variant="outlined"
+                      color="warning"
+                      label={t("groups.archivedCurriculum", "Curriculum archived")}
+                    />
+                  )}
+                  {group.coProfessionalIds.length > 0 && (
+                    <Chip
+                      size="small"
+                      variant="outlined"
+                      label={t("groups.coProfessionals", "+{{count}} co-professional", {
+                        count: group.coProfessionalIds.length,
+                      })}
+                    />
+                  )}
+                  <Chip
+                    size="small"
+                    variant="outlined"
+                    label={t("groups.sessionCount", "{{count}} sessions", {
+                      count: group.sessionCount,
+                    })}
+                  />
+                  <Chip
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                    label={t("groups.participantCount", "{{count}} participants", {
+                      count: group.totalParticipants,
+                    })}
+                  />
+
+                  <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: "center" }} />
+
+                  <Tooltip title={t("groups.open", "Open")}>
+                    <IconButton
+                      size="small"
+                      onClick={() => navigate(`/groups/${group._id}`)}
+                      sx={{ color: "primary.main" }}
+                    >
+                      <VisibilityOutlinedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  <Tooltip title={t("groups.history", "Change history")}>
+                    <IconButton
+                      size="small"
+                      onClick={() => setHistoryFor(group)}
+                      sx={{ color: "primary.main" }}
+                    >
+                      <HistoryRoundedIcon fontSize="small" />
+                    </IconButton>
+                  </Tooltip>
+
+                  <CanDelete feature="groups">
+                    <Delete
+                      title={t("groups.deleteTitle", "Delete group")}
+                      onConfirm={() => removeGroup(group)}
+                    />
+                  </CanDelete>
+                </Paper>
               ))}
-            </TableBody>
-          </Table>
-        </Box>
-      )}
-
-      <CreateGroupDialog
-        open={creating}
-        onClose={() => setCreating(false)}
-        onCreated={(groupId) => {
-          setCreating(false);
-          if (groupId) navigate(`/groups/${groupId}`);
-          else load();
-        }}
-      />
-
-      {historyFor && (
-        <ChangeHistoryDialog
-          open
-          onClose={() => setHistoryFor(null)}
-          title={`${spanish ? "Historial" : "History"} — ${nameOf(historyFor)}`}
-          url={`/api/groups/${historyFor._id}/history`}
-        />
-      )}
-    </Container>
+            </Stack>
+          </MainCard>
+        )}
+      </Box>
+    </FeatureUiGate>
   );
-}
+};
 
 export default GroupsPage;
