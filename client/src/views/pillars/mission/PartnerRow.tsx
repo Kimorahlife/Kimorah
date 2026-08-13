@@ -61,9 +61,12 @@ const PartnerRow: React.FC<{ partner: MissionPartner }> = ({ partner }) => {
     <Button
       variant="contained"
       endIcon={<ChevronRightRoundedIcon />}
-      href={partner.url}
-      target={partner.url ? "_blank" : undefined}
-      rel={partner.url ? "noopener noreferrer" : undefined}
+      // A partner without a URL renders as a plain button. Passing an
+      // undefined href picks MUI's anchor overload, which requires a string —
+      // so the three link props travel together or not at all.
+      {...(partner.url
+        ? { href: partner.url, target: "_blank", rel: "noopener noreferrer" }
+        : {})}
       sx={{
         bgcolor: partner.accent,
         color: "#fff",
