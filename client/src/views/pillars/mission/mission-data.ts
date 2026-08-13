@@ -37,29 +37,38 @@ export interface PriorityResearchItem {
   imageUrl?: string;
 }
 
-export interface PriorityProgramItem {
+export interface PriorityCurriculumCard {
+  number: number;
+  title: string;
+  highlightedTitle?: string;
+  description: string;
+  action: string;
+  accent: string;
+  /** Identifies which curriculum this card is, so "Explore" opens the right one. */
+  slug: string;
+}
+
+/**
+ * The programme wrapped around the curricula — artwork, purpose line, audience
+ * note. A curriculum document carries none of that, so it stays here as copy
+ * while the curricula themselves come from the database.
+ */
+export interface PriorityProgramCopy {
   title: string;
   highlightedTitle: string;
   description: string;
   purpose: string;
-  curricula: Array<{
-    number: number;
-    title: string;
-    highlightedTitle?: string;
-    description: string;
-    action: string;
-    accent: string;
-    /**
-     * Identifies which curriculum this card is, so "Explore" can open the right
-     * one. Absent on the hardcoded pair, which is positional by definition;
-     * carried by anything built from the database, where position means nothing.
-     */
-    slug?: string;
-  }>;
+  /** Label on every curriculum's button — the same on each, so it lives here. */
+  exploreAction: string;
   audience: string;
   audienceDescription: string;
   secondaryAction: string;
   imageUrl: string;
+}
+
+/** The copy above, with the stored curricula filled in — what the card renders. */
+export interface PriorityProgramItem extends PriorityProgramCopy {
+  curricula: PriorityCurriculumCard[];
 }
 
 export interface MissionContent {
@@ -67,7 +76,7 @@ export interface MissionContent {
   tagline: string;
   description: string;
   causes: MissionCause[];
-  priorityProgram: PriorityProgramItem;
+  priorityProgram: PriorityProgramCopy;
   priority: PriorityResearchItem;
   partners: MissionPartner[];
   cta: { heading: string; subtext: string; buttonLabel: string };
@@ -90,25 +99,7 @@ export const missionData: MissionContent = {
     description:
       "Psychoeducational curricula designed to accompany, heal, and revitalize after the earthquake in Venezuela.",
     purpose: "TWO CURRICULA, ONE PURPOSE: ACCOMPANY, HEAL, AND REVITALIZE.",
-    curricula: [
-      {
-        number: 1,
-        title: "When the Earth Changes,",
-        highlightedTitle: "We Change Too",
-        description:
-          "A psychoeducational support and processing curriculum for people directly and indirectly affected by the earthquake in Venezuela.",
-        action: "EXPLORE CURRICULUM",
-        accent: "#7950c3",
-      },
-      {
-        number: 2,
-        title: "When Love Remains",
-        description:
-          "A psychoeducational support and processing curriculum for people grieving the death of a loved one after the earthquake in Venezuela.",
-        action: "EXPLORE CURRICULUM",
-        accent: "#aa3f7b",
-      },
-    ],
+    exploreAction: "EXPLORE CURRICULUM",
     audience: "DESIGNED FOR MENTAL HEALTH PROFESSIONALS",
     audienceDescription:
       "Evidence-informed. Trauma-informed. Integrative and culturally sensitive approaches.",
@@ -154,25 +145,7 @@ export const missionDataEs: MissionContent = {
     description:
       "Currículos psicoeducativos diseñados para acompañar, sanar y revitalizar tras el terremoto de Venezuela.",
     purpose: "DOS CURRÍCULOS, UN MISMO PROPÓSITO: ACOMPAÑAR, SANAR Y REVITALIZAR.",
-    curricula: [
-      {
-        number: 1,
-        title: "Cuando la Tierra cambia,",
-        highlightedTitle: "Nosotros también",
-        description:
-          "Currículo psicoeducativo de apoyo y procesamiento para personas afectadas directa e indirectamente por el terremoto de Venezuela.",
-        action: "EXPLORAR CURRÍCULO",
-        accent: "#7950c3",
-      },
-      {
-        number: 2,
-        title: "Cuando el Amor Permanece",
-        description:
-          "Currículo psicoeducativo de apoyo y procesamiento para personas en duelo por la muerte de un ser querido tras el terremoto de Venezuela.",
-        action: "EXPLORAR CURRÍCULO",
-        accent: "#aa3f7b",
-      },
-    ],
+    exploreAction: "EXPLORAR CURRÍCULO",
     audience: "DISEÑADO PARA PROFESIONALES DE LA SALUD MENTAL",
     audienceDescription:
       "Basado en evidencia. Informado por trauma. Enfoques integrativos y culturalmente sensibles.",

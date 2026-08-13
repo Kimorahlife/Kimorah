@@ -7,7 +7,7 @@ import AccessGateDialog from "../../shared/AccessGateDialog";
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded";
 import GroupsOutlinedIcon from "@mui/icons-material/GroupsOutlined";
 import PlayArrowRoundedIcon from "@mui/icons-material/PlayArrowRounded";
-import { PriorityProgramItem } from "./mission-data";
+import { PriorityCurriculumCard, PriorityProgramItem } from "./mission-data";
 
 const SERIF = '"Playfair Display", Georgia, "Times New Roman", serif';
 
@@ -27,7 +27,7 @@ const PriorityProgramCard: React.FC<{
    * slot, because the card renders whatever it is handed — two entries or five
    * — and position stops meaning anything the moment the list is data.
    */
-  onExplore?: (curriculum: PriorityProgramItem["curricula"][number], index: number) => void;
+  onExplore?: (curriculum: PriorityCurriculumCard) => void;
   onWatchVideo?: () => void;
 }> = ({ item, onExplore, onWatchVideo }) => {
   const canOpenCurriculum = useFeatureFullAccess("curriculums");
@@ -98,7 +98,7 @@ const PriorityProgramCard: React.FC<{
       </Typography>
 
       <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", sm: "1fr 1fr" }, gap: 2 }}>
-        {item.curricula.map((curriculum, index) => (
+        {item.curricula.map((curriculum) => (
           <Box
             key={curriculum.number}
             sx={{
@@ -142,7 +142,7 @@ const PriorityProgramCard: React.FC<{
             <Button
               fullWidth
               variant="contained"
-              onClick={() => openCurriculum(() => onExplore?.(curriculum, index))}
+              onClick={() => openCurriculum(() => onExplore?.(curriculum))}
               endIcon={<ArrowForwardRoundedIcon />}
               sx={{
                 mt: 2,

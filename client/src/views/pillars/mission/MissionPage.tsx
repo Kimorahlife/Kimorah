@@ -4,7 +4,7 @@ import EnergySavingsLeafRoundedIcon from "@mui/icons-material/EnergySavingsLeafR
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import LogoBadge from "../../landing/LogoBadge";
-import { missionData, missionDataEs } from "./mission-data";
+import { missionData, missionDataEs, PriorityCurriculumCard } from "./mission-data";
 import PartnerRow from "./PartnerRow";
 import PriorityResearchCard from "./PriorityResearchCard";
 import PriorityProgramCard from "./PriorityProgramCard";
@@ -34,30 +34,15 @@ const SectionHeading: React.FC<{ title: string; action?: string; onAction?: () =
   </Box>
 );
 
-/** Marks which source a card was built from, while the two are side by side. */
-const CompareLabel: React.FC<{ text: string; tone: string }> = ({ text, tone }) => (
-  <Box
-    sx={{
-      display: "inline-block",
-      mb: 1,
-      px: 1.25,
-      py: 0.4,
-      border: `1px solid ${tone}`,
-      borderRadius: 99,
-      color: tone,
-      fontSize: 11,
-      fontWeight: 800,
-      letterSpacing: 1.1,
-    }}
-  >
-    {text}
-  </Box>
+/** A short line where the programme card would be — loading, failed, or empty. */
+const ProgramNote: React.FC<{ text: string; tone?: string }> = ({ text, tone = INDIGO }) => (
+  <Typography sx={{ color: tone, fontSize: 13 }}>{text}</Typography>
 );
 
 /**
  * Mission pillar page — a full-width, data-driven layout built from modular
- * components (PriorityResearchCard, PartnerRow). Content comes from
- * `missionData` today; swap that for an API call when the backend is ready.
+ * components (PriorityResearchCard, PartnerRow). The page copy comes from
+ * `missionData`; the priority programme's curricula come from the database.
  */
 const MissionPage: React.FC = () => {
   const navigate = useNavigate();
@@ -67,29 +52,8 @@ const MissionPage: React.FC = () => {
 
   const stored = useDatabaseCurricula(d.priorityProgram);
 
-  /**
-   * Show the hardcoded card and the database card side by side, labelled, so
-   * the two can be checked against each other — on the deployed site as well
-   * as locally, while that checking is still going on.
-   *
-   * When the comparison is finished: set this to `import.meta.env.DEV` to hide
-   * it from visitors again, or delete the hardcoded card and `mission-data`'s
-   * `curricula` entries outright and render `stored.program` alone.
-   */
-  const comparing = true;
-
-  const explore = (
-    curriculum: (typeof d.priorityProgram)["curricula"][number],
-    index: number,
-  ) => {
-    if (curriculum.slug) navigate(`/mission/c/${curriculum.slug}/session/1`);
-    else navigate(index === 0 ? "/mission/sessions/1" : "/mission/grief/session/1/introduction");
-  };
-
-  // In production the page shows one card: the stored curricula when any are
-  // published, the hardcoded pair until then. In development both are shown so
-  // they can still be compared.
-  const primary = !comparing && stored.program ? stored.program : d.priorityProgram;
+  const explore = (curriculum: PriorityCurriculumCard) =>
+    navigate(`/mission/c/${curriculum.slug}/session/1`);
 
   return (
     <Box
@@ -153,39 +117,24 @@ const MissionPage: React.FC = () => {
 
           {/* Priority Programs */}
           <SectionHeading title={spanish ? "PROGRAMAS PRIORITARIOS" : "PRIORITY PROGRAMS"} />
-          {comparing && <CompareLabel text="HARDCODED — mission-data.ts" tone="#8a8fb5" />}
-          {/* data-compare lets the comparison check measure the two cards'
-              computed styles against each other instead of guessing selectors. */}
-          <Box data-compare="hardcoded">
-            <PriorityProgramCard item={primary} onExplore={explore} />
-          </Box>
-
-          {comparing && (
-            <Box sx={{ mt: 4 }}>
-              <CompareLabel
-                text={
-                  stored.includesDrafts
-                    ? "FROM THE DATABASE — includes drafts, because you are signed in"
-                    : "FROM THE DATABASE — published only"
-                }
-                tone="#6540b2"
-              />
-              {stored.loading && <Typography sx={{ color: INDIGO, fontSize: 13 }}>Loading stored curricula…</Typography>}
-              {stored.error && <Typography sx={{ color: "#b3261e", fontSize: 13 }}>{stored.error}</Typography>}
-              {!stored.loading && !stored.error && !stored.program && (
-                <Typography sx={{ color: INDIGO, fontSize: 13 }}>
-                  {stored.includesDrafts
-                    ? "No curricula stored yet — create one in the Curriculum Builder."
-                    : "Nothing published yet — turn on Published in the Curriculum Builder to show a curriculum here."}
-                </Typography>
-              )}
-              {stored.program && (
-                <Box data-compare="database">
-                  <PriorityProgramCard item={stored.program} onExplore={explore} />
-                </Box>
-              )}
-            </Box>
+          {stored.loading && (
+            <ProgramNote text={spanish ? "Cargando currículos…" : "Loading curricula…"} />
           )}
+          {stored.error && <ProgramNote text={stored.error} tone="#b3261e" />}
+          {!stored.loading && !stored.error && !stored.program && (
+            <ProgramNote
+              text={
+                stored.includesDrafts
+                  ? spanish
+                    ? "Aún no hay currículos — crea uno en el Constructor de Currículos."
+                    : "No curricula stored yet — create one in the Curriculum Builder."
+                  : spanish
+                    ? "Aún no se ha publicado nada — activa Publicado en el Constructor de Currículos para mostrar un currículo aquí."
+                    : "Nothing published yet — turn on Published in the Curriculum Builder to show a curriculum here."
+              }
+            />
+          )}
+          {stored.program && <PriorityProgramCard item={stored.program} onExplore={explore} />}
 
           {/* Priority Research */}
           <SectionHeading title={spanish ? "INVESTIGACIÓN PRIORITARIA" : "PRIORITY RESEARCH"} />

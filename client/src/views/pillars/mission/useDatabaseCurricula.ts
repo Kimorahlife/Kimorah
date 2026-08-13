@@ -1,17 +1,16 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { api } from "../../../api";
-import { PriorityProgramItem } from "./mission-data";
+import { PriorityProgramCopy, PriorityProgramItem } from "./mission-data";
 
 /**
- * The curriculum cards, built from the database instead of `mission-data.ts`.
+ * The curriculum cards, built from the database.
  *
  * Only the per-curriculum fields come from the database — number, title,
  * highlighted title, description, accent. Everything around them (the artwork,
  * the purpose line, the audience note, the "Explore curriculum" label) is
- * programme copy that a curriculum document does not carry, so it keeps coming
- * from `mission-data.ts` unchanged. That split is the whole point: the two
- * cards should differ only where the database is actually the source.
+ * programme copy that a curriculum document does not carry, so it comes from
+ * `mission-data.ts`.
  */
 
 interface Localized {
@@ -29,8 +28,11 @@ interface CurriculumCard {
   accent: string;
 }
 
+/** Used when a stored curriculum leaves its accent unset. */
+const DEFAULT_ACCENT = "#7950c3";
+
 export interface DatabaseCurricula {
-  /** The hardcoded programme, with its curricula swapped for the stored ones. */
+  /** The programme copy, filled in with the stored curricula. Null until any exist. */
   program: PriorityProgramItem | null;
   loading: boolean;
   /** Set when the fetch failed outright, so the page can say so rather than look empty. */
@@ -39,7 +41,7 @@ export interface DatabaseCurricula {
   includesDrafts: boolean;
 }
 
-export const useDatabaseCurricula = (fallback: PriorityProgramItem): DatabaseCurricula => {
+export const useDatabaseCurricula = (copy: PriorityProgramCopy): DatabaseCurricula => {
   const { i18n } = useTranslation();
   const spanish = (i18n.resolvedLanguage || i18n.language).startsWith("es");
 
@@ -92,16 +94,16 @@ export const useDatabaseCurricula = (fallback: PriorityProgramItem): DatabaseCur
   const program: PriorityProgramItem | null =
     rows && rows.length
       ? {
-          ...fallback,
-          curricula: rows.map((row, index) => ({
+          ...copy,
+          curricula: rows.map((row) => ({
             number: row.number,
             slug: row.slug,
             title: pick(row.title),
             highlightedTitle: pick(row.highlightedTitle) || undefined,
             description: pick(row.description),
             // Not stored on a curriculum — the same label on every card.
-            action: fallback.curricula[index]?.action ?? fallback.curricula[0]?.action ?? "",
-            accent: row.accent || fallback.curricula[index]?.accent || "#7950c3",
+            action: copy.exploreAction,
+            accent: row.accent || DEFAULT_ACCENT,
           })),
         }
       : null;
