@@ -85,7 +85,7 @@ const MissionClosingPage: React.FC = () => {
 
     <Box sx={{ display: "flex", flexWrap: "wrap", justifyContent: "center", alignItems: "center", gap: 1.5, bgcolor: "rgba(232,224,247,.82)", py: 2.5 }}>
       <Button onClick={() => navigate("/mission")} variant="outlined" startIcon={<AppsRoundedIcon />} sx={{ minWidth: 300, minHeight: 54, px: 3.5, borderWidth: 1.5, borderColor: PURPLE, color: INK, borderRadius: 99, fontSize: 16, fontWeight: 500 }}>{copy(lang, "CURRICULUM INDEX", "IR AL ÍNDICE DEL CURRÍCULO")}</Button>
-      <Button onClick={() => navigate("/mission/sessions/2")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ minWidth: 300, minHeight: 54, px: 3.5, bgcolor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500, boxShadow: "0 5px 12px rgba(57,36,118,.28)", "&:hover": { bgcolor: "#6742a7" } }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button>
+      <Button onClick={() => navigate("/mission/c/when-the-earth-changes/session/2")} variant="contained" endIcon={<ArrowForwardRoundedIcon />} sx={{ minWidth: 300, minHeight: 54, px: 3.5, bgcolor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500, boxShadow: "0 5px 12px rgba(57,36,118,.28)", "&:hover": { bgcolor: "#6742a7" } }}>{copy(lang, "CONTINUE TO SESSION 2", "CONTINUAR A SESIÓN 2")}</Button>
     </Box>
   </Box>;
 };

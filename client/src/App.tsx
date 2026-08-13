@@ -19,8 +19,6 @@ import PillarDetail from "./views/pillars/PillarDetail";
 import MissionPage from "./views/pillars/mission/MissionPage";
 import CurriculumSessionPage from "./views/pillars/mission/CurriculumSessionPage";
 import MissionSessionOnePage from "./views/pillars/mission/MissionSessionOnePage";
-import MissionSessionTwoPage from "./views/pillars/mission/MissionSessionTwoPage";
-import MissionSessionThreePage from "./views/pillars/mission/MissionSessionThreePage";
 import MissionConceptsPage from "./views/pillars/mission/MissionConceptsPage";
 import MissionObjectivesPage from "./views/pillars/mission/MissionObjectivesPage";
 import MissionPsychoeducationPage from "./views/pillars/mission/MissionPsychoeducationPage";
@@ -100,6 +98,10 @@ const App: React.FC = () => {
       <Route path="/mission/c/:slug/session/:number" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/mission/c/:slug/session/:number/:section" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/mission/sessions" element={<Navigate to="/mission/sessions/1" replace />} />
+      {/* Session 1 is the only hardcoded session — the design the database
+          template is measured against. Every later session is data, so any
+          other number lands on the template. */}
+      <Route path="/mission/sessions/:number" element={<Navigate to="/mission/c/when-the-earth-changes/session/2" replace />} />
       <Route path="/mission/sessions/1" element={<RequireAuth element={<MissionSessionOnePage />} />} />
       <Route path="/mission/sessions/1/concepts" element={<RequireAuth element={<MissionConceptsPage />} />} />
       <Route path="/mission/sessions/1/objectives" element={<RequireAuth element={<MissionObjectivesPage />} />} />
@@ -108,10 +110,6 @@ const App: React.FC = () => {
       <Route path="/mission/sessions/1/processing" element={<RequireAuth element={<MissionProcessingPage />} />} />
       <Route path="/mission/sessions/1/closing" element={<RequireAuth element={<MissionClosingPage />} />} />
       <Route path="/mission/sessions/1/:section" element={<RequireAuth element={<SessionOneComingSoonPage />} />} />
-      <Route path="/mission/sessions/2" element={<RequireAuth element={<MissionSessionTwoPage />} />} />
-      <Route path="/mission/sessions/2/:section" element={<RequireAuth element={<MissionSessionTwoPage />} />} />
-      <Route path="/mission/sessions/3" element={<RequireAuth element={<MissionSessionThreePage />} />} />
-      <Route path="/mission/sessions/3/:section" element={<RequireAuth element={<MissionSessionThreePage />} />} />
       <Route path="/mission/grief/session/1/:section" element={<RequireAuth element={<GriefCurriculumPage />} />} />
       {/* Coquí Research Data — reached from Mission's "Review Data" button */}
       <Route path="/mission/coqui" element={<RequireAuth element={<KindnessPage />} />} />

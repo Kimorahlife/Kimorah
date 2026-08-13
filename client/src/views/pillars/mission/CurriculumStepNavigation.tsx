@@ -38,7 +38,7 @@ const sessionThreeSteps = [
 ] as const;
 
 type Props = {
-  session: 1 | 2 | 3;
+  session: 1;
   active: string;
 };
 
@@ -46,7 +46,7 @@ export default function CurriculumStepNavigation({ session, active }: Props) {
   const navigate = useNavigate();
   const { i18n } = useTranslation();
   const spanish = i18n.language?.toLowerCase().startsWith("es");
-  const steps = session === 1 ? sessionOneSteps : session === 2 ? sessionTwoSteps : sessionThreeSteps;
+  const steps = sessionOneSteps;
   const currentIndex = Math.max(0, steps.findIndex((step) => step.id === active));
   const previous = currentIndex > 0 ? steps[currentIndex - 1] : undefined;
   const next = currentIndex < steps.length - 1 ? steps[currentIndex + 1] : undefined;
