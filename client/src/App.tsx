@@ -44,7 +44,11 @@ import SiteHeader from "./views/shared/SiteHeader";
 import { useAutoTranslate } from "./views/shared/useAutoTranslate";
 
 // Pages that manage their own top-of-page chrome (no global SiteHeader).
-const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/dashboard/professional", "/roles", "/users", "/coqui-questions", "/curriculums", "/diagnostics", "/profile", "/bookmarks", "/forum", "/messages", "/settings", "/help"]);
+const NO_HEADER = new Set(["/", "/login", "/signup", "/forgot-password", "/reset-password", "/dashboard", "/dashboard/professional", "/roles", "/users", "/groups", "/coqui-questions", "/curriculums", "/diagnostics", "/profile", "/bookmarks", "/forum", "/messages", "/settings", "/help"]);
+// The set above matches exact paths. A page with sub-paths of its own needs a
+// prefix instead, or the detail view gets the marketing banner stacked on top
+// of the dashboard chrome while its list page does not.
+const NO_HEADER_PREFIXES = ["/groups/"];
 // Auth screens keep a floating language switcher; the landing page has its own.
 const AUTH_PAGES = new Set(["/login", "/signup", "/forgot-password", "/reset-password"]);
 
@@ -53,7 +57,8 @@ const App: React.FC = () => {
   const { pathname } = useLocation();
   // The landing carries its own corner controls (Dashboard + language), so the
   // site banner is for inner pages only — signed in or not.
-  const showHeader = !NO_HEADER.has(pathname);
+  const showHeader =
+    !NO_HEADER.has(pathname) && !NO_HEADER_PREFIXES.some((p) => pathname.startsWith(p));
   const showFloatingLang = AUTH_PAGES.has(pathname);
   return (
     <>
