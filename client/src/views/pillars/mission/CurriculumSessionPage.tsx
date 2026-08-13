@@ -154,6 +154,24 @@ const FIXED = {
     en: "This is a space to accompany one another with respect, compassion, and humanity.",
     es: "Este es un espacio para acompañarnos con respeto, compasión y humanidad.",
   },
+
+  // The two cards the Objectives tab shows in the sidebar, matching the
+  // hardcoded objectives page. Same on every session and curriculum.
+  objectivesWhy: {
+    title: { en: "Why have clear objectives?", es: "¿Por qué tener objetivos claros?" },
+    body: {
+      en: "They give direction to our group work, help us focus on what matters, and give each step a meaningful purpose.",
+      es: "Dan dirección al trabajo grupal, nos ayudan a enfocarnos en lo importante y dan a cada paso un propósito significativo.",
+    },
+  },
+  objectivesReminder: {
+    title: { en: "Important reminder", es: "Recordatorio importante" },
+    body: {
+      en: "Each objective is a guide, not a demand. Small, conscious steps support individual and group well-being.",
+      es: "Cada objetivo es una guía, no una exigencia. Los pequeños pasos conscientes apoyan el bienestar individual y grupal.",
+    },
+  },
+
   cohesion: {
     quickTip: { en: "QUICK TIP", es: "CONSEJO RÁPIDO" },
     title: { en: "GROUP COHESION", es: "COHESIÓN GRUPAL" },
@@ -796,11 +814,36 @@ const CurriculumSessionPage: React.FC = () => {
                 ))}
               </Box>
             )}
-            {/* Without the box above, this one takes over its top margin. */}
-            <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: active === "introduction" ? 2 : 4 }}>
-              <FavoriteBorderRoundedIcon sx={{ color: accent, fontSize: 38 }} />
-              <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{FIXED.aside[lang]}</Typography>
-            </Box>
+            {active === "objectives" ? (
+              /* Objectives swaps the standing aside for its own two cards,
+                 the way the hardcoded objectives page lays them out. */
+              <>
+                <Box sx={{ bgcolor: "rgba(255,255,255,.72)", borderRadius: 3, p: 2, mt: 3, textAlign: "left" }}>
+                  <TrackChangesOutlinedIcon sx={{ color: PURPLE, fontSize: 31 }} />
+                  <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600, mt: 0.5 }}>
+                    {FIXED.objectivesWhy.title[lang]}
+                  </Typography>
+                  <Typography sx={{ mt: 0.7, fontSize: 12, lineHeight: 1.5 }}>
+                    {FIXED.objectivesWhy.body[lang]}
+                  </Typography>
+                </Box>
+                <Box sx={{ bgcolor: "rgba(244,239,251,.9)", borderLeft: `4px solid ${PURPLE}`, borderRadius: 3, p: 2, mt: 2, textAlign: "left" }}>
+                  <StarBorderRoundedIcon sx={{ color: PURPLE, fontSize: 30 }} />
+                  <Typography sx={{ fontFamily: SERIF, color: PURPLE, fontSize: 19, fontWeight: 600 }}>
+                    {FIXED.objectivesReminder.title[lang]}
+                  </Typography>
+                  <Typography sx={{ mt: 0.7, fontSize: 11.5, lineHeight: 1.45 }}>
+                    {FIXED.objectivesReminder.body[lang]}
+                  </Typography>
+                </Box>
+              </>
+            ) : (
+              /* Without the applications box above, this takes over its top margin. */
+              <Box sx={{ bgcolor: "rgba(255,255,255,.66)", borderRadius: 3, p: 2.5, mt: active === "introduction" ? 2 : 4 }}>
+                <FavoriteBorderRoundedIcon sx={{ color: accent, fontSize: 38 }} />
+                <Typography sx={{ fontWeight: 700, lineHeight: 1.55, mt: 1 }}>{FIXED.aside[lang]}</Typography>
+              </Box>
+            )}
           </Box>
 
           <Box component="main" sx={{ bgcolor: PAPER, border: "1px solid rgba(69,45,143,.15)", borderRadius: 3, p: { xs: 2.5, md: 4 } }}>
