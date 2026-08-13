@@ -26,6 +26,7 @@ import { CanAdd, CanDelete, CanEdit, FeatureUiGate, ReadOnlyBanner } from "../sh
 import MainCard from "../../Berry/ui-component/cards/MainCard";
 import ChangeHistoryDialog from "./components/ChangeHistoryDialog";
 import CreateGroupDialog from "./components/CreateGroupDialog";
+import GroupSessionsDialog from "./components/GroupSessionsDialog";
 
 /**
  * Groups — a professional running a curriculum with a set of people.
@@ -50,6 +51,7 @@ const GroupsPage: React.FC = () => {
   const [error, setError] = useState("");
   const [creating, setCreating] = useState(false);
   const [historyFor, setHistoryFor] = useState<GroupSummary | null>(null);
+  const [sessionsFor, setSessionsFor] = useState<GroupSummary | null>(null);
 
   const fetchGroups = useCallback(async () => {
     setLoading(true);
@@ -142,6 +144,17 @@ const GroupsPage: React.FC = () => {
           }}
         />
 
+        {sessionsFor && (
+          <GroupSessionsDialog
+            open
+            groupId={sessionsFor._id}
+            onClose={() => setSessionsFor(null)}
+            // Participant totals live on the row behind the dialog, so they
+            // have to be refetched once numbers change.
+            onSaved={fetchGroups}
+          />
+        )}
+
         {historyFor && (
           <ChangeHistoryDialog
             open
@@ -226,14 +239,17 @@ const GroupsPage: React.FC = () => {
 
                   <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: "center" }} />
 
-                  {/* Opening a group is how you work in it — record
-                      participants, rename it, read its curriculum — so this
-                      reads as Edit, the same as the Users row. */}
+                  {/* The main act: the group's sessions with a participant
+                      count on each, and a way into this group's own copy of
+                      the curriculum. A dialog because recording attendance is
+                      a quick, repeated edit made against this list. */}
                   <CanEdit feature="groups">
-                    <Tooltip title={t("common.edit", "Edit")}>
+                    <Tooltip
+                      title={t("groups.sessionsAndParticipants", "Sessions & participants")}
+                    >
                       <IconButton
                         size="small"
-                        onClick={() => navigate(`/groups/${group._id}`)}
+                        onClick={() => setSessionsFor(group)}
                         sx={{ color: "primary.main" }}
                       >
                         <EditIcon fontSize="small" />
