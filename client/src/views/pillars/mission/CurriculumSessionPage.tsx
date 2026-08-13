@@ -922,10 +922,11 @@ const CurriculumSessionPage: React.FC = () => {
               {lang === "es" ? `CONTINUAR A SESIÓN ${nextSession.number}` : `CONTINUE TO SESSION ${nextSession.number}`}
             </Button>
           )}
-          {/* Read from a group, the way out is back to that group — the
-              curriculum index is not where the reader came from. */}
+          {/* Read from a group, this leads to that group's own index of the
+              curriculum rather than the Mission listing of templates. The
+              ribbon at the top is the way back to the group itself. */}
           <Button
-            onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
+            onClick={() => navigate(groupId ? `/groups/${groupId}/c/${slug}` : "/mission")}
             variant="outlined"
             startIcon={<AppsRoundedIcon />}
             sx={{
@@ -933,13 +934,7 @@ const CurriculumSessionPage: React.FC = () => {
               borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500,
             }}
           >
-            {groupId
-              ? lang === "es"
-                ? "VOLVER AL GRUPO"
-                : "BACK TO GROUP"
-              : lang === "es"
-                ? "IR AL ÍNDICE DEL CURRÍCULO"
-                : "CURRICULUM INDEX"}
+            {lang === "es" ? "IR AL ÍNDICE DEL CURRÍCULO" : "CURRICULUM INDEX"}
           </Button>
         </Box>
       </Box>

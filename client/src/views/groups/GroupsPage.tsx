@@ -16,6 +16,7 @@ import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import GroupsRoundedIcon from "@mui/icons-material/GroupsRounded";
 import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
+import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { api } from "../../api";
@@ -256,6 +257,22 @@ const GroupsPage: React.FC = () => {
                       </IconButton>
                     </Tooltip>
                   </CanEdit>
+
+                  {/* Straight to this group's whole curriculum, without going
+                      through the participants dialog first. */}
+                  {group.curriculumId?.slug && (
+                    <Tooltip title={t("groups.openCurriculum", "Open curriculum")}>
+                      <IconButton
+                        size="small"
+                        onClick={() =>
+                          navigate(`/groups/${group._id}/c/${group.curriculumId?.slug}`)
+                        }
+                        sx={{ color: "primary.main" }}
+                      >
+                        <MenuBookRoundedIcon fontSize="small" />
+                      </IconButton>
+                    </Tooltip>
+                  )}
 
                   <Tooltip title={t("groups.history", "Change history")}>
                     <IconButton

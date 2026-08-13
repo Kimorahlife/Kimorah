@@ -13,6 +13,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -219,6 +220,16 @@ function GroupSessionsDialog({
       </DialogContent>
 
       <DialogActions sx={{ px: 3, py: 2 }}>
+        {group?.curriculum?.slug && (
+          <Button
+            variant="outlined"
+            startIcon={<MenuBookRoundedIcon />}
+            onClick={() => navigate(`/groups/${groupId}/c/${group.curriculum?.slug}`)}
+            sx={{ textTransform: "none" }}
+          >
+            {spanish ? "Ver currículo completo" : "Open full curriculum"}
+          </Button>
+        )}
         <Button onClick={() => navigate(`/groups/${groupId}`)} sx={{ textTransform: "none" }}>
           {spanish ? "Ver grupo completo" : "Open full group"}
         </Button>

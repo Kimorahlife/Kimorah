@@ -16,6 +16,7 @@ import {
 } from "@mui/material";
 import ArrowBackRoundedIcon from "@mui/icons-material/ArrowBackRounded";
 import HistoryRoundedIcon from "@mui/icons-material/HistoryRounded";
+import MenuBookRoundedIcon from "@mui/icons-material/MenuBookRounded";
 import OpenInNewRoundedIcon from "@mui/icons-material/OpenInNewRounded";
 import { useNavigate, useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -149,13 +150,25 @@ function GroupDetailPage() {
             {group.mainProfessionalId?.name || group.mainProfessionalId?.email || "—"}
           </Typography>
         </Box>
-        <Button
-          startIcon={<HistoryRoundedIcon />}
-          onClick={() => setHistoryOpen(true)}
-          sx={{ textTransform: "none" }}
-        >
-          {spanish ? "Historial" : "History"}
-        </Button>
+        <Stack direction="row" spacing={1}>
+          {group.curriculum?.slug && (
+            <Button
+              variant="outlined"
+              startIcon={<MenuBookRoundedIcon />}
+              onClick={() => navigate(`/groups/${id}/c/${group.curriculum?.slug}`)}
+              sx={{ textTransform: "none" }}
+            >
+              {spanish ? "Ver currículo" : "Open curriculum"}
+            </Button>
+          )}
+          <Button
+            startIcon={<HistoryRoundedIcon />}
+            onClick={() => setHistoryOpen(true)}
+            sx={{ textTransform: "none" }}
+          >
+            {spanish ? "Historial" : "History"}
+          </Button>
+        </Stack>
       </Stack>
 
       {error && (
