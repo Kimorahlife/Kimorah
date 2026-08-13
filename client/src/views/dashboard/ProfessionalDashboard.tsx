@@ -1,4 +1,4 @@
-import { ReactNode, useState } from "react";
+import { ReactNode } from "react";
 import {
   Box,
   Button,
@@ -14,10 +14,8 @@ import AutoStoriesOutlinedIcon from "@mui/icons-material/AutoStoriesOutlined";
 import BookmarkBorderRoundedIcon from "@mui/icons-material/BookmarkBorderRounded";
 import CalendarMonthOutlinedIcon from "@mui/icons-material/CalendarMonthOutlined";
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded";
-import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import PeopleAltOutlinedIcon from "@mui/icons-material/PeopleAltOutlined";
 import SearchRoundedIcon from "@mui/icons-material/SearchRounded";
-import StarRoundedIcon from "@mui/icons-material/StarRounded";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "../authentication/components/useUser";
@@ -70,19 +68,6 @@ function BookmarkRow({ title, image }: { title: string; image: string }) {
   );
 }
 
-function ActivityRow({ icon, time }: { icon: ReactNode; time: string }) {
-  return (
-    <Stack direction="row" alignItems="center" spacing={1.4}>
-      <Box sx={{ width: 28, height: 28, borderRadius: "50%", bgcolor: "#f1e9fc", color: PURPLE, display: "grid", placeItems: "center" }}>{icon}</Box>
-      <Box sx={{ flex: 1 }}>
-        <Box sx={{ height: 6, borderRadius: 5, bgcolor: "#dedce6", width: "82%" }} />
-        <Box sx={{ height: 6, borderRadius: 5, bgcolor: "#dedce6", width: "55%", mt: .7 }} />
-      </Box>
-      <Typography sx={{ fontSize: 11, color: MUTED }}>{time}</Typography>
-    </Stack>
-  );
-}
-
 /**
  * The professional dashboard's page content.
  *
@@ -98,7 +83,6 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
   const user = useUser();
   const spanish = i18n.language?.toLowerCase().startsWith("es");
   const displayName = firstName ?? user?.name?.split(" ")[0] ?? (spanish ? "colega" : "there");
-  const [peopleServed, setPeopleServed] = useState("");
 
   const text = {
     welcome: spanish ? `Bienvenida de nuevo, ${displayName}` : `Welcome back, ${displayName}`,
@@ -118,16 +102,13 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
             <Typography sx={{ fontSize: { xs: 18, md: 20 }, lineHeight: 1.45, fontWeight: 600 }}>
               {spanish ? <>Estás presente para los demás.<br />No olvides estar presente para ti.</> : <>You’re showing up for others.<br />Don’t forget to show up for yourself.</>}
             </Typography>
-            <Button variant="outlined" sx={{ mt: 2.8, alignSelf: "flex-start", color: "#fff", borderColor: "#a578e7", bgcolor: "rgba(55,17,118,.42)", textTransform: "none", px: 3.5, "&:hover": { borderColor: "#fff" } }}>
-              {spanish ? "Escribir en el diario" : "Write in Journal"}
-            </Button>
           </Box>
 
           <Typography sx={{ mt: 2.4, mb: 1.5, fontSize: 17, fontWeight: 800 }}>{spanish ? "Resumen" : "At a Glance"}</Typography>
           <Stack direction={{ xs: "column", md: "row" }} gap={2}>
             <StatCard icon={<CalendarMonthOutlinedIcon />} value={5} label={spanish ? "Próximas sesiones" : "Upcoming Sessions"} link={spanish ? "Ver calendario" : "View calendar"} />
             <StatCard icon={<BookmarkBorderRoundedIcon />} value={15} label={spanish ? "Favoritos guardados" : "Saved Bookmark(s)"} link={spanish ? "Ver todos" : "View all"} />
-            <StatCard icon={<PeopleAltOutlinedIcon />} value={Number(peopleServed) || 0} label={spanish ? "Personas atendidas" : "People Served"} link={spanish ? "Ver impacto" : "View impact"} />
+            <StatCard icon={<PeopleAltOutlinedIcon />} value={0} label={spanish ? "Personas atendidas" : "People Served"} link={spanish ? "Ver impacto" : "View impact"} />
           </Stack>
 
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", md: "1.25fr .95fr" }, gap: 2, mt: 2 }}>
@@ -167,18 +148,6 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
               <Button fullWidth variant="outlined" sx={{ mt: 1.5, color: PURPLE, borderColor: "#d8c7ee", textTransform: "none" }}>{spanish ? "Ir a favoritos" : "Go to Bookmarks"}</Button>
             </Panel>
           </Box>
-
-          <Panel sx={{ p: 2, mt: 2, background: "linear-gradient(90deg, #fff, #faf5ff)" }}>
-            <Stack direction={{ xs: "column", sm: "row" }} gap={2} alignItems={{ sm: "center" }}>
-              <Box sx={{ width: 50, height: 50, flexShrink: 0, borderRadius: "50%", bgcolor: "#f1e9fc", color: PURPLE, display: "grid", placeItems: "center" }}><PeopleAltOutlinedIcon /></Box>
-              <Box sx={{ flex: 1 }}>
-                <Typography sx={{ fontWeight: 800, fontSize: 13.5 }}>{spanish ? "Personas atendidas usando recursos/herramientas del sitio" : "People Served Using Website Resources/Tools"}</Typography>
-                <Typography sx={{ color: MUTED, fontSize: 11.5, mt: .4 }}>{spanish ? "Registra el impacto de tu trabajo." : "Track the impact of your work."}</Typography>
-              </Box>
-              <TextField size="small" value={peopleServed} onChange={(event) => setPeopleServed(event.target.value.replace(/\D/g, ""))} placeholder={spanish ? "Cantidad" : "Enter amount"} sx={{ width: { sm: 170 } }} />
-              <Button variant="contained" sx={{ bgcolor: PURPLE, px: 3.5, textTransform: "none" }}>Save</Button>
-            </Stack>
-          </Panel>
         </Box>
 
         <Stack spacing={2}>
@@ -202,11 +171,6 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
               ))}
             </Stack>
             <Typography sx={{ color: PURPLE, fontWeight: 700, fontSize: 12.5, mt: 2.4 }}>Explore All Resources →</Typography>
-          </Panel>
-          <Panel sx={{ p: 2.2 }}>
-            <Typography sx={{ fontWeight: 800, fontSize: 14, mb: 2 }}>Recent Activity</Typography>
-            <Stack spacing={2}><ActivityRow icon={<StarRoundedIcon fontSize="small" />} time="2h ago" /><ActivityRow icon={<EditOutlinedIcon fontSize="small" />} time="Today" /><ActivityRow icon={<CalendarMonthOutlinedIcon fontSize="small" />} time="May 25" /></Stack>
-            <Button fullWidth variant="outlined" sx={{ mt: 2.2, color: PURPLE, borderColor: "#d8c7ee", textTransform: "none" }}>View All Activity</Button>
           </Panel>
           <Panel sx={{ p: 2.2 }}>
             <Stack direction="row" justifyContent="space-between"><Typography sx={{ fontWeight: 800, fontSize: 14 }}>Recommended for You</Typography><Typography sx={{ color: PURPLE, fontSize: 11 }}>View all</Typography></Stack>
