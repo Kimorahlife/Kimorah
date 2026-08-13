@@ -696,21 +696,41 @@ const CurriculumSessionPage: React.FC = () => {
           reader is never unsure which group they are recording against. */}
       {groupId && (
         <Box
-          onClick={() => navigate(`/groups/${groupId}`)}
           sx={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 1,
-            py: 1.1, px: 2, cursor: "pointer",
-            bgcolor: PURPLE, color: "white", fontSize: 13.5, fontWeight: 700,
-            "&:hover": { bgcolor: "#5a3aa8" },
+            display: "flex", alignItems: "center", gap: 1.5,
+            py: 1, px: { xs: 1.5, md: 2.5 },
+            bgcolor: PURPLE, color: "white",
           }}
         >
-          <GroupsRoundedIcon sx={{ fontSize: 19 }} />
-          <Box component="span">
-            {lang === "es" ? "Grupo" : "Group"}
-            {groupName ? `: ${groupName}` : ""}
+          {/* A real button rather than a clickable strip: this is the way out
+              of the curriculum, so it has to look like something you press. */}
+          <Box
+            component="button"
+            type="button"
+            onClick={() => navigate(`/groups/${groupId}`)}
+            sx={{
+              appearance: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", gap: 0.75,
+              px: 1.5, py: 0.6, borderRadius: 99,
+              border: "1px solid rgba(255,255,255,.55)",
+              bgcolor: "rgba(255,255,255,.12)", color: "inherit",
+              fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
+              flexShrink: 0,
+              "&:hover": { bgcolor: "rgba(255,255,255,.24)" },
+            }}
+          >
+            <ArrowBackRoundedIcon sx={{ fontSize: 17 }} />
+            {lang === "es" ? "Volver al grupo" : "Back to group"}
           </Box>
-          <Box component="span" sx={{ opacity: 0.75, fontWeight: 500 }}>
-            · {lang === "es" ? "volver al grupo" : "back to group"}
+
+          <Box sx={{ display: "flex", alignItems: "center", gap: 0.75, minWidth: 0 }}>
+            <GroupsRoundedIcon sx={{ fontSize: 18, opacity: 0.9, flexShrink: 0 }} />
+            <Box
+              component="span"
+              sx={{ fontSize: 13.5, fontWeight: 700, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}
+            >
+              {groupName || (lang === "es" ? "Grupo" : "Group")}
+            </Box>
           </Box>
         </Box>
       )}
@@ -844,10 +864,37 @@ const CurriculumSessionPage: React.FC = () => {
                 position: { lg: "sticky" }, top: { lg: 16 },
               }}
             >
+              {/* The rail is where a reader already looks to move around, so
+                  the way out belongs at the top of it. */}
+              <Box
+                component="button"
+                type="button"
+                onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
+                sx={{
+                  appearance: "none", border: 0, cursor: "pointer", width: "100%",
+                  display: "flex", alignItems: "center", gap: 0.75,
+                  px: 1.25, py: 1, mb: 0.5, borderRadius: 2.5,
+                  bgcolor: "transparent", color: accent,
+                  fontSize: 12.5, fontWeight: 700, fontFamily: "inherit",
+                  "&:hover": { bgcolor: "#f6f2fd" },
+                }}
+              >
+                <ArrowBackRoundedIcon sx={{ fontSize: 17 }} />
+                {groupId
+                  ? lang === "es"
+                    ? "Volver al grupo"
+                    : "Back to group"
+                  : lang === "es"
+                    ? "Todos los currículos"
+                    : "All curriculums"}
+              </Box>
+
+              <Box sx={{ borderTop: "1px solid rgba(80,54,150,.12)", mx: 1.25, mb: 0.75 }} />
+
               <Typography
                 sx={{
                   fontSize: 10.5, fontWeight: 800, letterSpacing: 1.1, color: "#7d7899",
-                  px: 1.25, pt: 0.75, pb: 1,
+                  px: 1.25, pb: 1,
                 }}
               >
                 {lang === "es" ? "SESIONES" : "SESSIONS"}
@@ -995,11 +1042,11 @@ const CurriculumSessionPage: React.FC = () => {
               {lang === "es" ? `CONTINUAR A SESIÓN ${nextSession.number}` : `CONTINUE TO SESSION ${nextSession.number}`}
             </Button>
           )}
-          {/* Read from a group, this leads to that group's own index of the
-              curriculum rather than the Mission listing of templates. The
-              ribbon at the top is the way back to the group itself. */}
+          {/* In a group this leads back to the group. It must not point at
+              /groups/:id/c/:slug — that entry redirects to session one, so
+              from session three it would quietly send the reader backwards. */}
           <Button
-            onClick={() => navigate(groupId ? `/groups/${groupId}/c/${slug}` : "/mission")}
+            onClick={() => navigate(groupId ? `/groups/${groupId}` : "/mission")}
             variant="outlined"
             startIcon={<AppsRoundedIcon />}
             sx={{
@@ -1007,7 +1054,13 @@ const CurriculumSessionPage: React.FC = () => {
               borderColor: PURPLE, borderRadius: 99, fontSize: 16, fontWeight: 500,
             }}
           >
-            {lang === "es" ? "IR AL ÍNDICE DEL CURRÍCULO" : "CURRICULUM INDEX"}
+            {groupId
+              ? lang === "es"
+                ? "VOLVER AL GRUPO"
+                : "BACK TO GROUP"
+              : lang === "es"
+                ? "IR AL ÍNDICE DEL CURRÍCULO"
+                : "CURRICULUM INDEX"}
           </Button>
         </Box>
       </Box>
