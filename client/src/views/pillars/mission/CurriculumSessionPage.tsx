@@ -55,7 +55,9 @@ const WHEN_LOVE_REMAINS_MAGENTA = "#aa3f7b";
 type Lang = "en" | "es";
 interface Localized { en: string; es: string }
 interface Item { icon?: string; title: Localized; lead?: Localized; body?: Localized; prompts: Localized[] }
-interface Group { heading?: Localized; intro?: Localized; items: Item[] }
+/** Mirrors GROUP_LAYOUTS on the server; absent means "points". */
+type GroupLayout = "points" | "prose";
+interface Group { heading?: Localized; intro?: Localized; layout?: GroupLayout; items: Item[] }
 interface Section { intro?: Localized; groups: Group[] }
 interface Session {
   number: number;
@@ -499,6 +501,37 @@ const CurriculumSessionPage: React.FC = () => {
     </>
   );
 
+  /**
+   * A group an author marked as prose: each item set as its own paragraph
+   * rather than a bullet with an icon.
+   *
+   * Defined once and used by both the Psychoeducation section and the preview
+   * of it on the Introduction, so the same group cannot read as prose in one
+   * place and as tiles in the other.
+   */
+  const isProse = (group?: Group): boolean => group?.layout === "prose";
+
+  const proseParagraphs = (items: Item[]) => (
+    <Box sx={{ display: "grid", gap: 1.4, maxWidth: 1050 }}>
+      {items
+        .filter((item) => pick(item.title))
+        .map((item, i) => (
+          <Box key={i}>
+            <Typography component="p" sx={{ m: 0, fontSize: { xs: 14, md: 15.5 }, lineHeight: 1.75, color: INK }}>
+              {pick(item.title)}
+            </Typography>
+            {/* Body still shows — a paragraph may carry an aside without
+                becoming a bullet. */}
+            {pick(item.body) && (
+              <Typography component="p" sx={{ m: 0, mt: 0.4, fontSize: 13.5, lineHeight: 1.6, color: "#5b5680" }}>
+                {pick(item.body)}
+              </Typography>
+            )}
+          </Box>
+        ))}
+    </Box>
+  );
+
   const body = () => {
     const tab = TABS.find((t) => t.id === active)!;
     const label = lang === "es" ? tab.es : tab.en;
@@ -506,13 +539,17 @@ const CurriculumSessionPage: React.FC = () => {
     if (active === "introduction") {
       const objectives = (session.sections?.objectives?.groups ?? []).flatMap((g) => g.items);
       const psychoed = session.sections?.psychoeducation;
-      // Session 1 shows the first headed run here, not every point.
-      // The first group that reads as a list of points — some curricula open
-      // the section with a single prose block, which makes a poor tile row.
+      // Session 1 shows the first headed run here, not every point. A group
+      // marked as prose is preferred outright; otherwise the first with more
+      // than one item, since a lone item makes a poor tile row.
       const psychoedSource =
-        (psychoed?.groups ?? []).find((g) => g.items.length > 1) ?? psychoed?.groups?.[0];
+        (psychoed?.groups ?? []).find((g) => isProse(g) || g.items.length > 1) ??
+        psychoed?.groups?.[0];
       const psychoedItems = (psychoedSource?.items ?? []).slice(0, 6);
-      const prosePsychoeducation = slug === "when-love-remains" && session.number >= 2 && session.number <= 7;
+      // Was pinned to one curriculum and sessions 2–7, so no other curriculum
+      // could read as prose and session 8 could not either. It is now the
+      // author's choice, stored on the group.
+      const prosePsychoeducation = isProse(psychoedSource);
       return (
         <>
           {/* Group only — the template has no participants to record. Sits at
@@ -657,13 +694,7 @@ const CurriculumSessionPage: React.FC = () => {
               accent={accent}
             >
               {prosePsychoeducation ? (
-                <Box sx={{ ml: { md: 8.25 }, maxWidth: 1050 }}>
-                  {(psychoedSource?.items ?? []).filter((item) => pick(item.title)).map((item, i) => (
-                    <Typography key={i} component="p" sx={{ m: 0, mb: 1.5, fontSize: { xs: 14, md: 15.5 }, lineHeight: 1.75, color: INK }}>
-                      {pick(item.title)}
-                    </Typography>
-                  ))}
-                </Box>
+                <Box sx={{ ml: { md: 8.25 } }}>{proseParagraphs(psychoedSource?.items ?? [])}</Box>
               ) : (
                 /* The first headed run, as a row of icon tiles — Session 1's shape. */
                 <Box
@@ -777,42 +808,78 @@ const CurriculumSessionPage: React.FC = () => {
         <Section icon={<TabIcon />} title={label} subtitle={pick(data?.intro) || undefined} accent={accent}>
           <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", lg: "1.1fr .9fr" }, gap: 2.5, alignItems: "start" }}>
             {first && (
-              <Box sx={{ border: "1px solid rgba(69,45,143,.14)", borderRadius: 3, p: 2.5 }}>
+              <Box
+                sx={{
+                  border: "1px solid rgba(69,45,143,.14)",
+                  borderRadius: 3,
+                  p: 2.5,
+                  // Paragraphs take the full width — prose set in a narrow
+                  // column reads as a stack of fragments.
+                  gridColumn: isProse(first) ? { lg: "1 / -1" } : undefined,
+                }}
+              >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}>
                   <Box sx={{ width: 42, height: 42, borderRadius: "50%", bgcolor: accent, color: "white", display: "grid", placeItems: "center" }}>
                     <LightbulbOutlinedIcon />
                   </Box>
                   <Typography sx={{ fontFamily: SERIF, fontSize: 25, color: accent }}>{pick(first.heading)}</Typography>
                 </Box>
-                <Box sx={{ display: "grid", gap: 1.2 }}>
-                  {first.items.map((item, i) => (
-                    <Box key={i} sx={{ display: "flex", gap: 1.5, p: 1.7, bgcolor: "rgba(255,255,255,.86)", border: "1px solid rgba(69,45,143,.11)", borderRadius: 2.5 }}>
-                      <Box sx={{ width: 46, height: 46, flexShrink: 0, borderRadius: "50%", bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`, color: accent, display: "grid", placeItems: "center", "& svg": { fontSize: 24 } }}>
-                        {iconFor(item.icon, i)}
+                {pick(first.intro) && (
+                  <Typography sx={{ fontSize: 14, lineHeight: 1.6, mb: 1.5, color: "#5b5680" }}>
+                    {pick(first.intro)}
+                  </Typography>
+                )}
+                {isProse(first) ? (
+                  proseParagraphs(first.items)
+                ) : (
+                  <Box sx={{ display: "grid", gap: 1.2 }}>
+                    {first.items.map((item, i) => (
+                      <Box key={i} sx={{ display: "flex", gap: 1.5, p: 1.7, bgcolor: "rgba(255,255,255,.86)", border: "1px solid rgba(69,45,143,.11)", borderRadius: 2.5 }}>
+                        <Box sx={{ width: 46, height: 46, flexShrink: 0, borderRadius: "50%", bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`, color: accent, display: "grid", placeItems: "center", "& svg": { fontSize: 24 } }}>
+                          {iconFor(item.icon, i)}
+                        </Box>
+                        <Box>
+                          <Typography sx={{ color: accent, fontSize: 15.5, fontWeight: 800, lineHeight: 1.3 }}>{pick(item.title)}</Typography>
+                          {pick(item.body) && <Typography sx={{ fontSize: 13.5, lineHeight: 1.5, mt: 0.4 }}>{pick(item.body)}</Typography>}
+                        </Box>
                       </Box>
-                      <Box>
-                        <Typography sx={{ color: accent, fontSize: 15.5, fontWeight: 800, lineHeight: 1.3 }}>{pick(item.title)}</Typography>
-                        {pick(item.body) && <Typography sx={{ fontSize: 13.5, lineHeight: 1.5, mt: 0.4 }}>{pick(item.body)}</Typography>}
-                      </Box>
-                    </Box>
-                  ))}
-                </Box>
+                    ))}
+                  </Box>
+                )}
               </Box>
             )}
             {rest.map((group, gi) => (
-              <Box key={gi} sx={{ bgcolor: `color-mix(in srgb, ${accent} 8%, #fff)`, border: "1px solid rgba(69,45,143,.12)", borderRadius: 3, p: 2.5 }}>
+              <Box
+                key={gi}
+                sx={{
+                  bgcolor: `color-mix(in srgb, ${accent} 8%, #fff)`,
+                  border: "1px solid rgba(69,45,143,.12)",
+                  borderRadius: 3,
+                  p: 2.5,
+                  gridColumn: isProse(group) ? { lg: "1 / -1" } : undefined,
+                }}
+              >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}>
                   <Diversity3OutlinedIcon sx={{ color: accent, fontSize: 34 }} />
                   <Typography sx={{ fontFamily: SERIF, fontSize: 23, color: accent }}>{pick(group.heading)}</Typography>
                 </Box>
-                <Box sx={{ display: "grid", gap: 1.2 }}>
-                  {group.items.map((item, i) => (
-                    <Box key={i} sx={{ minHeight: 68, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "rgba(255,255,255,.9)", borderRadius: 2.5, p: 1.5 }}>
-                      <Box sx={{ color: accent, display: "flex", "& svg": { fontSize: 24 } }}>{iconFor(item.icon, i)}</Box>
-                      <Typography sx={{ fontSize: 14, fontWeight: 700 }}>{pick(item.title)}</Typography>
-                    </Box>
-                  ))}
-                </Box>
+                {pick(group.intro) && (
+                  <Typography sx={{ fontSize: 14, lineHeight: 1.6, mb: 1.5, color: "#5b5680" }}>
+                    {pick(group.intro)}
+                  </Typography>
+                )}
+                {isProse(group) ? (
+                  proseParagraphs(group.items)
+                ) : (
+                  <Box sx={{ display: "grid", gap: 1.2 }}>
+                    {group.items.map((item, i) => (
+                      <Box key={i} sx={{ minHeight: 68, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "rgba(255,255,255,.9)", borderRadius: 2.5, p: 1.5 }}>
+                        <Box sx={{ color: accent, display: "flex", "& svg": { fontSize: 24 } }}>{iconFor(item.icon, i)}</Box>
+                        <Typography sx={{ fontSize: 14, fontWeight: 700 }}>{pick(item.title)}</Typography>
+                      </Box>
+                    ))}
+                  </Box>
+                )}
               </Box>
             ))}
           </Box>

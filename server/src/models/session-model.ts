@@ -61,10 +61,23 @@ const itemSchema = new Schema<CurriculumItem>(
  * headed ones. Simpler sections carry a single group with no heading, so one
  * shape covers both.
  */
+/**
+ * How a group's items are meant to read.
+ *
+ * "points" is the bulleted shape every section has always had. "prose" is for
+ * a run that is really a paragraph or two of explanation, where each item is a
+ * sentence rather than a bullet — the site sets it as flowing text instead of
+ * tiles. Kept on the group because it is a property of the writing, not of the
+ * page: the same group reads the same way wherever it is shown.
+ */
+export const GROUP_LAYOUTS = ["points", "prose"] as const;
+export type GroupLayout = (typeof GROUP_LAYOUTS)[number];
+
 export interface ItemGroup {
   order: number;
   heading?: Localized;
   intro?: Localized;
+  layout?: GroupLayout;
   items: CurriculumItem[];
 }
 
@@ -73,6 +86,9 @@ const groupSchema = new Schema<ItemGroup>(
     order: { type: Number, default: 0 },
     heading: localized(),
     intro: localized(),
+    // Defaulted rather than required so every group written before this field
+    // existed keeps rendering exactly as it did.
+    layout: { type: String, enum: GROUP_LAYOUTS, default: "points" },
     items: { type: [itemSchema], default: [] },
   },
   { _id: true },

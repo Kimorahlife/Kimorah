@@ -17,11 +17,17 @@ import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
 import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded";
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded";
+import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
+import NotesRoundedIcon from "@mui/icons-material/NotesRounded";
+import ToggleButton from "@mui/material/ToggleButton";
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup";
 import ContentField from "./ContentField";
 import ItemList from "./ItemList";
 import {
   CurriculumSection,
+  GroupLayout,
   ItemGroup,
+  SECTIONS_WITH_LAYOUT,
   SECTION_LABELS,
   SectionKey,
   emptyGroup,
@@ -50,6 +56,7 @@ const GroupList: React.FC<{
 }> = ({ section, value, onChange, disabled = false }) => {
   const label = SECTION_LABELS[section];
   const groups = value.groups ?? [];
+  const showLayout = SECTIONS_WITH_LAYOUT.includes(section);
   const singleUnnamed = groups.length === 1 && !groups[0].heading?.en && !groups[0].heading?.es;
 
   /** Groups folded away. Empty by default — a new group opens ready to write in. */
@@ -153,6 +160,17 @@ const GroupList: React.FC<{
                 {group.items.length > 0 && (
                   <Chip size="small" label={group.items.length} sx={{ height: 20, fontSize: 11, flexShrink: 0 }} />
                 )}
+                {/* The layout lives inside the group, so a collapsed group
+                    would otherwise hide the fact that it reads as prose. */}
+                {showLayout && (group.layout ?? "points") === "prose" && (
+                  <Chip
+                    size="small"
+                    variant="outlined"
+                    icon={<NotesRoundedIcon />}
+                    label="Paragraph"
+                    sx={{ height: 22, fontSize: 11, flexShrink: 0 }}
+                  />
+                )}
 
                 <Tooltip title={open ? "Collapse group" : "Expand group"}>
                   <span>
@@ -196,6 +214,41 @@ const GroupList: React.FC<{
 
               <Collapse in={open} unmountOnExit>
                 <Box sx={{ pt: 2 }}>
+                  {/* Sits above the writing because it changes what the
+                      writing should be: bullets in one mode, sentences in the
+                      other. A new group opens expanded, so this is the first
+                      thing an author meets after naming it. */}
+                  {showLayout && (
+                    <Stack direction="row" alignItems="center" spacing={1.25} sx={{ mb: 2 }}>
+                      <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                        Reads as
+                      </Typography>
+                      <ToggleButtonGroup
+                        size="small"
+                        exclusive
+                        value={group.layout ?? "points"}
+                        onChange={(_e, next: GroupLayout | null) =>
+                          next && patch(index, { layout: next })
+                        }
+                        disabled={disabled}
+                      >
+                        <ToggleButton value="points" sx={{ textTransform: "none", px: 1.5, gap: 0.75 }}>
+                          <FormatListBulletedRoundedIcon fontSize="small" />
+                          Points
+                        </ToggleButton>
+                        <ToggleButton value="prose" sx={{ textTransform: "none", px: 1.5, gap: 0.75 }}>
+                          <NotesRoundedIcon fontSize="small" />
+                          Paragraph
+                        </ToggleButton>
+                      </ToggleButtonGroup>
+                      <Typography variant="caption" sx={{ color: "text.secondary" }}>
+                        {(group.layout ?? "points") === "prose"
+                          ? "Each entry below becomes its own paragraph."
+                          : "Each entry below becomes a bullet with an icon."}
+                      </Typography>
+                    </Stack>
+                  )}
+
                   <ContentField
                     label="Group lead-in (optional)"
                     value={group.intro ?? { en: "", es: "" }}
@@ -208,7 +261,11 @@ const GroupList: React.FC<{
                     section={section}
                     items={group.items}
                     onChange={(items) => patch(index, { items })}
-                    addLabel={`Add ${label.one}`}
+                    addLabel={
+                      showLayout && (group.layout ?? "points") === "prose"
+                        ? "Add paragraph"
+                        : `Add ${label.one}`
+                    }
                     disabled={disabled}
                   />
                 </Box>

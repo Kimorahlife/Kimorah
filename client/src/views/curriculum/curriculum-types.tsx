@@ -50,12 +50,23 @@ export interface CurriculumItem {
   prompts: Localized[];
 }
 
+/**
+ * How a group's items are meant to read — bulleted points, or a paragraph.
+ *
+ * Mirrors GROUP_LAYOUTS on the server. "prose" is for a run that is really
+ * explanation, where each item is a sentence rather than a bullet.
+ */
+export const GROUP_LAYOUTS = ["points", "prose"] as const;
+export type GroupLayout = (typeof GROUP_LAYOUTS)[number];
+
 /** A named run of items — Psicoeducación's "Explicar:", "Teoría Polivagal", … */
 export interface ItemGroup {
   _id?: string;
   order: number;
   heading?: Localized;
   intro?: Localized;
+  /** Absent on anything written before layouts existed, and read as "points". */
+  layout?: GroupLayout;
   items: CurriculumItem[];
 }
 
@@ -108,6 +119,12 @@ export const SECTION_LABELS: Record<
 /** Sections where the optional enrichment fields are worth showing. */
 export const SECTIONS_WITH_LEAD: SectionKey[] = ["concepts"];
 export const SECTIONS_WITH_PROMPTS: SectionKey[] = ["concepts"];
+/**
+ * Sections whose reader page honours a group's layout. Offered only where it
+ * has an effect — a Points/Paragraph switch on a section that ignores it would
+ * promise something the site does not do.
+ */
+export const SECTIONS_WITH_LAYOUT: SectionKey[] = ["psychoeducation"];
 
 export type CurriculumSections = Record<SectionKey, CurriculumSection>;
 
@@ -187,10 +204,11 @@ export const emptyItem = (order: number): CurriculumItem => ({
   prompts: [],
 });
 
-export const emptyGroup = (order: number): ItemGroup => ({
+export const emptyGroup = (order: number, layout: GroupLayout = "points"): ItemGroup => ({
   order,
   heading: emptyLocalized(),
   intro: emptyLocalized(),
+  layout,
   items: [],
 });
 
