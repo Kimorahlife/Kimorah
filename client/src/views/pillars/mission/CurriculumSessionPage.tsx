@@ -502,13 +502,37 @@ const CurriculumSessionPage: React.FC = () => {
     </>
   );
 
+  /* ------------------------------------------------------------------ *
+   * Shared helpers — READ THIS BEFORE ADDING ONE.
+   *
+   * Every tab draws itself. A helper may be shared only when it *decides
+   * something about the content* — is this group prose, where does a run
+   * end. Those answers must agree across tabs, and that is the whole point
+   * of sharing them.
+   *
+   * A helper that *draws* is never shared. Two tabs showing the same items
+   * still show them differently: Psychoeducation gives its paragraphs discs,
+   * cards and full-width runs, while the Introduction shows a quiet preview
+   * indented under a heading. They only look alike today, which is exactly
+   * what makes the mistake easy.
+   *
+   * `proseParagraphs` was once shared by both. Teaching it to split a
+   * paragraph on its line breaks — wanted in Psychoeducation, and correct
+   * there — silently changed the Introduction and broke it. That is the
+   * failure this separation exists to prevent.
+   *
+   * So: if a change is for one tab, it belongs in that tab's own renderer.
+   * If two renderers drift into being genuinely identical AND must stay that
+   * way, lift the common part into a named component both call — do not
+   * quietly reach for the neighbour's helper.
+   * ------------------------------------------------------------------ */
+
   /**
    * A group an author marked as prose: each item set as its own paragraph
    * rather than a bullet with an icon.
    *
-   * Defined once and used by both the Psychoeducation section and the preview
-   * of it on the Introduction, so the same group cannot read as prose in one
-   * place and as tiles in the other.
+   * A decision, not a drawing — shared on purpose, so the same group cannot
+   * read as prose in Psychoeducation and as tiles in the Introduction.
    */
   const isProse = (group?: Group): boolean => group?.layout === "prose";
 
@@ -553,16 +577,16 @@ const CurriculumSessionPage: React.FC = () => {
   };
 
   /**
-   * A paragraph that sits between bullets gets the same panel the section
-   * opens with — a disc and a card. Left bare it reads as text that escaped
-   * the layout rather than a deliberate aside.
+   * PSYCHOEDUCATION ONLY — a paragraph that sits between bullets gets the same
+   * panel the section opens with: a disc and a card. Left bare it reads as text
+   * that escaped the layout rather than a deliberate aside.
    *
    * The first run is already introduced by the group's own disc and heading,
    * so it stays plain and does not repeat the mark.
    */
   const proseRun = (items: Item[], first: boolean) =>
     first ? (
-      proseParagraphs(items)
+      psychoedParagraphs(items)
     ) : (
       <Box
         sx={{
@@ -580,7 +604,7 @@ const CurriculumSessionPage: React.FC = () => {
         >
           <LightbulbOutlinedIcon />
         </Box>
-        {proseParagraphs(items)}
+        {psychoedParagraphs(items)}
       </Box>
     );
 
@@ -602,13 +626,25 @@ const CurriculumSessionPage: React.FC = () => {
 
   /**
    * A prose item may hold several paragraphs, separated by line breaks in the
-   * source document. HTML collapses those to spaces, so split them here or the
-   * whole item arrives as one run-on wall of text.
+   * source document. HTML collapses those to spaces, so split them or the whole
+   * item arrives as one run-on wall of text.
+   *
+   * A decision about the content, so both tabs may use it. Whether either one
+   * *does* is each tab's own business — the Introduction deliberately does not.
    */
   const paragraphsOf = (text: string): string[] =>
     text.split(/\n+/).map((p) => p.trim()).filter(Boolean);
 
-  const proseParagraphs = (items: Item[]) => (
+  /**
+   * PSYCHOEDUCATION ONLY — the paragraphs inside a prose run.
+   *
+   * Breaks an item on its line breaks, because this is the section where an
+   * author writes at length and the source document's own paragraphing is the
+   * only structure those long passages have.
+   *
+   * The Introduction has `introParagraphs`. Do not merge them.
+   */
+  const psychoedParagraphs = (items: Item[]) => (
     <Box sx={{ display: "grid", gap: 1.4, maxWidth: 1050 }}>
       {items
         .filter((item) => pick(item.title))
@@ -625,6 +661,34 @@ const CurriculumSessionPage: React.FC = () => {
             ))}
             {/* Body still shows — a paragraph may carry an aside without
                 becoming a bullet. */}
+            {pick(item.body) && (
+              <Typography component="p" sx={{ m: 0, mt: 0.4, fontSize: 13.5, lineHeight: 1.6, color: "#5b5680" }}>
+                {pick(item.body)}
+              </Typography>
+            )}
+          </Box>
+        ))}
+    </Box>
+  );
+
+  /**
+   * INTRODUCTION ONLY — the Psychoeducation preview, when that section is prose.
+   *
+   * A preview, so it stays a plain stack of items and leaves the source
+   * document's internal paragraphing to the section itself. The reader is here
+   * for the gist; the full shape waits on the Psychoeducation tab.
+   *
+   * Psychoeducation has `psychoedParagraphs`. Do not merge them.
+   */
+  const introParagraphs = (items: Item[]) => (
+    <Box sx={{ display: "grid", gap: 1.4, maxWidth: 1050 }}>
+      {items
+        .filter((item) => pick(item.title))
+        .map((item, i) => (
+          <Box key={i}>
+            <Typography component="p" sx={{ m: 0, fontSize: { xs: 14, md: 15.5 }, lineHeight: 1.75, color: INK }}>
+              {pick(item.title)}
+            </Typography>
             {pick(item.body) && (
               <Typography component="p" sx={{ m: 0, mt: 0.4, fontSize: 13.5, lineHeight: 1.6, color: "#5b5680" }}>
                 {pick(item.body)}
@@ -797,7 +861,7 @@ const CurriculumSessionPage: React.FC = () => {
               accent={accent}
             >
               {prosePsychoeducation ? (
-                <Box sx={{ ml: { md: 8.25 } }}>{proseParagraphs(psychoedSource?.items ?? [])}</Box>
+                <Box sx={{ ml: { md: 8.25 } }}>{introParagraphs(psychoedSource?.items ?? [])}</Box>
               ) : (
                 /* The first headed run, as a row of icon tiles — Session 1's shape. */
                 <Box
