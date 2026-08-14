@@ -735,12 +735,15 @@ const CurriculumSessionPage: React.FC = () => {
    *
    * Psychoeducation has `psychoedParagraphs`. Do not merge them.
    */
-  const introParagraphs = (items: Item[]) => {
+  const introParagraphs = (items: Item[], total: number) => {
     const paragraphs = items
       .filter((item) => pick(item.title))
       .flatMap((item) => paragraphsOf(pick(item.title)));
     const shown = paragraphs.slice(0, INTRO_PREVIEW_PARAGRAPHS);
-    const remaining = paragraphs.length - shown.length;
+    // Against the whole section, not just the run sampled here. The preview
+    // shows one group; the tab holds every group, and counting only this one
+    // once reported nothing left on a session with seventeen items waiting.
+    const remaining = Math.max(0, total - shown.length);
 
     return (
       <Box sx={{ maxWidth: 1050 }}>
@@ -768,7 +771,7 @@ const CurriculumSessionPage: React.FC = () => {
             </Typography>
           ))}
         </Box>
-        {remaining > 0 && seeMore("psychoeducation", remaining)}
+        {seeMore("psychoeducation", remaining)}
       </Box>
     );
   };
@@ -787,10 +790,14 @@ const CurriculumSessionPage: React.FC = () => {
         (psychoed?.groups ?? []).find((g) => isProse(g) || g.items.length > 1) ??
         psychoed?.groups?.[0];
       const psychoedItems = (psychoedSource?.items ?? []).slice(0, 6);
-      // What the tile row leaves out — the rest of this run, plus every run
-      // after it, since only the first is previewed here.
-      const psychoedRemaining =
-        (psychoed?.groups ?? []).reduce((n, g) => n + g.items.length, 0) - psychoedItems.length;
+      // Everything the section holds, counted in the units the preview shows.
+      // Across every group, not just the one sampled above — only the first run
+      // is previewed here, so the rest is exactly what the reader is missing.
+      const psychoedTotal = (psychoed?.groups ?? [])
+        .flatMap((g) => g.items)
+        .filter((item) => pick(item.title))
+        .flatMap((item) => paragraphsOf(pick(item.title))).length;
+      const psychoedRemaining = Math.max(0, psychoedTotal - psychoedItems.length);
       // Was pinned to one curriculum and sessions 2–7, so no other curriculum
       // could read as prose and session 8 could not either. It is now the
       // author's choice, stored on the group.
@@ -939,7 +946,7 @@ const CurriculumSessionPage: React.FC = () => {
               accent={accent}
             >
               {prosePsychoeducation ? (
-                <Box sx={{ ml: { md: 8.25 } }}>{introParagraphs(psychoedSource?.items ?? [])}</Box>
+                <Box sx={{ ml: { md: 8.25 } }}>{introParagraphs(psychoedSource?.items ?? [], psychoedTotal)}</Box>
               ) : (
                 /* The first headed run, as a row of icon tiles — Session 1's shape. */
                 <Box sx={{ ml: { md: 2.5 } }}>
@@ -966,7 +973,7 @@ const CurriculumSessionPage: React.FC = () => {
                       </Box>
                     ))}
                   </Box>
-                  {psychoedRemaining > 0 && seeMore("psychoeducation", psychoedRemaining)}
+                  {seeMore("psychoeducation", psychoedRemaining)}
                 </Box>
               )}
             </Section>
