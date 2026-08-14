@@ -285,12 +285,19 @@ const GroupsPage: React.FC = () => {
                     </IconButton>
                   </Tooltip>
 
-                  <CanDelete feature="groups">
-                    <Delete
-                      title={t("groups.deleteTitle", "Delete group")}
-                      onConfirm={() => removeGroup(group)}
-                    />
-                  </CanDelete>
+                  {/* The permission says the caller may delete groups;
+                      canManage says they may delete *this* one. Both are
+                      required, because a co-professional runs the group
+                      without being accountable for it — the server enforces
+                      the same rule and 403s regardless. */}
+                  {group.canManage && (
+                    <CanDelete feature="groups">
+                      <Delete
+                        title={t("groups.deleteTitle", "Delete group")}
+                        onConfirm={() => removeGroup(group)}
+                      />
+                    </CanDelete>
+                  )}
                 </Paper>
               ))}
             </Stack>

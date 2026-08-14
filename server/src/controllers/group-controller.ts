@@ -202,6 +202,11 @@ export const getGroups = async (
         ...group,
         totalParticipants: byGroup.get(String(group._id))?.participants ?? 0,
         sessionCount: byGroup.get(String(group._id))?.sessions ?? 0,
+        // Per row, because holding groups:delete is not the same as being
+        // allowed to delete *this* group — a co-professional can see a group
+        // they may not reshape. Without this the list can only gate on the
+        // permission and offers a button the server refuses.
+        canManage: canManage(req, group as unknown as GroupDoc),
       })),
     });
   } catch (error: any) {

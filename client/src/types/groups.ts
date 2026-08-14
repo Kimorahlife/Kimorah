@@ -25,6 +25,12 @@ export interface GroupSummary {
   totalParticipants: number;
   sessionCount: number;
   createdAt?: string;
+  /**
+   * Whether the caller may reshape or delete this group — the main
+   * professional or an admin. A co-professional records participants only, so
+   * the list uses this to decide which rows offer a delete.
+   */
+  canManage?: boolean;
 }
 
 /**
