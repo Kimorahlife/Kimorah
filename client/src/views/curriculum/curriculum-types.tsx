@@ -41,6 +41,11 @@ export interface Localized {
 }
 
 export interface CurriculumItem {
+  /**
+   * Overrides the group's layout for this one item, so a paragraph can sit
+   * among bullets without either being rendered as the other.
+   */
+  layout?: "prose" | "point";
   _id?: string;
   order: number;
   icon?: string;

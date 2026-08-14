@@ -54,7 +54,7 @@ const WHEN_LOVE_REMAINS_MAGENTA = "#aa3f7b";
 
 type Lang = "en" | "es";
 interface Localized { en: string; es: string }
-interface Item { icon?: string; title: Localized; lead?: Localized; body?: Localized; prompts: Localized[] }
+interface Item { icon?: string; title: Localized; lead?: Localized; body?: Localized; prompts: Localized[]; layout?: "prose" | "point" }
 /** Mirrors GROUP_LAYOUTS on the server; absent means "points". */
 type GroupLayout = "points" | "prose";
 interface Group { heading?: Localized; intro?: Localized; layout?: GroupLayout; items: Item[] }
@@ -512,6 +512,47 @@ const CurriculumSessionPage: React.FC = () => {
    */
   const isProse = (group?: Group): boolean => group?.layout === "prose";
 
+  /**
+   * Whether one item reads as a paragraph.
+   *
+   * An explicit `layout` on the item always wins. Failing that, a group that
+   * plainly mixes the two — a paragraph or more alongside a run of bullets —
+   * is judged item by item, because one flag cannot describe it: marking the
+   * group prose turns the bullets into paragraphs, marking it points turns the
+   * paragraph into a bullet. A group that is uniform keeps following its own
+   * layout exactly as before.
+   */
+  const PROSE_LENGTH = 200;
+  const POINT_LENGTH = 120;
+  const lengthOf = (item: Item): number => (pick(item.title) || "").trim().length;
+
+  const groupIsMixed = (group?: Group): boolean => {
+    const lengths = (group?.items ?? []).map(lengthOf);
+    return lengths.some((n) => n >= PROSE_LENGTH) && lengths.filter((n) => n <= POINT_LENGTH).length >= 2;
+  };
+
+  const itemIsProse = (item: Item, group?: Group): boolean => {
+    if (item.layout) return item.layout === "prose";
+    if (groupIsMixed(group)) return lengthOf(item) >= PROSE_LENGTH;
+    return group?.layout === "prose";
+  };
+
+  /** Consecutive items that render the same way, so each run is drawn once. */
+  const runsOf = (group?: Group): Array<{ prose: boolean; items: Item[] }> => {
+    const runs: Array<{ prose: boolean; items: Item[] }> = [];
+    for (const item of group?.items ?? []) {
+      const prose = itemIsProse(item, group);
+      const last = runs[runs.length - 1];
+      if (last && last.prose === prose) last.items.push(item);
+      else runs.push({ prose, items: [item] });
+    }
+    return runs;
+  };
+
+  /** True when the group contains any prose at all — it then wants full width. */
+  const hasProse = (group?: Group): boolean =>
+    (group?.items ?? []).some((item) => itemIsProse(item, group));
+
   const proseParagraphs = (items: Item[]) => (
     <Box sx={{ display: "grid", gap: 1.4, maxWidth: 1050 }}>
       {items
@@ -816,7 +857,7 @@ const CurriculumSessionPage: React.FC = () => {
                   p: 2.5,
                   // Paragraphs take the full width — prose set in a narrow
                   // column reads as a stack of fragments.
-                  gridColumn: isProse(first) ? { lg: "1 / -1" } : undefined,
+                  gridColumn: hasProse(first) ? { lg: "1 / -1" } : undefined,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}>
@@ -830,11 +871,11 @@ const CurriculumSessionPage: React.FC = () => {
                     {pick(first.intro)}
                   </Typography>
                 )}
-                {isProse(first) ? (
-                  proseParagraphs(first.items)
+                {runsOf(first).map((run, ri) => run.prose ? (
+                  <Box key={ri} sx={{ mb: 1.5 }}>{proseParagraphs(run.items)}</Box>
                 ) : (
-                  <Box sx={{ display: "grid", gap: 1.2 }}>
-                    {first.items.map((item, i) => (
+                  <Box key={ri} sx={{ display: "grid", gap: 1.2 }}>
+                    {run.items.map((item, i) => (
                       <Box key={i} sx={{ display: "flex", gap: 1.5, p: 1.7, bgcolor: "rgba(255,255,255,.86)", border: "1px solid rgba(69,45,143,.11)", borderRadius: 2.5 }}>
                         <Box sx={{ width: 46, height: 46, flexShrink: 0, borderRadius: "50%", bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`, color: accent, display: "grid", placeItems: "center", "& svg": { fontSize: 24 } }}>
                           {iconFor(item.icon, i)}
@@ -846,7 +887,7 @@ const CurriculumSessionPage: React.FC = () => {
                       </Box>
                     ))}
                   </Box>
-                )}
+                ))}
               </Box>
             )}
             {rest.map((group, gi) => (
@@ -857,7 +898,7 @@ const CurriculumSessionPage: React.FC = () => {
                   border: "1px solid rgba(69,45,143,.12)",
                   borderRadius: 3,
                   p: 2.5,
-                  gridColumn: isProse(group) ? { lg: "1 / -1" } : undefined,
+                  gridColumn: hasProse(group) ? { lg: "1 / -1" } : undefined,
                 }}
               >
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1.25, mb: 2 }}>
@@ -869,18 +910,18 @@ const CurriculumSessionPage: React.FC = () => {
                     {pick(group.intro)}
                   </Typography>
                 )}
-                {isProse(group) ? (
-                  proseParagraphs(group.items)
+                {runsOf(group).map((run, ri) => run.prose ? (
+                  <Box key={ri} sx={{ mb: 1.5 }}>{proseParagraphs(run.items)}</Box>
                 ) : (
-                  <Box sx={{ display: "grid", gap: 1.2 }}>
-                    {group.items.map((item, i) => (
+                  <Box key={ri} sx={{ display: "grid", gap: 1.2 }}>
+                    {run.items.map((item, i) => (
                       <Box key={i} sx={{ minHeight: 68, display: "flex", alignItems: "center", gap: 1.5, bgcolor: "rgba(255,255,255,.9)", borderRadius: 2.5, p: 1.5 }}>
                         <Box sx={{ color: accent, display: "flex", "& svg": { fontSize: 24 } }}>{iconFor(item.icon, i)}</Box>
                         <Typography sx={{ fontSize: 14, fontWeight: 700 }}>{pick(item.title)}</Typography>
                       </Box>
                     ))}
                   </Box>
-                )}
+                ))}
               </Box>
             ))}
           </Box>

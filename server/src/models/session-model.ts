@@ -34,6 +34,7 @@ import { Localized, localized, localizedList } from "./localized";
  * is still complete.
  */
 export interface CurriculumItem {
+  layout?: "prose" | "point";
   order: number;
   icon?: string;
   title: Localized;
@@ -44,6 +45,8 @@ export interface CurriculumItem {
 
 const itemSchema = new Schema<CurriculumItem>(
   {
+    // Overrides the group's layout for this item alone.
+    layout: { type: String, enum: ["prose", "point"], required: false },
     order: { type: Number, default: 0 },
     icon: { type: String, enum: [...CURRICULUM_ICONS, ""], default: "" },
     title: localized(),
