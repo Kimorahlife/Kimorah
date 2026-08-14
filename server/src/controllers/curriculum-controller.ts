@@ -119,11 +119,12 @@ const withSessions = async (doc: any): Promise<any> => ({
 const syncSessions = async (
   curriculumId: mongoose.Types.ObjectId,
   incoming: unknown,
+  tx?: mongoose.ClientSession,
 ): Promise<void> => {
   const normalized = normalizeSessions(incoming);
 
   const existing = new Set(
-    (await Sessions.find({ curriculumId }).select("_id").lean()).map((d) => String(d._id)),
+    (await Sessions.find({ curriculumId }).select("_id").session(tx ?? null).lean()).map((d) => String(d._id)),
   );
 
   const kept: mongoose.Types.ObjectId[] = [];
@@ -137,15 +138,15 @@ const syncSessions = async (
     };
 
     if (_id && existing.has(String(_id))) {
-      await Sessions.updateOne({ _id, curriculumId }, { $set: payload });
+      await Sessions.updateOne({ _id, curriculumId }, { $set: payload }, { session: tx });
       kept.push(new mongoose.Types.ObjectId(String(_id)));
     } else {
-      const created = await Sessions.create(payload);
+      const [created] = await Sessions.create([payload], { session: tx });
       kept.push(created._id);
     }
   }
 
-  await Sessions.deleteMany({ curriculumId, _id: { $nin: kept } });
+  await Sessions.deleteMany({ curriculumId, _id: { $nin: kept } }, { session: tx });
 };
 
 /** GET /api/curriculums/all — every curriculum, authoring order. */
@@ -275,11 +276,23 @@ export const updateCurriculum = async (
     const sessionsBefore =
       req.body?.sessions !== undefined ? await listSessions(doc._id) : [];
 
-    doc.set(pickWritable(req.body ?? {}));
-    await doc.save();
+    // One transaction for the whole save. Without it a failure part-way
+    // through leaves the curriculum updated, some sessions written and the
+    // delete of the rest already run — which is how a save can lose sessions.
+    const tx = await mongoose.startSession();
+    try {
+      await tx.withTransaction(async () => {
+        doc.set(pickWritable(req.body ?? {}));
+        await doc.save({ session: tx });
+        if (req.body?.sessions !== undefined) {
+          await syncSessions(doc._id, req.body.sessions, tx);
+        }
+      });
+    } finally {
+      await tx.endSession();
+    }
 
     if (req.body?.sessions !== undefined) {
-      await syncSessions(doc._id, req.body.sessions);
       const sessionsAfter = await listSessions(doc._id);
 
       await logChanges(
