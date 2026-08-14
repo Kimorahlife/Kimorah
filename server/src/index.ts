@@ -15,6 +15,7 @@ import researchRoutes from "./routes/research-routes";
 import curriculumRoutes from "./routes/curriculum-routes";
 import groupRoutes from "./routes/group-routes";
 import translationRoutes from "./routes/translation-routes";
+import professionalAffirmationRoutes from "./routes/professional-affirmation-routes";
 
 /**
  * Warn loudly at boot if required configuration is missing, so a bad deploy is
@@ -59,6 +60,7 @@ app.use("/api/research", researchRoutes);
 app.use("/api/curriculums", curriculumRoutes);
 app.use("/api/groups", groupRoutes);
 app.use("/api/translate", translationRoutes);
+app.use("/api/professional-affirmations", professionalAffirmationRoutes);
 
 // 404 + global error handler
 app.use(notFound);

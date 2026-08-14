@@ -80,6 +80,27 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
 
   const canSeeGroups = useFeatureFullAccess("groups");
   const [groups, setGroups] = useState<GroupSummary[]>([]);
+  const affirmationFallback = spanish
+    ? "El trabajo que realizo importa, incluso cuando su impacto no es visible de inmediato."
+    : "The work I do matters, even when its impact is not immediately visible.";
+  const [affirmation, setAffirmation] = useState(affirmationFallback);
+
+  // A fresh dashboard access receives a different database-backed affirmation.
+  useEffect(() => {
+    setAffirmation(affirmationFallback);
+    const previous = sessionStorage.getItem("professional-affirmation-id") || undefined;
+    api
+      .get("/api/professional-affirmations/random", {
+        params: { lang: spanish ? "es" : "en", ...(previous ? { exclude: previous } : {}) },
+      })
+      .then(({ data }) => {
+        const next = data?.message;
+        if (!next?.text) return;
+        setAffirmation(next.text);
+        if (next._id) sessionStorage.setItem("professional-affirmation-id", next._id);
+      })
+      .catch(() => setAffirmation(affirmationFallback));
+  }, [spanish]);
 
   // The dashboard reads groups rather than owning them: the list page is the
   // place to manage them, this is a way in and a count worth glancing at.
@@ -253,7 +274,7 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
               sidebar is gone, so it leads the right rail instead. */}
           <Box sx={{ borderRadius: "14px", overflow: "hidden", minHeight: 240, p: 3, color: "#fff", display: "flex", flexDirection: "column", backgroundImage: `linear-gradient(180deg, rgba(58,25,106,.35), rgba(20,15,67,.65)), url(${SUNSET})`, backgroundSize: "cover", backgroundPosition: "center" }}>
             <Typography sx={{ fontWeight: 600, fontSize: 14 }}>{spanish ? "Reflexión diaria" : "Daily Quote"}</Typography>
-            <Typography sx={{ fontFamily: "Georgia, serif", fontSize: 19, lineHeight: 1.8, mt: 2.5 }}>“Every choice is a step toward your well-being.”</Typography>
+            <Typography sx={{ fontFamily: "Georgia, serif", fontSize: 19, lineHeight: 1.8, mt: 2.5 }}>“{affirmation}”</Typography>
             <Typography sx={{ fontSize: 11, mt: "auto", textAlign: "right" }}>— KIMORAH LIFE</Typography>
           </Box>
           <Panel sx={{ p: 2.3 }}>

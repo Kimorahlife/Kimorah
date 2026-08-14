@@ -4,6 +4,8 @@ import { refreshCache } from "../services/permission-cache";
 import { KNOWN_PERMISSIONS } from "../config/permissions";
 import { CoquiQuestion } from "../models/coqui-question-model";
 import coquiSurvey from "../config/coqui-survey.json";
+import { PROFESSIONAL_AFFIRMATIONS } from "../config/professional-affirmations";
+import { ProfessionalAffirmations } from "../models/professional-affirmation-model";
 
 const ALL_PERMISSION_KEYS = KNOWN_PERMISSIONS.map((p) => p.key);
 
@@ -75,6 +77,24 @@ export async function seedCoquiQuestions(): Promise<void> {
   console.log(`✅ Coquí questions seeded from config (${questions.length}) — manage them in the DB from now on.`);
 }
 
+/** Add the curated professional affirmations without overwriting DB edits. */
+export async function seedProfessionalAffirmations(): Promise<void> {
+  await ProfessionalAffirmations.bulkWrite(
+    PROFESSIONAL_AFFIRMATIONS.map((translations, order) => ({
+      updateOne: {
+        filter: { text: translations.en },
+        update: {
+          $set: { translations },
+          $setOnInsert: { text: translations.en, order, active: true },
+        },
+        upsert: true,
+      },
+    })),
+  );
+  const count = await ProfessionalAffirmations.countDocuments({ active: true });
+  console.log(`✅ Professional affirmations available (${count})`);
+}
+
 /**
  * Boot sequence. Data is only ever additive here (upsert permissions, sync
  * survey questions) — deploying never creates roles and never mutates existing
@@ -84,5 +104,6 @@ export async function boot(): Promise<void> {
   await syncPermissions();
   await reportRoleState();
   await seedCoquiQuestions();
+  await seedProfessionalAffirmations();
   await refreshCache();
 }

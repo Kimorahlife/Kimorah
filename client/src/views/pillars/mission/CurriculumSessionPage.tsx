@@ -392,7 +392,8 @@ const CurriculumSessionPage: React.FC = () => {
    */
   const stored = curriculum?.accent?.trim();
   const authored = stored && stored !== DEFAULT_ACCENT ? stored : "";
-  const accent = authored || (slug === WHEN_LOVE_REMAINS_SLUG ? WHEN_LOVE_REMAINS_MAGENTA : PURPLE);
+  const curriculumSlug = String(curriculum?.slug || slug).trim().toLowerCase();
+  const accent = authored || (curriculumSlug === WHEN_LOVE_REMAINS_SLUG ? WHEN_LOVE_REMAINS_MAGENTA : PURPLE);
   // The hero keeps its near-black plum unless a curriculum carries its own
   // colour, in which case it is mixed down from that rather than hand-picked.
   const headerBackground =

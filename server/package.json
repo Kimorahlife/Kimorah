@@ -17,6 +17,7 @@
     "content:psychoeducation-icons": "dotenv -e .env.development.local -- tsx src/scripts/backfill-psychoeducation-icons.ts",
     "content:when-love-remains": "dotenv -e .env.development.local -- tsx src/scripts/import-when-love-remains-sessions.ts",
     "content:psychoeducation-layout": "dotenv -e .env.development.local -- tsx src/scripts/backfill-psychoeducation-layout.ts",
+    "content:professional-affirmations": "dotenv -e .env.development.local -- tsx src/scripts/seed-professional-affirmations.ts",
     "postbuild": "node scripts/copy-config.cjs",
     "start": "node dist/index.js"
   },
