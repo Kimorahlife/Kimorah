@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import mongoose from "mongoose";
 import { Roles } from "../models/roles-model";
 import { Users } from "../models/user-model";
 import HttpError from "../util/errors/http-error";
@@ -125,8 +126,17 @@ export const deleteRole = async (
 
     // Clear the role from any users who held it (they revert to no role /
     // no access), then remove the role and refresh the RBAC cache.
-    await Users.updateMany({ roles: role.name }, { $set: { roles: "" } });
-    await Roles.findByIdAndDelete(id);
+    // One transaction: a user must never be left holding a role that has been
+    // deleted, which is what happens if the second write fails on its own.
+    const tx = await mongoose.startSession();
+    try {
+      await tx.withTransaction(async () => {
+        await Users.updateMany({ roles: role.name }, { $set: { roles: "" } }, { session: tx });
+        await Roles.findByIdAndDelete(id, { session: tx });
+      });
+    } finally {
+      await tx.endSession();
+    }
     await refreshCache();
 
     res.status(200).json({ message: id });

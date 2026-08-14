@@ -1,4 +1,5 @@
 import { Request, Response, NextFunction } from "express";
+import mongoose from "mongoose";
 import { Permission } from "../models/permission-model";
 import { Roles } from "../models/roles-model";
 import HttpError from "../util/errors/http-error";
@@ -82,8 +83,17 @@ export const deletePermission = async (
     }
 
     // Pull the deleted key out of every role that grants it, then refresh cache.
-    await Roles.updateMany({ permissions: perm.key }, { $pull: { permissions: perm.key } });
-    await Permission.findByIdAndDelete(id);
+    // One transaction, for the same reason: a role must not keep a permission
+    // key that no longer exists in the catalog.
+    const tx = await mongoose.startSession();
+    try {
+      await tx.withTransaction(async () => {
+        await Roles.updateMany({ permissions: perm.key }, { $pull: { permissions: perm.key } }, { session: tx });
+        await Permission.findByIdAndDelete(id, { session: tx });
+      });
+    } finally {
+      await tx.endSession();
+    }
     await refreshCache();
 
     res.status(200).json({ message: id });
