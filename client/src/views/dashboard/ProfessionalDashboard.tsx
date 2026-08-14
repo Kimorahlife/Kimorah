@@ -127,17 +127,13 @@ export default function ProfessionalDashboard({ firstName }: { firstName?: strin
 
   return (
     <Box sx={{ color: INK, fontFamily: "'Inter', 'Arial', sans-serif" }}>
-      <Box>
-        <Typography sx={{ fontSize: { xs: 25, md: 31 }, fontWeight: 800 }}>{text.welcome} ✨</Typography>
-        <Typography sx={{ mt: .35, fontSize: 13.5 }}>{text.subtitle}</Typography>
-      </Box>
-
-      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", xl: "minmax(0, 2.4fr) minmax(270px, .85fr)" }, gap: 3, mt: 2.5 }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: { xs: "1fr", xl: "minmax(0, 2.4fr) minmax(270px, .85fr)" }, gap: 3 }}>
         <Box sx={{ minWidth: 0 }}>
           <Box sx={{ height: 188, borderRadius: "14px", overflow: "hidden", color: "#fff", px: { xs: 3, md: 4 }, py: 3.5, display: "flex", flexDirection: "column", justifyContent: "center", backgroundImage: `linear-gradient(90deg, rgba(37,17,84,.8), rgba(70,29,126,.2)), url(${SUNSET})`, backgroundSize: "cover", backgroundPosition: "center" }}>
-            <Typography sx={{ fontSize: { xs: 18, md: 20 }, lineHeight: 1.45, fontWeight: 600 }}>
-              {spanish ? <>Estás presente para los demás.<br />No olvides estar presente para ti.</> : <>You’re showing up for others.<br />Don’t forget to show up for yourself.</>}
+            <Typography sx={{ fontSize: { xs: 25, md: 31 }, lineHeight: 1.2, fontWeight: 800, color: "#fff" }}>
+              {text.welcome} ✨
             </Typography>
+            <Typography sx={{ mt: .75, fontSize: 13.5, color: "#fff" }}>{text.subtitle}</Typography>
           </Box>
 
           <Typography sx={{ mt: 2.4, mb: 1.5, fontSize: 17, fontWeight: 800 }}>{spanish ? "Resumen" : "At a Glance"}</Typography>
