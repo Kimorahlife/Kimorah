@@ -41,6 +41,7 @@ import LendAHandPage from "./views/pillars/kindness/LendAHandPage";
 import HarmonyPage from "./views/pillars/harmony/HarmonyPage";
 import LanguageSwitcher from "./views/shared/LanguageSwitcher";
 import SiteHeader from "./views/shared/SiteHeader";
+import AboutPage from "./views/about/AboutPage";
 import { useAutoTranslate } from "./views/shared/useAutoTranslate";
 
 // Pages that manage their own top-of-page chrome (no global SiteHeader).
@@ -70,6 +71,7 @@ const App: React.FC = () => {
       <Routes>
       {/* Public landing — the front door */}
       <Route path="/" element={<Landing />} />
+      <Route path="/about" element={<AboutPage />} />
 
       {/* Public auth routes */}
       <Route path="/login" element={<Login />} />
