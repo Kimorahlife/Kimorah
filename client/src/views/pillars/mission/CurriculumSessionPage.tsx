@@ -537,6 +537,38 @@ const CurriculumSessionPage: React.FC = () => {
     return group?.layout === "prose";
   };
 
+  /**
+   * A paragraph that sits between bullets gets the same panel the section
+   * opens with — a disc and a card. Left bare it reads as text that escaped
+   * the layout rather than a deliberate aside.
+   *
+   * The first run is already introduced by the group's own disc and heading,
+   * so it stays plain and does not repeat the mark.
+   */
+  const proseRun = (items: Item[], first: boolean) =>
+    first ? (
+      proseParagraphs(items)
+    ) : (
+      <Box
+        sx={{
+          bgcolor: "rgba(255,255,255,.86)",
+          border: "1px solid rgba(69,45,143,.14)",
+          borderRadius: 3,
+          p: 2.5,
+        }}
+      >
+        <Box
+          sx={{
+            width: 46, height: 46, borderRadius: "50%", bgcolor: accent, color: "white",
+            display: "grid", placeItems: "center", mb: 1.5,
+          }}
+        >
+          <LightbulbOutlinedIcon />
+        </Box>
+        {proseParagraphs(items)}
+      </Box>
+    );
+
   /** Consecutive items that render the same way, so each run is drawn once. */
   const runsOf = (group?: Group): Array<{ prose: boolean; items: Item[] }> => {
     const runs: Array<{ prose: boolean; items: Item[] }> = [];
@@ -872,7 +904,7 @@ const CurriculumSessionPage: React.FC = () => {
                   </Typography>
                 )}
                 {runsOf(first).map((run, ri) => run.prose ? (
-                  <Box key={ri} sx={{ mb: 1.5 }}>{proseParagraphs(run.items)}</Box>
+                  <Box key={ri} sx={{ mb: 1.5 }}>{proseRun(run.items, ri === 0)}</Box>
                 ) : (
                   <Box key={ri} sx={{ display: "grid", gap: 1.2 }}>
                     {run.items.map((item, i) => (
@@ -911,7 +943,7 @@ const CurriculumSessionPage: React.FC = () => {
                   </Typography>
                 )}
                 {runsOf(group).map((run, ri) => run.prose ? (
-                  <Box key={ri} sx={{ mb: 1.5 }}>{proseParagraphs(run.items)}</Box>
+                  <Box key={ri} sx={{ mb: 1.5 }}>{proseRun(run.items, ri === 0)}</Box>
                 ) : (
                   <Box key={ri} sx={{ display: "grid", gap: 1.2 }}>
                     {run.items.map((item, i) => (
