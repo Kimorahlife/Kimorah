@@ -8,10 +8,14 @@ import {
   Paper,
   Stack,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
 } from "@mui/material";
 import AddRoundedIcon from "@mui/icons-material/AddRounded";
+import FormatListBulletedRoundedIcon from "@mui/icons-material/FormatListBulletedRounded";
+import NotesRoundedIcon from "@mui/icons-material/NotesRounded";
 import ArrowDownwardRoundedIcon from "@mui/icons-material/ArrowDownwardRounded";
 import ArrowUpwardRoundedIcon from "@mui/icons-material/ArrowUpwardRounded";
 import DeleteOutlineRoundedIcon from "@mui/icons-material/DeleteOutlineRounded";
@@ -23,6 +27,7 @@ import {
   ICON_OPTIONS,
   Localized,
   SECTIONS_WITH_LEAD,
+  SECTIONS_WITH_LAYOUT,
   SECTIONS_WITH_PROMPTS,
   SECTION_LABELS,
   SectionKey,
@@ -32,6 +37,7 @@ import {
 
 /** True when an item carries anything beyond its one line of text. */
 const hasExtras = (item: CurriculumItem): boolean =>
+  item.layout === "prose" ||
   Boolean(item.icon) ||
   Boolean(item.lead?.en.trim()) ||
   Boolean(item.body?.en.trim()) ||
@@ -59,6 +65,8 @@ const ItemList: React.FC<{
 }> = ({ section, items, onChange, addLabel, disabled = false }) => {
   const showLead = SECTIONS_WITH_LEAD.includes(section);
   const showPrompts = SECTIONS_WITH_PROMPTS.includes(section);
+  // A paragraph only reads as one where the reader page honours it.
+  const showLayout = SECTIONS_WITH_LAYOUT.includes(section);
   const one = SECTION_LABELS[section].one;
   const placeholder = one.charAt(0).toUpperCase() + one.slice(1);
 
@@ -96,18 +104,45 @@ const ItemList: React.FC<{
 
   const add = () => onChange(reindex([...items, emptyItem(items.length)]));
 
+  /** A paragraph is a point that says outright that it is prose. */
+  const addParagraph = () =>
+    onChange(
+      reindex([
+        ...items,
+        { ...emptyItem(items.length), layout: "prose" as const },
+      ]),
+    );
+
+  const setLayout = (index: number, layout: "prose" | "point") =>
+    patch(index, { layout });
+
   const setPrompt = (index: number, pIndex: number, next: Localized) =>
-    patch(index, { prompts: items[index].prompts.map((p, i) => (i === pIndex ? next : p)) });
+    patch(index, {
+      prompts: items[index].prompts.map((p, i) => (i === pIndex ? next : p)),
+    });
 
   return (
     <Box>
       {items.map((item, index) => {
         const open = expanded.has(index);
         return (
-          <Paper key={item._id ?? index} variant="outlined" sx={{ mb: 1, borderRadius: 2, px: 1.5, py: 1.25 }}>
+          <Paper
+            key={item._id ?? index}
+            variant="outlined"
+            sx={{ mb: 1, borderRadius: 2, px: 1.5, py: 1.25 }}
+          >
             <Stack direction="row" spacing={0.5} alignItems="center">
               {iconNode(item.icon) && (
-                <Box sx={{ color: "primary.main", display: "flex", flexShrink: 0, mr: 0.5 }}>{iconNode(item.icon)}</Box>
+                <Box
+                  sx={{
+                    color: "primary.main",
+                    display: "flex",
+                    flexShrink: 0,
+                    mr: 0.5,
+                  }}
+                >
+                  {iconNode(item.icon)}
+                </Box>
               )}
 
               <TextField
@@ -115,13 +150,23 @@ const ItemList: React.FC<{
                 fullWidth
                 placeholder={`${placeholder} ${index + 1}`}
                 value={item.title.en}
-                onChange={(e) => patch(index, { title: { ...item.title, en: e.target.value } })}
+                onChange={(e) =>
+                  patch(index, { title: { ...item.title, en: e.target.value } })
+                }
                 disabled={disabled}
                 multiline
                 maxRows={4}
               />
 
-              <Tooltip title={open ? "Hide options" : hasExtras(item) ? "Options in use" : "More options"}>
+              <Tooltip
+                title={
+                  open
+                    ? "Hide options"
+                    : hasExtras(item)
+                      ? "Options in use"
+                      : "More options"
+                }
+              >
                 <span>
                   <IconButton
                     size="small"
@@ -130,27 +175,47 @@ const ItemList: React.FC<{
                     disabled={disabled}
                     color={hasExtras(item) ? "primary" : "default"}
                   >
-                    {open ? <ExpandLessRoundedIcon fontSize="small" /> : <TuneRoundedIcon fontSize="small" />}
+                    {open ? (
+                      <ExpandLessRoundedIcon fontSize="small" />
+                    ) : (
+                      <TuneRoundedIcon fontSize="small" />
+                    )}
                   </IconButton>
                 </span>
               </Tooltip>
               <Tooltip title="Move up">
                 <span>
-                  <IconButton size="small" aria-label="Move up" disabled={disabled || index === 0} onClick={() => move(index, -1)}>
+                  <IconButton
+                    size="small"
+                    aria-label="Move up"
+                    disabled={disabled || index === 0}
+                    onClick={() => move(index, -1)}
+                  >
                     <ArrowUpwardRoundedIcon fontSize="small" />
                   </IconButton>
                 </span>
               </Tooltip>
               <Tooltip title="Move down">
                 <span>
-                  <IconButton size="small" aria-label="Move down" disabled={disabled || index === items.length - 1} onClick={() => move(index, 1)}>
+                  <IconButton
+                    size="small"
+                    aria-label="Move down"
+                    disabled={disabled || index === items.length - 1}
+                    onClick={() => move(index, 1)}
+                  >
                     <ArrowDownwardRoundedIcon fontSize="small" />
                   </IconButton>
                 </span>
               </Tooltip>
               <Tooltip title="Remove">
                 <span>
-                  <IconButton size="small" aria-label="Remove" color="error" disabled={disabled} onClick={() => remove(index)}>
+                  <IconButton
+                    size="small"
+                    aria-label="Remove"
+                    color="error"
+                    disabled={disabled}
+                    onClick={() => remove(index)}
+                  >
                     <DeleteOutlineRoundedIcon fontSize="small" />
                   </IconButton>
                 </span>
@@ -159,6 +224,32 @@ const ItemList: React.FC<{
 
             <Collapse in={open} unmountOnExit>
               <Box sx={{ pt: 2 }}>
+                {showLayout && (
+                  <ToggleButtonGroup
+                    exclusive
+                    size="small"
+                    value={item.layout ?? "point"}
+                    onChange={(_, next) => next && setLayout(index, next)}
+                    disabled={disabled}
+                    sx={{ mb: 2, display: "block" }}
+                  >
+                    <ToggleButton
+                      value="point"
+                      sx={{ textTransform: "none", px: 1.5, gap: 0.75 }}
+                    >
+                      <FormatListBulletedRoundedIcon fontSize="small" />
+                      Point
+                    </ToggleButton>
+                    <ToggleButton
+                      value="prose"
+                      sx={{ textTransform: "none", px: 1.5, gap: 0.75 }}
+                    >
+                      <NotesRoundedIcon fontSize="small" />
+                      Paragraph
+                    </ToggleButton>
+                  </ToggleButtonGroup>
+                )}
+
                 <TextField
                   select
                   size="small"
@@ -197,11 +288,20 @@ const ItemList: React.FC<{
 
                 {showPrompts && (
                   <Box>
-                    <Typography variant="caption" sx={{ fontWeight: 700, color: "text.secondary" }}>
+                    <Typography
+                      variant="caption"
+                      sx={{ fontWeight: 700, color: "text.secondary" }}
+                    >
                       Reflection prompts
                     </Typography>
                     {item.prompts.map((p, pIndex) => (
-                      <Stack key={pIndex} direction="row" spacing={1} alignItems="flex-start" sx={{ mt: 1 }}>
+                      <Stack
+                        key={pIndex}
+                        direction="row"
+                        spacing={1}
+                        alignItems="flex-start"
+                        sx={{ mt: 1 }}
+                      >
                         <Box sx={{ flex: 1, minWidth: 0 }}>
                           <ContentField
                             label={`Prompt ${pIndex + 1}`}
@@ -214,7 +314,13 @@ const ItemList: React.FC<{
                           size="small"
                           color="error"
                           disabled={disabled}
-                          onClick={() => patch(index, { prompts: item.prompts.filter((_, i) => i !== pIndex) })}
+                          onClick={() =>
+                            patch(index, {
+                              prompts: item.prompts.filter(
+                                (_, i) => i !== pIndex,
+                              ),
+                            })
+                          }
                           sx={{ mt: 2.5 }}
                         >
                           <DeleteOutlineRoundedIcon fontSize="small" />
@@ -225,7 +331,11 @@ const ItemList: React.FC<{
                       size="small"
                       startIcon={<AddRoundedIcon />}
                       disabled={disabled}
-                      onClick={() => patch(index, { prompts: [...item.prompts, { en: "", es: "" }] })}
+                      onClick={() =>
+                        patch(index, {
+                          prompts: [...item.prompts, { en: "", es: "" }],
+                        })
+                      }
                       sx={{ textTransform: "none", mt: 1 }}
                     >
                       Add prompt
@@ -238,9 +348,28 @@ const ItemList: React.FC<{
         );
       })}
 
-      <Button variant="outlined" startIcon={<AddRoundedIcon />} onClick={add} disabled={disabled} sx={{ textTransform: "none", borderRadius: 2 }}>
-        {addLabel}
-      </Button>
+      <Stack direction="row" spacing={1} sx={{ flexWrap: "wrap", rowGap: 1 }}>
+        <Button
+          variant="outlined"
+          startIcon={<AddRoundedIcon />}
+          onClick={add}
+          disabled={disabled}
+          sx={{ textTransform: "none", borderRadius: 2 }}
+        >
+          {addLabel}
+        </Button>
+        {showLayout && (
+          <Button
+            variant="outlined"
+            startIcon={<NotesRoundedIcon />}
+            onClick={addParagraph}
+            disabled={disabled}
+            sx={{ textTransform: "none", borderRadius: 2 }}
+          >
+            Add paragraph
+          </Button>
+        )}
+      </Stack>
     </Box>
   );
 };

@@ -524,16 +524,31 @@ const CurriculumSessionPage: React.FC = () => {
    */
   const PROSE_LENGTH = 200;
   const POINT_LENGTH = 120;
-  const lengthOf = (item: Item): number => (pick(item.title) || "").trim().length;
+  const textOf = (item: Item): string => (pick(item.title) || "").trim();
+
+  /**
+   * Reads like a paragraph rather than a bullet.
+   *
+   * A line break is the surer signal: a bullet is one line by definition, so
+   * anything an author has broken across lines is prose whatever its length.
+   * Length alone misses a short paragraph — "The goal is not to leave behind…"
+   * runs to 184 characters over three lines, and sat as a bullet until this
+   * looked past the character count.
+   */
+  const readsAsProse = (item: Item): boolean => {
+    const text = textOf(item);
+    return text.includes("\n") || text.length >= PROSE_LENGTH;
+  };
 
   const groupIsMixed = (group?: Group): boolean => {
-    const lengths = (group?.items ?? []).map(lengthOf);
-    return lengths.some((n) => n >= PROSE_LENGTH) && lengths.filter((n) => n <= POINT_LENGTH).length >= 2;
+    const items = group?.items ?? [];
+    return items.some(readsAsProse) &&
+      items.filter((i) => !readsAsProse(i) && textOf(i).length <= POINT_LENGTH).length >= 2;
   };
 
   const itemIsProse = (item: Item, group?: Group): boolean => {
     if (item.layout) return item.layout === "prose";
-    if (groupIsMixed(group)) return lengthOf(item) >= PROSE_LENGTH;
+    if (groupIsMixed(group)) return readsAsProse(item);
     return group?.layout === "prose";
   };
 
@@ -585,15 +600,29 @@ const CurriculumSessionPage: React.FC = () => {
   const hasProse = (group?: Group): boolean =>
     (group?.items ?? []).some((item) => itemIsProse(item, group));
 
+  /**
+   * A prose item may hold several paragraphs, separated by line breaks in the
+   * source document. HTML collapses those to spaces, so split them here or the
+   * whole item arrives as one run-on wall of text.
+   */
+  const paragraphsOf = (text: string): string[] =>
+    text.split(/\n+/).map((p) => p.trim()).filter(Boolean);
+
   const proseParagraphs = (items: Item[]) => (
     <Box sx={{ display: "grid", gap: 1.4, maxWidth: 1050 }}>
       {items
         .filter((item) => pick(item.title))
         .map((item, i) => (
-          <Box key={i}>
-            <Typography component="p" sx={{ m: 0, fontSize: { xs: 14, md: 15.5 }, lineHeight: 1.75, color: INK }}>
-              {pick(item.title)}
-            </Typography>
+          <Box key={i} sx={{ display: "grid", gap: 1.4 }}>
+            {paragraphsOf(pick(item.title)).map((paragraph, pi) => (
+              <Typography
+                key={pi}
+                component="p"
+                sx={{ m: 0, fontSize: { xs: 14, md: 15.5 }, lineHeight: 1.75, color: INK }}
+              >
+                {paragraph}
+              </Typography>
+            ))}
             {/* Body still shows — a paragraph may carry an aside without
                 becoming a bullet. */}
             {pick(item.body) && (
