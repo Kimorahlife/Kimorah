@@ -671,33 +671,107 @@ const CurriculumSessionPage: React.FC = () => {
     </Box>
   );
 
+  /** How much of a prose section the Introduction shows before handing over. */
+  const INTRO_PREVIEW_PARAGRAPHS = 2;
+
+  /** Sends the reader to a tab of this same session. */
+  const goToTab = (id: TabId) => navigate(`${base}/session/${session.number}/${id}`);
+
   /**
-   * INTRODUCTION ONLY — the Psychoeducation preview, when that section is prose.
+   * The link out of a preview and into the section that owns it.
    *
-   * A preview, so it stays a plain stack of items and leaves the source
-   * document's internal paragraphing to the section itself. The reader is here
-   * for the gist; the full shape waits on the Psychoeducation tab.
+   * Kept honest about where it goes: an arrow, not a chevron, because this
+   * leaves the page rather than expanding in place.
+   */
+  const seeMore = (id: TabId, remaining: number) => (
+    <Box
+      sx={{
+        display: "flex", alignItems: "center", gap: 2,
+        mt: 2.25, pt: 1.75,
+        borderTop: "1px solid rgba(69,45,143,.12)",
+        flexWrap: "wrap",
+      }}
+    >
+      <Button
+        onClick={() => goToTab(id)}
+        endIcon={<ArrowForwardRoundedIcon />}
+        sx={{
+          textTransform: "none",
+          fontWeight: 700,
+          fontSize: 14.5,
+          color: accent,
+          borderRadius: 99,
+          px: 2.25, py: 0.75,
+          border: `1px solid color-mix(in srgb, ${accent} 32%, transparent)`,
+          bgcolor: `color-mix(in srgb, ${accent} 6%, #fff)`,
+          "&:hover": {
+            bgcolor: `color-mix(in srgb, ${accent} 12%, #fff)`,
+            borderColor: accent,
+          },
+          "& .MuiButton-endIcon": { transition: "transform .18s ease" },
+          "&:hover .MuiButton-endIcon": { transform: "translateX(3px)" },
+        }}
+      >
+        {lang === "es" ? "Ver más" : "See more"}
+      </Button>
+      {remaining > 0 && (
+        <Typography sx={{ fontSize: 13, color: "#6d6892" }}>
+          {lang === "es"
+            ? `${remaining} ${remaining === 1 ? "parte más" : "partes más"} en Psicoeducación`
+            : `${remaining} more ${remaining === 1 ? "part" : "parts"} in Psychoeducation`}
+        </Typography>
+      )}
+    </Box>
+  );
+
+  /**
+   * INTRODUCTION ONLY — the opening of the Psychoeducation section.
+   *
+   * A preview, and only a preview. Long-form psychoeducation runs to twenty-odd
+   * items, and printed whole here it buried the rest of the Introduction and
+   * left every bullet reading as a stray one-line paragraph. So it shows the
+   * opening paragraphs, fades the cut, and hands the reader to the tab that
+   * owns the rest.
    *
    * Psychoeducation has `psychoedParagraphs`. Do not merge them.
    */
-  const introParagraphs = (items: Item[]) => (
-    <Box sx={{ display: "grid", gap: 1.4, maxWidth: 1050 }}>
-      {items
-        .filter((item) => pick(item.title))
-        .map((item, i) => (
-          <Box key={i}>
-            <Typography component="p" sx={{ m: 0, fontSize: { xs: 14, md: 15.5 }, lineHeight: 1.75, color: INK }}>
-              {pick(item.title)}
+  const introParagraphs = (items: Item[]) => {
+    const paragraphs = items
+      .filter((item) => pick(item.title))
+      .flatMap((item) => paragraphsOf(pick(item.title)));
+    const shown = paragraphs.slice(0, INTRO_PREVIEW_PARAGRAPHS);
+    const remaining = paragraphs.length - shown.length;
+
+    return (
+      <Box sx={{ maxWidth: 1050 }}>
+        <Box sx={{ display: "grid", gap: 1.4 }}>
+          {shown.map((paragraph, i) => (
+            <Typography
+              key={i}
+              component="p"
+              sx={{
+                m: 0,
+                fontSize: { xs: 14, md: 15.5 },
+                lineHeight: 1.75,
+                color: INK,
+                // The last line of the cut trails off, so the preview reads as
+                // an opening rather than as text that stops mid-thought.
+                ...(remaining > 0 && i === shown.length - 1
+                  ? {
+                      WebkitMaskImage: "linear-gradient(180deg,#000 62%,rgba(0,0,0,.25) 100%)",
+                      maskImage: "linear-gradient(180deg,#000 62%,rgba(0,0,0,.25) 100%)",
+                    }
+                  : {}),
+              }}
+            >
+              {paragraph}
             </Typography>
-            {pick(item.body) && (
-              <Typography component="p" sx={{ m: 0, mt: 0.4, fontSize: 13.5, lineHeight: 1.6, color: "#5b5680" }}>
-                {pick(item.body)}
-              </Typography>
-            )}
-          </Box>
-        ))}
-    </Box>
-  );
+          ))}
+        </Box>
+        {remaining > 0 && seeMore("psychoeducation", remaining)}
+      </Box>
+    );
+  };
 
   const body = () => {
     const tab = TABS.find((t) => t.id === active)!;
@@ -713,6 +787,10 @@ const CurriculumSessionPage: React.FC = () => {
         (psychoed?.groups ?? []).find((g) => isProse(g) || g.items.length > 1) ??
         psychoed?.groups?.[0];
       const psychoedItems = (psychoedSource?.items ?? []).slice(0, 6);
+      // What the tile row leaves out — the rest of this run, plus every run
+      // after it, since only the first is previewed here.
+      const psychoedRemaining =
+        (psychoed?.groups ?? []).reduce((n, g) => n + g.items.length, 0) - psychoedItems.length;
       // Was pinned to one curriculum and sessions 2–7, so no other curriculum
       // could read as prose and session 8 could not either. It is now the
       // author's choice, stored on the group.
@@ -864,29 +942,31 @@ const CurriculumSessionPage: React.FC = () => {
                 <Box sx={{ ml: { md: 8.25 } }}>{introParagraphs(psychoedSource?.items ?? [])}</Box>
               ) : (
                 /* The first headed run, as a row of icon tiles — Session 1's shape. */
-                <Box
-                  sx={{
-                    display: "grid",
-                    gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: `repeat(${Math.max(psychoedItems.length, 1)},1fr)` },
-                    ml: { md: 2.5 },
-                    alignItems: "stretch",
-                  }}
-                >
-                  {psychoedItems.map((item, i) => (
-                    <Box
-                      key={i}
-                      sx={{
-                        textAlign: "center", px: 2, py: 1.5, minHeight: 165,
-                        display: "flex", flexDirection: "column", alignItems: "center",
-                        borderRight: { md: i < psychoedItems.length - 1 ? "1px solid rgba(73,50,139,.14)" : 0 },
-                      }}
-                    >
-                      <Box sx={{ minHeight: 58, mb: 1.25, color: accent, display: "grid", placeItems: "center", "& svg": { fontSize: 42, strokeWidth: 0.75 } }}>
-                        {psychoeducationOverviewIcon(i)}
+                <Box sx={{ ml: { md: 2.5 } }}>
+                  <Box
+                    sx={{
+                      display: "grid",
+                      gridTemplateColumns: { xs: "1fr", sm: "repeat(2,1fr)", md: `repeat(${Math.max(psychoedItems.length, 1)},1fr)` },
+                      alignItems: "stretch",
+                    }}
+                  >
+                    {psychoedItems.map((item, i) => (
+                      <Box
+                        key={i}
+                        sx={{
+                          textAlign: "center", px: 2, py: 1.5, minHeight: 165,
+                          display: "flex", flexDirection: "column", alignItems: "center",
+                          borderRight: { md: i < psychoedItems.length - 1 ? "1px solid rgba(73,50,139,.14)" : 0 },
+                        }}
+                      >
+                        <Box sx={{ minHeight: 58, mb: 1.25, color: accent, display: "grid", placeItems: "center", "& svg": { fontSize: 42, strokeWidth: 0.75 } }}>
+                          {psychoeducationOverviewIcon(i)}
+                        </Box>
+                        <Typography sx={{ fontSize: 12, lineHeight: 1.4, maxWidth: 210 }}>{pick(item.title)}</Typography>
                       </Box>
-                      <Typography sx={{ fontSize: 12, lineHeight: 1.4, maxWidth: 210 }}>{pick(item.title)}</Typography>
-                    </Box>
-                  ))}
+                    ))}
+                  </Box>
+                  {psychoedRemaining > 0 && seeMore("psychoeducation", psychoedRemaining)}
                 </Box>
               )}
             </Section>
