@@ -21,7 +21,7 @@ const ServiceCard: React.FC<{ service: ImmersiveService; onAction?: () => void }
     }}
   >
     {service.imageUrl ? (
-      <Box component="img" src={service.imageUrl} alt={service.title} sx={{ width: "100%", height: { xs: 132, sm: 152 }, objectFit: "cover" }} />
+      <Box component="img" src={service.imageUrl} alt={service.title} sx={{ width: "100%", height: { xs: 132, sm: 152 }, objectFit: "cover", objectPosition: service.id === "grief" ? "center 36%" : "center" }} />
     ) : (
       <Box sx={{ height: { xs: 132, sm: 152 }, display: "flex", alignItems: "center", justifyContent: "center", background: "linear-gradient(135deg, #b7a6d6 0%, #8b79bd 100%)" }}>
         <SpaRoundedIcon sx={{ color: "rgba(255,255,255,0.5)", fontSize: 46 }} />

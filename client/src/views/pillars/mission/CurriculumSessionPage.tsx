@@ -534,8 +534,6 @@ const CurriculumSessionPage: React.FC = () => {
    * A decision, not a drawing — shared on purpose, so the same group cannot
    * read as prose in Psychoeducation and as tiles in the Introduction.
    */
-  const isProse = (group?: Group): boolean => group?.layout === "prose";
-
   /**
    * Whether one item reads as a paragraph.
    *
@@ -783,13 +781,16 @@ const CurriculumSessionPage: React.FC = () => {
     if (active === "introduction") {
       const objectives = (session.sections?.objectives?.groups ?? []).flatMap((g) => g.items);
       const psychoed = session.sections?.psychoeducation;
-      // Session 1 shows the first headed run here, not every point. A group
-      // marked as prose is preferred outright; otherwise the first with more
-      // than one item, since a lone item makes a poor tile row.
+      // Session 1 shows the first headed run here, not every point. Prefer a
+      // group containing prose, whether the builder stored that choice on the
+      // whole group or on an individual item. Otherwise use the first group
+      // with enough items to make a useful tile row.
       const psychoedSource =
-        (psychoed?.groups ?? []).find((g) => isProse(g) || g.items.length > 1) ??
+        (psychoed?.groups ?? []).find((g) => hasProse(g) || g.items.length > 1) ??
         psychoed?.groups?.[0];
       const psychoedItems = (psychoedSource?.items ?? []).slice(0, 6);
+      const psychoedProseItems = (psychoedSource?.items ?? [])
+        .filter((item) => itemIsProse(item, psychoedSource));
       // Everything the section holds, counted in the units the preview shows.
       // Across every group, not just the one sampled above — only the first run
       // is previewed here, so the rest is exactly what the reader is missing.
@@ -798,10 +799,10 @@ const CurriculumSessionPage: React.FC = () => {
         .filter((item) => pick(item.title))
         .flatMap((item) => paragraphsOf(pick(item.title))).length;
       const psychoedRemaining = Math.max(0, psychoedTotal - psychoedItems.length);
-      // Was pinned to one curriculum and sessions 2–7, so no other curriculum
-      // could read as prose and session 8 could not either. It is now the
-      // author's choice, stored on the group.
-      const prosePsychoeducation = isProse(psychoedSource);
+      // Honor both levels the builder supports. A mixed group can therefore
+      // open as prose here without turning its short point items into narrow,
+      // icon-led columns around one long paragraph.
+      const prosePsychoeducation = psychoedProseItems.length > 0;
       return (
         <>
           {/* Group only — the template has no participants to record. Sits at
@@ -946,7 +947,7 @@ const CurriculumSessionPage: React.FC = () => {
               accent={accent}
             >
               {prosePsychoeducation ? (
-                <Box sx={{ ml: { md: 8.25 } }}>{introParagraphs(psychoedSource?.items ?? [], psychoedTotal)}</Box>
+                <Box sx={{ ml: { md: 8.25 } }}>{introParagraphs(psychoedProseItems, psychoedTotal)}</Box>
               ) : (
                 /* The first headed run, as a row of icon tiles — Session 1's shape. */
                 <Box sx={{ ml: { md: 2.5 } }}>
@@ -991,6 +992,14 @@ const CurriculumSessionPage: React.FC = () => {
         borderRadius: 3,
       };
       const feedback = (session.feedback ?? []).filter((f) => pick(f));
+      // The builder's closing field is authored as prose. Blank lines mark
+      // paragraph boundaries and single line breaks may structure a short
+      // list, so render both instead of letting HTML collapse them to spaces.
+      const closingParagraphs = pick(session.closing)
+        .replace(/\r\n/g, "\n")
+        .split(/\n\s*\n+/)
+        .map((paragraph) => paragraph.trim())
+        .filter(Boolean);
       return (
         <Box sx={{ display: "grid", gap: 2, minWidth: 0 }}>
           {pick(session.closing) && (
@@ -1001,7 +1010,17 @@ const CurriculumSessionPage: React.FC = () => {
                   {lang === "es" ? "Cierre psicoeducativo" : "Psychoeducational closing"}
                 </Typography>
               </Box>
-              <Typography sx={{ mt: 2.5, fontSize: { xs: 15, md: 17 }, lineHeight: 1.75 }}>{pick(session.closing)}</Typography>
+              <Box sx={{ mt: 2.5, display: "grid", gap: 2 }}>
+                {closingParagraphs.map((paragraph, index) => (
+                  <Typography
+                    key={index}
+                    component="p"
+                    sx={{ m: 0, fontSize: { xs: 15, md: 17 }, lineHeight: 1.75, whiteSpace: "pre-line" }}
+                  >
+                    {paragraph}
+                  </Typography>
+                ))}
+              </Box>
             </Box>
           )}
 

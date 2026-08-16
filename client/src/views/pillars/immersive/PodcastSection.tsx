@@ -27,13 +27,18 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ heading, subtitle, podc
       sx={{
         mt: 3,
         display: "grid",
-        gridTemplateColumns: { xs: "1fr 1fr", md: "repeat(4, 1fr)" },
+        gridTemplateColumns: { xs: "1fr", sm: "repeat(2, 1fr)", lg: "repeat(auto-fit, minmax(210px, 1fr))" },
         gap: { xs: 1.5, sm: 2.5 },
       }}
     >
       {podcasts.map((podcast) => (
         <Box
+          component="a"
           key={podcast.id}
+          href={podcast.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label={`${podcast.title} — YouTube playlist`}
           sx={{
             display: "flex",
             flexDirection: "column",
@@ -42,19 +47,44 @@ const PodcastSection: React.FC<PodcastSectionProps> = ({ heading, subtitle, podc
             bgcolor: "rgba(255,255,255,0.88)",
             backdropFilter: "blur(8px)",
             boxShadow: "0 6px 18px rgba(60,40,90,0.12)",
+            color: "inherit",
+            textDecoration: "none",
+            cursor: "pointer",
+            transition: "transform .18s ease, box-shadow .18s ease",
+            "&:hover, &:focus-visible": {
+              transform: "translateY(-4px)",
+              boxShadow: "0 12px 26px rgba(60,40,90,0.2)",
+              outline: "none",
+            },
           }}
         >
-          <Box
-            sx={{
-              height: 92,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              background: "linear-gradient(135deg, #a89ac9 0%, #7d6bb0 100%)",
-            }}
-          >
-            <HeadphonesRoundedIcon sx={{ color: "rgba(255,255,255,0.55)", fontSize: 34 }} />
-          </Box>
+          {podcast.imageUrl ? (
+            <Box
+              component="img"
+              src={podcast.imageUrl}
+              alt=""
+              aria-hidden="true"
+              sx={{
+                display: "block",
+                width: "100%",
+                height: 92,
+                objectFit: "cover",
+                objectPosition: "center",
+              }}
+            />
+          ) : (
+            <Box
+              sx={{
+                height: 92,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                background: "linear-gradient(135deg, #a89ac9 0%, #7d6bb0 100%)",
+              }}
+            >
+              <HeadphonesRoundedIcon sx={{ color: "rgba(255,255,255,0.55)", fontSize: 34 }} />
+            </Box>
+          )}
           <Box sx={{ p: { xs: 1.5, sm: 2 }, textAlign: "center" }}>
             <Typography sx={{ fontFamily: SERIF, fontWeight: 700, color: INDIGO, fontSize: { xs: 15, sm: 17 } }}>
               {podcast.title}
