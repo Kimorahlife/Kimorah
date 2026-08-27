@@ -99,7 +99,7 @@ const App: React.FC = () => {
       <Route path="/groups/:groupId/c/:slug/session/:number" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/groups/:groupId/c/:slug/session/:number/:section" element={<RequireAuth element={<CurriculumSessionPage />} />} />
       <Route path="/coqui-questions" element={<PrivateRoute requireFeature="research" element={<CoquiQuestions />} />} />
-      <Route path="/curriculums" element={<PrivateRoute requireFeature="curriculums" element={<CurriculumBuilder />} />} />
+      <Route path="/curriculums" element={<PrivateRoute requireFeature="curriculum-builder" element={<CurriculumBuilder />} />} />
 
       {/* Member workspace — permissions and sidebar entries exist, the pages
           don't yet. Each is gated like a finished page, so building the real

@@ -25,6 +25,8 @@ export type Feature =
   | "roles"
   | "research"
   | "curriculums"
+  // Authoring curricula, as opposed to reading them above.
+  | "curriculum-builder"
   // A professional running a curriculum with a set of people.
   | "groups"
   // Member workspace. The pages behind these are not built yet — granting one
@@ -124,6 +126,12 @@ export const FEATURE_PERMISSIONS: Record<Feature, FeaturePerms> = {
   roles: { read: ["roles:read"], add: ["roles:add"], write: ["roles:write"], delete: ["roles:delete"] },
   research: { read: ["research:read"], add: ["research:add"], write: ["research:write"], delete: ["research:delete"] },
   curriculums: { read: ["curriculums:read"], add: ["curriculums:add"], write: ["curriculums:write"], delete: ["curriculums:delete"] },
+  "curriculum-builder": {
+    read: ["curriculum-builder:read"],
+    add: ["curriculum-builder:add"],
+    write: ["curriculum-builder:write"],
+    delete: ["curriculum-builder:delete"],
+  },
   groups: { read: ["groups:read"], add: ["groups:add"], write: ["groups:write"], delete: ["groups:delete"] },
   profile: { read: ["profile:read"], add: ["profile:add"], write: ["profile:write"], delete: ["profile:delete"] },
   bookmarks: { read: ["bookmarks:read"], add: ["bookmarks:add"], write: ["bookmarks:write"], delete: ["bookmarks:delete"] },
