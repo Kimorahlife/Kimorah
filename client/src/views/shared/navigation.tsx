@@ -59,6 +59,9 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
   const showRoles = hasFullUiAccess(userPermissions, "roles", isGlobal);
   const showResearch = hasFullUiAccess(userPermissions, "research", isGlobal);
   const showCurriculums = hasFullUiAccess(userPermissions, "curriculums", isGlobal);
+  // Authoring is its own grant: reading the curricula does not confer the
+  // power to rewrite them.
+  const showCurriculumBuilder = hasFullUiAccess(userPermissions, "curriculum-builder", isGlobal);
   const showGroups = hasFullUiAccess(userPermissions, "groups", isGlobal);
   const showDashboard = hasFullUiAccess(userPermissions, "dashboard", isGlobal);
   const showProfessionalDashboard = hasFullUiAccess(userPermissions, "professional-dashboard", isGlobal);
@@ -125,7 +128,7 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
   }
 
   // Administration — user/role management plus the Coquí question bank.
-  if (showUsers || showRoles || showResearch || showCurriculums) {
+  if (showUsers || showRoles || showResearch || showCurriculumBuilder) {
     nav.push({ kind: "header", title: t("nav.administration", "Administration") });
     if (showUsers) {
       nav.push({
@@ -151,7 +154,7 @@ export function getVisibleNavigation(userPermissions: string[], isGlobal: boolea
     // Authoring for the Mission curricula. It sits in Administration rather
     // than Professional Access because that section is for editing, and it
     // keeps the read-only "Curriculums" → /mission entry unambiguous.
-    if (showCurriculums) {
+    if (showCurriculumBuilder) {
       nav.push({
         segment: "curriculums",
         title: t("nav.curriculumBuilder", "Curriculum Builder"),

@@ -96,14 +96,14 @@ const CurriculumBuilder: React.FC = () => {
         </Box>
       }
       secondary={
-        <CanAdd feature="curriculums">
+        <CanAdd feature="curriculum-builder">
           <Button variant="contained" startIcon={<AddIcon />} onClick={openNew} sx={{ textTransform: "none", borderRadius: 2 }}>
             {t("curriculum.add", "New Curriculum")}
           </Button>
         </CanAdd>
       }
     >
-      <ReadOnlyBanner feature="curriculums" />
+      <ReadOnlyBanner feature="curriculum-builder" />
 
       {state.loading && list.length === 0 ? (
         <Spinner />
@@ -163,7 +163,7 @@ const CurriculumBuilder: React.FC = () => {
 
               <Divider orientation="vertical" flexItem sx={{ mx: 0.5, height: 28, alignSelf: "center" }} />
 
-              <CanEdit feature="curriculums">
+              <CanEdit feature="curriculum-builder">
                 <Tooltip title={t("common.edit", "Edit")}>
                   <IconButton size="small" onClick={() => openEdit(c)} sx={{ color: "primary.main" }}>
                     <EditIcon fontSize="small" />
@@ -171,7 +171,7 @@ const CurriculumBuilder: React.FC = () => {
                 </Tooltip>
               </CanEdit>
 
-              <CanDelete feature="curriculums">
+              <CanDelete feature="curriculum-builder">
                 <Delete
                   title={t("curriculum.deleteTitle", "Delete curriculum")}
                   onConfirm={() => requestDelete(c)}

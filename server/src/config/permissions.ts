@@ -47,11 +47,21 @@ export const KNOWN_PERMISSIONS: KnownPermission[] = [
   { key: "research:write",  label: "Research (Coquí) – Edit",   group: "Research", action: "write"  },
   { key: "research:delete", label: "Research (Coquí) – Delete", group: "Research", action: "delete" },
 
-  // Curriculums (Mission session curricula)
+  // Curriculums (Mission session curricula) — reading them. Grants the
+  // read-only Curriculums entry and the "Explore curriculum" buttons.
   { key: "curriculums:read",   label: "Curriculums – View",   group: "Curriculums", action: "read"   },
   { key: "curriculums:add",    label: "Curriculums – Add",    group: "Curriculums", action: "add"    },
   { key: "curriculums:write",  label: "Curriculums – Edit",   group: "Curriculums", action: "write"  },
   { key: "curriculums:delete", label: "Curriculums – Delete", group: "Curriculums", action: "delete" },
+
+  // Curriculum Builder — authoring them. Separate from Curriculums above
+  // because reading a curriculum and rewriting it are different privileges:
+  // while they shared one key, granting a professional the reading list also
+  // let them edit and delete every curriculum in it.
+  { key: "curriculum-builder:read",   label: "Curriculum Builder – View",   group: "Curriculum Builder", action: "read"   },
+  { key: "curriculum-builder:add",    label: "Curriculum Builder – Add",    group: "Curriculum Builder", action: "add"    },
+  { key: "curriculum-builder:write",  label: "Curriculum Builder – Edit",   group: "Curriculum Builder", action: "write"  },
+  { key: "curriculum-builder:delete", label: "Curriculum Builder – Delete", group: "Curriculum Builder", action: "delete" },
 
   // Groups — a professional running a curriculum with a set of people.
   // Read/add/write belong to professionals and admins; delete is meant for
